@@ -5,12 +5,15 @@
   "description": "IHK Prüfungsübersicht – automatisierter Import und Datenplattform für §34a Sachkundeprüfung-Informationen",
   "license": "MIT",
   "workspaces": [
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "test": "npm -w backend test",
     "import:initial": "npm -w backend run import:initial",
     "db:generate": "npm -w backend run db:generate",
-    "db:migrate": "npm -w backend run db:migrate"
+    "db:migrate": "npm -w backend run db:migrate",
+    "dev:frontend": "npm -w frontend run dev",
+    "build:frontend": "npm -w frontend run build"
   }
 }
