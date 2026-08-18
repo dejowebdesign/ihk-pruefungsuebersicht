@@ -6,14 +6,32 @@ vi.mock("../src/importer/live-import", () => ({
   runLiveImport: vi.fn(),
 }));
 
+// Mock prisma so maybeInitialImport's "has prior SUCCESS run" check can be
+// exercised without a real database. The findFirst mock is reachable through
+// prisma().importRun.findFirst (the same path the scheduler uses).
+vi.mock("../src/db/prisma", () => {
+  const findFirst = vi.fn();
+  return {
+    prisma: () => ({ importRun: { findFirst } }),
+    disconnectPrisma: vi.fn(),
+  };
+});
+
 import { runLiveImport } from "../src/importer/live-import";
+import { prisma } from "../src/db/prisma";
 import {
   triggerImport,
   isImportRunning,
   importIntervalHours,
   startScheduler,
   stopScheduler,
+  maybeInitialImport,
 } from "../src/scheduler/scheduler";
+
+// Resolve the findFirst mock through the same prisma() path the scheduler uses.
+const findFirstMock = (prisma() as unknown as {
+  importRun: { findFirst: ReturnType<typeof vi.fn> };
+}).importRun.findFirst;
 
 describe("scheduler", () => {
   beforeEach(() => {
@@ -88,5 +106,39 @@ describe("scheduler", () => {
     const h3 = startScheduler();
     expect(h3).not.toBe(h);
     stopScheduler();
+  });
+});
+
+describe("maybeInitialImport (bootstrap)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    stopScheduler();
+    expect(isImportRunning()).toBe(false);
+  });
+
+  it("triggers an import when no prior SUCCESS run exists", async () => {
+    (runLiveImport as ReturnType<typeof vi.fn>).mockResolvedValue({
+      status: "SUCCESS",
+      sheetsImported: 85,
+    });
+    findFirstMock.mockResolvedValue(null); // empty DB
+    const result = await maybeInitialImport();
+    expect(findFirstMock).toHaveBeenCalledTimes(1);
+    expect(runLiveImport).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ status: "SUCCESS", sheetsImported: 85 });
+  });
+
+  it("skips the import when a SUCCESS run already exists", async () => {
+    findFirstMock.mockResolvedValue({ id: "existing", status: "SUCCESS" });
+    const result = await maybeInitialImport();
+    expect(runLiveImport).not.toHaveBeenCalled();
+    expect(result).toEqual({ skipped: true, reason: "data already present" });
+  });
+
+  it("does not crash when the availability check fails (defers to scheduler)", async () => {
+    findFirstMock.mockRejectedValue(new Error("db not ready"));
+    const result = await maybeInitialImport();
+    expect(runLiveImport).not.toHaveBeenCalled();
+    expect(result).toBeNull();
   });
 });

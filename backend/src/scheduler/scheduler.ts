@@ -65,6 +65,39 @@ export function stopScheduler(): void {
   }
 }
 
+/**
+ * Bootstrap: after a fresh deployment the database has no successful ImportRun,
+ * so all public read endpoints return 503 ("no data available yet") and would
+ * stay that way until the first 6h tick. To make a fresh deploy self-populate,
+ * trigger one import now when (and only when) no SUCCESS run exists yet.
+ *
+ * Fire-and-forget from the server entrypoint: the HTTP server starts immediately
+ * and data becomes available once this background import completes. Guarded by
+ * the same mutex as scheduled/admin imports, so it never races the scheduler.
+ * Retries naturally on the next start / next tick if it fails.
+ */
+export async function maybeInitialImport(): Promise<
+  ImportResult | { skipped: true; reason: string } | null
+> {
+  try {
+    const db = prisma();
+    const lastSuccess = await db.importRun.findFirst({
+      where: { status: "SUCCESS" },
+      orderBy: { startedAt: "desc" },
+    });
+    if (lastSuccess) {
+      return { skipped: true, reason: "data already present" };
+    }
+  } catch (e) {
+    // If the schema isn't pushed yet (e.g. entrypoint racing db push) or the DB
+    // is unreachable, defer to the scheduled tick rather than crashing startup.
+    console.error("Initial import availability check failed:", e);
+    return null;
+  }
+  console.log("No prior successful import — starting initial bootstrap import...");
+  return triggerImport();
+}
+
 /** Report current scheduler state (last success / last attempt / next run). */
 export async function schedulerStatus() {
   const db = prisma();

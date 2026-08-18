@@ -4,13 +4,22 @@
 
 import { serve } from "@hono/node-server";
 import { createApp } from "../api/app";
-import { startScheduler, stopScheduler } from "../scheduler/scheduler";
+import { maybeInitialImport, startScheduler, stopScheduler } from "../scheduler/scheduler";
 import { disconnectPrisma } from "../db/prisma";
 
 async function main() {
   const port = Number(process.env.PORT ?? 3000);
   const withScheduler = process.argv.includes("--with-scheduler");
-  if (withScheduler) startScheduler();
+  if (withScheduler) {
+    startScheduler();
+    // Bootstrap: populate the DB on a fresh deploy (no prior SUCCESS run) so
+    // the API stops returning 503 without waiting up to 6h for the first tick.
+    // Non-blocking — the HTTP server starts immediately and data appears once
+    // the background import finishes.
+    void maybeInitialImport().catch((e) =>
+      console.error("Initial import failed:", e),
+    );
+  }
 
   const app = createApp();
   serve({ fetch: app.fetch, port }, (info) => {

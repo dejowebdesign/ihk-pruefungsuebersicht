@@ -16,8 +16,10 @@ export interface LiveImportOptions extends GvizFetchOptions {
 
 /** Fetch all sheets via gviz and persist them as a new ImportRun. */
 export async function runLiveImport(opts: LiveImportOptions = {}) {
-  const sheetId = opts.sheetId ?? DEFAULT_SHEET_ID;
-  const sheets = await fetchAllSheets(opts);
+  // Allow GOOGLE_SHEET_ID to override the built-in default (the compose file
+  // declares it). An explicit opts.sheetId still wins (used by tests/ad-hoc).
+  const sheetId = opts.sheetId ?? process.env.GOOGLE_SHEET_ID ?? DEFAULT_SHEET_ID;
+  const sheets = await fetchAllSheets({ ...opts, sheetId });
   return persistImport(sheets, {
     source: "google-gviz",
     sourceRef: sheetId,
