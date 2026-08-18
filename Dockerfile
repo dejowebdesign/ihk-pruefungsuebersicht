@@ -13,8 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl \
 COPY backend/package.json backend/package-lock.json* ./backend/
 COPY package.json package-lock.json* ./
 
-# Install backend deps (including prisma CLI for generate).
-RUN npm install --omit=dev=false --workspace=ihk-pruefungsuebersicht || npm install
+# Install backend deps including devDependencies (prisma CLI + tsx are devDeps but
+# required at runtime for `prisma db push` and running tsx serve.ts). The backend
+# workspace is referenced by its package name "ihk-pruefungsuebersicht".
+# NB: do NOT use `--omit=dev=false` (invalid value — npm rejects/escalates it)
+# and do NOT mask failures with `|| npm install` (installs the whole frontend
+# tree and hides the real error). `--include=dev` is the correct, explicit flag.
+RUN npm install --workspace=ihk-pruefungsuebersicht --include=dev
 
 # Copy source and generate prisma client.
 COPY backend/ ./backend/
