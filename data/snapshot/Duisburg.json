@@ -1,0 +1,325 @@
+{
+  "sheetName": "Duisburg",
+  "gid": "682568670",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=682568670",
+  "cols": [
+    {
+      "id": "A",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      "IHK-STAMMDATEN",
+      "Bezirk",
+      "Duisburg, Wesel, Kleve",
+      null,
+      "Da die Niederrheinische IHK die Aufgabe der",
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Adresse",
+      "Mercatorstraße 22–24, 47051 Duisburg",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Niederrheinische Industrie- und Handelskammer ",
+      "Telefon",
+      "0203 2821-0",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Duisburg-Wesel-Kleve zu Duisburg",
+      "Website",
+      "https://www.ihk-niederrhein.de",
+      null,
+      " Unterrichtung und der Sachkundeprüfung nach §34a GewO",
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ansprechpartner SKP",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Nordrhein-Westfalen",
+      "Ansprechpartner SKP",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      " auf benachbarte Industrie- und Handelskammern übertragen hat, ",
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Prüfungsform",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Datenstand",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Letzte Aktualisierung",
+      null,
+      null,
+      "finden diese nicht in Duisburg statt.",
+      null,
+      null,
+      null
+    ],
+    [
+      "SCHRIFTLICHE PRÜFUNG",
+      "Medium",
+      null,
+      null,
+      "Sachkundeprüfung:",
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      "Industrie- und Handelskammer für Essen, Mülheim an der Ruhr, Oberhausen zu Essen",
+      null,
+      null,
+      null
+    ],
+    [
+      "ZEITLICHER ABLAUF",
+      "Gleicher Tag",
+      null,
+      null,
+      "Telefon: 0201 1892-430",
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Abstand schriftlich/mündlich",
+      null,
+      null,
+      "E-Mail: sfk@essen.ihk.de",
+      null,
+      null,
+      null
+    ],
+    [
+      "MÜNDLICHE PRÜFUNG",
+      "Prüfung vorhanden",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Prüferanzahl",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 26,
+  "numCols": 8,
+  "parsedNumHeaders": 0,
+  "warnings": null,
+  "errors": null
+}

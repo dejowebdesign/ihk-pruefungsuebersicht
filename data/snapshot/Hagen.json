@@ -1,0 +1,166 @@
+{
+  "sheetName": "Hagen",
+  "gid": "410744861",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=410744861",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Südwestfälische Industrie- und Handelskammer zu Hagen Nordrhein-Westfalen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Märkischer Kreis, Ennepe-Ruhr-Kreis, Stadt Hagen Bahnhofstraße 18, 58095 Hagen  02331 390-0 https://www.ihk.de/hagen/ ",
+      "type": "number",
+      "pattern": "General"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "Verweisen zur IHK Flensburg, zu Kiel und zu Lübeck ",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Südwestfälische Industrie- und Handelskammer zu Hagen Nordrhein-Westfalen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "Märkischer Kreis, Ennepe-Ruhr-Kreis, Stadt Hagen Bahnhofstraße 18, 58095 Hagen  02331 390-0 https://www.ihk.de/hagen/ ",
+    "",
+    "Verweisen zur IHK Flensburg, zu Kiel und zu Lübeck ",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      3.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 10,
+  "numCols": 8,
+  "parsedNumHeaders": 18,
+  "warnings": null,
+  "errors": null
+}

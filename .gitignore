@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.local
+# Never commit real secrets / API keys / tokens
+secrets.json
+*.pem
+*.key
+
+# Database & local data
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/data/*.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~
+
+# Test / coverage
+coverage/
+.nyc_output/

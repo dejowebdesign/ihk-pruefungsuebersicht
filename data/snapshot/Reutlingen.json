@@ -1,0 +1,150 @@
+{
+  "sheetName": "Reutlingen",
+  "gid": "670153500",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=670153500",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer Reutlingen Baden-Württemberg SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Landkreise Reutlingen, Tübingen, Zollernalbkreis Hindenburgstraße 54, 72762 Reutlingen 07121 201-0 ",
+      "type": "number",
+      "pattern": "General"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "Die IHK Reutlingen führt selbst keine Unterrichtungen und Prüfungen  zur Sachkunde nach § 34a Bewachungsgewerbe durch.  In der Umgebung bieten jedoch die I HK Bodensee-Oberschwaben und die  IHK Stuttgart  diese Leistungen an. ",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer Reutlingen Baden-Württemberg SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "Landkreise Reutlingen, Tübingen, Zollernalbkreis Hindenburgstraße 54, 72762 Reutlingen 07121 201-0 ",
+    "",
+    "Die IHK Reutlingen führt selbst keine Unterrichtungen und Prüfungen  zur Sachkunde nach § 34a Bewachungsgewerbe durch.  In der Umgebung bieten jedoch die I HK Bodensee-Oberschwaben und die  IHK Stuttgart  diese Leistungen an. ",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      3.0,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 10,
+  "numCols": 7,
+  "parsedNumHeaders": 18,
+  "warnings": null,
+  "errors": null
+}

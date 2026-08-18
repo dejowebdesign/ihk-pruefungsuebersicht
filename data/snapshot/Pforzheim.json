@@ -1,0 +1,166 @@
+{
+  "sheetName": "Pforzheim",
+  "gid": "538907654",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=538907654",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer Nordschwarzwald Baden-Württemberg SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "die Stadt Pforzheim sowie die drei angrenzenden Landkreise Calw,  Enzkreis und Freudenstadt  Dr.-Brandenburg-Straße 6, 75173 Pforzheim 07231 2010 https://www.ihk.de/nordschwarzwald/ ",
+      "type": "number",
+      "pattern": "General"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer Nordschwarzwald Baden-Württemberg SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "die Stadt Pforzheim sowie die drei angrenzenden Landkreise Calw,  Enzkreis und Freudenstadt  Dr.-Brandenburg-Straße 6, 75173 Pforzheim 07231 2010 https://www.ihk.de/nordschwarzwald/ ",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      3.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 10,
+  "numCols": 8,
+  "parsedNumHeaders": 19,
+  "warnings": null,
+  "errors": null
+}

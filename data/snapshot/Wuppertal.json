@@ -1,0 +1,166 @@
+{
+  "sheetName": "Wuppertal",
+  "gid": "1054092440",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=1054092440",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer  Wuppertal-Solingen-Remscheid Nordrhein-Westfalen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Bergisches Städtedreieck Heinrich-Kamp-Platz 2, 42103 Wuppertal 0202 2490-0 https://www.ihk.de/bergische/ Christine Haas 0202 2490 201 c.haas@bergische.ihk.de ",
+      "type": "number",
+      "pattern": "General"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "Die Bergsiche IHK Wuppertal-Solingen-Remscheid hat mit der IHK Düsseldorf  Kooperationsvereinbarungen getroffen. Anmeldungen zur Sachkundeprüfung  sind daher an die IHK Düsseldorf zu richten: Ansprechpartner für die Sachkundeprüfungen und die Unterrichtungsverfahren  ist das Kundencenter unter der Rufnummer 02 11 / 35 57- 0  oder per E-Mail unter kundencenter@duesseldorf.ihk.de ",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer  Wuppertal-Solingen-Remscheid Nordrhein-Westfalen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "Bergisches Städtedreieck Heinrich-Kamp-Platz 2, 42103 Wuppertal 0202 2490-0 https://www.ihk.de/bergische/ Christine Haas 0202 2490 201 c.haas@bergische.ihk.de ",
+    "",
+    "Die Bergsiche IHK Wuppertal-Solingen-Remscheid hat mit der IHK Düsseldorf  Kooperationsvereinbarungen getroffen. Anmeldungen zur Sachkundeprüfung  sind daher an die IHK Düsseldorf zu richten: Ansprechpartner für die Sachkundeprüfungen und die Unterrichtungsverfahren  ist das Kundencenter unter der Rufnummer 02 11 / 35 57- 0  oder per E-Mail unter kundencenter@duesseldorf.ihk.de ",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      3.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 10,
+  "numCols": 8,
+  "parsedNumHeaders": 18,
+  "warnings": null,
+  "errors": null
+}

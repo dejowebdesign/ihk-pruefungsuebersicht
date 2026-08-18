@@ -1,0 +1,689 @@
+{
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "totalSheets": 85,
+  "extracted": 85,
+  "failed": 0,
+  "sheets": [
+    {
+      "sheetName": "Übersicht",
+      "gid": "0",
+      "file": "Übersicht.json",
+      "rows": 82,
+      "cols": 37,
+      "ok": true
+    },
+    {
+      "sheetName": "Master_Fragen_Muendlich",
+      "gid": "765582598",
+      "file": "Master_Fragen_Muendlich.json",
+      "rows": 244,
+      "cols": 10,
+      "ok": true
+    },
+    {
+      "sheetName": "Master_TOP_Fallbeispiele",
+      "gid": "1589924716",
+      "file": "Master_TOP_Fallbeispiele.json",
+      "rows": 30,
+      "cols": 27,
+      "ok": true
+    },
+    {
+      "sheetName": "Häufige_Fehler",
+      "gid": "1556635097",
+      "file": "Häufige_Fehler.json",
+      "rows": 22,
+      "cols": 6,
+      "ok": true
+    },
+    {
+      "sheetName": "Aachen",
+      "gid": "267650592",
+      "file": "Aachen.json",
+      "rows": 51,
+      "cols": 9,
+      "ok": true
+    },
+    {
+      "sheetName": "Arnsberg",
+      "gid": "1787082584",
+      "file": "Arnsberg.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Aschaffenburg",
+      "gid": "1462760577",
+      "file": "Aschaffenburg.json",
+      "rows": 24,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Augsburg",
+      "gid": "179248877",
+      "file": "Augsburg.json",
+      "rows": 43,
+      "cols": 23,
+      "ok": true
+    },
+    {
+      "sheetName": "Bayreuth",
+      "gid": "214183557",
+      "file": "Bayreuth.json",
+      "rows": 24,
+      "cols": 13,
+      "ok": true
+    },
+    {
+      "sheetName": "Berlin",
+      "gid": "706414863",
+      "file": "Berlin.json",
+      "rows": 39,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Bielefeld",
+      "gid": "988591132",
+      "file": "Bielefeld.json",
+      "rows": 34,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Bochum",
+      "gid": "240585117",
+      "file": "Bochum.json",
+      "rows": 26,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Bonn",
+      "gid": "1407179101",
+      "file": "Bonn.json",
+      "rows": 59,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Braunschweig",
+      "gid": "1044941183",
+      "file": "Braunschweig.json",
+      "rows": 61,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Bremen/Bremerhaven",
+      "gid": "1018180555",
+      "file": "Bremen_Bremerhaven.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Chemnitz",
+      "gid": "1841631495",
+      "file": "Chemnitz.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Coburg",
+      "gid": "505810108",
+      "file": "Coburg.json",
+      "rows": 24,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Cottbus",
+      "gid": "1768517144",
+      "file": "Cottbus.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Darmstadt",
+      "gid": "142509815",
+      "file": "Darmstadt.json",
+      "rows": 25,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Detmold",
+      "gid": "1753944958",
+      "file": "Detmold.json",
+      "rows": 24,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Dortmund",
+      "gid": "1309319251",
+      "file": "Dortmund.json",
+      "rows": 43,
+      "cols": 26,
+      "ok": true
+    },
+    {
+      "sheetName": "Dresden",
+      "gid": "515223003",
+      "file": "Dresden.json",
+      "rows": 43,
+      "cols": 26,
+      "ok": true
+    },
+    {
+      "sheetName": "Duisburg",
+      "gid": "682568670",
+      "file": "Duisburg.json",
+      "rows": 26,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Düsseldorf",
+      "gid": "406361321",
+      "file": "Düsseldorf.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Emden/Ostfriesland",
+      "gid": "903743547",
+      "file": "Emden_Ostfriesland.json",
+      "rows": 46,
+      "cols": 9,
+      "ok": true
+    },
+    {
+      "sheetName": "Erfurt",
+      "gid": "300974628",
+      "file": "Erfurt.json",
+      "rows": 43,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Essen",
+      "gid": "1366835213",
+      "file": "Essen.json",
+      "rows": 43,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Flensburg",
+      "gid": "550329975",
+      "file": "Flensburg.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Frankfurt",
+      "gid": "1694588137",
+      "file": "Frankfurt.json",
+      "rows": 45,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Frankfurt.Oder",
+      "gid": "1194038106",
+      "file": "Frankfurt.Oder.json",
+      "rows": 38,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Freiburg",
+      "gid": "974640157",
+      "file": "Freiburg.json",
+      "rows": 47,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Fulda",
+      "gid": "384038141",
+      "file": "Fulda.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Gera",
+      "gid": "1740445563",
+      "file": "Gera.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Gießen",
+      "gid": "335653730",
+      "file": "Gießen.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Hagen",
+      "gid": "410744861",
+      "file": "Hagen.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Halle/Dessau",
+      "gid": "1700161050",
+      "file": "Halle_Dessau.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Hamburg",
+      "gid": "1924040116",
+      "file": "Hamburg.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Hanau",
+      "gid": "1589069707",
+      "file": "Hanau.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Hannover",
+      "gid": "362173009",
+      "file": "Hannover.json",
+      "rows": 47,
+      "cols": 26,
+      "ok": true
+    },
+    {
+      "sheetName": "Heidenheim",
+      "gid": "1774485645",
+      "file": "Heidenheim.json",
+      "rows": 35,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Heilbronn",
+      "gid": "983904606",
+      "file": "Heilbronn.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Konstanz",
+      "gid": "328739211",
+      "file": "Konstanz.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Karlsruhe",
+      "gid": "2025061607",
+      "file": "Karlsruhe.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Kassel",
+      "gid": "1359851359",
+      "file": "Kassel.json",
+      "rows": 40,
+      "cols": 26,
+      "ok": true
+    },
+    {
+      "sheetName": "Kiel",
+      "gid": "1268883543",
+      "file": "Kiel.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Koblenz",
+      "gid": "1362884834",
+      "file": "Koblenz.json",
+      "rows": 43,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Köln",
+      "gid": "644716761",
+      "file": "Köln.json",
+      "rows": 43,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Krefeld",
+      "gid": "325834858",
+      "file": "Krefeld.json",
+      "rows": 10,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Lahn-Dill",
+      "gid": "629552170",
+      "file": "Lahn-Dill.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Leipzig",
+      "gid": "619999814",
+      "file": "Leipzig.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Limburg",
+      "gid": "11908524",
+      "file": "Limburg.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Lübeck",
+      "gid": "1183336096",
+      "file": "Lübeck.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Ludwigshafen",
+      "gid": "2045832404",
+      "file": "Ludwigshafen.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Lüneburg/Wolfsburg",
+      "gid": "1485350542",
+      "file": "Lüneburg_Wolfsburg.json",
+      "rows": 35,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Magdeburg",
+      "gid": "606230942",
+      "file": "Magdeburg.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Mainz",
+      "gid": "1264004128",
+      "file": "Mainz.json",
+      "rows": 42,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "München",
+      "gid": "1291433490",
+      "file": "München.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Münster",
+      "gid": "2133563353",
+      "file": "Münster.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Gelsenkirchen",
+      "gid": "1037922905",
+      "file": "Gelsenkirchen.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Neubrandenburg",
+      "gid": "620736815",
+      "file": "Neubrandenburg.json",
+      "rows": 45,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Nürnberg",
+      "gid": "33301305",
+      "file": "Nürnberg.json",
+      "rows": 40,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Offenbach",
+      "gid": "1072931286",
+      "file": "Offenbach.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Oldenburg",
+      "gid": "2068099136",
+      "file": "Oldenburg.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Osnabrück",
+      "gid": "113001780",
+      "file": "Osnabrück.json",
+      "rows": 36,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Passau",
+      "gid": "1824801748",
+      "file": "Passau.json",
+      "rows": 41,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Pforzheim",
+      "gid": "538907654",
+      "file": "Pforzheim.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Potsdam",
+      "gid": "353643835",
+      "file": "Potsdam.json",
+      "rows": 38,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Regensburg",
+      "gid": "1086354403",
+      "file": "Regensburg.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Reutlingen",
+      "gid": "670153500",
+      "file": "Reutlingen.json",
+      "rows": 10,
+      "cols": 7,
+      "ok": true
+    },
+    {
+      "sheetName": "Mannheim",
+      "gid": "2115745937",
+      "file": "Mannheim.json",
+      "rows": 44,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Rostock",
+      "gid": "991389365",
+      "file": "Rostock.json",
+      "rows": 38,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Saarbrücken",
+      "gid": "107378414",
+      "file": "Saarbrücken.json",
+      "rows": 38,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Schwerin",
+      "gid": "1807282361",
+      "file": "Schwerin.json",
+      "rows": 36,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Siegen",
+      "gid": "24868311",
+      "file": "Siegen.json",
+      "rows": 16,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Stade",
+      "gid": "2135146639",
+      "file": "Stade.json",
+      "rows": 36,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Stuttgart",
+      "gid": "1221546643",
+      "file": "Stuttgart.json",
+      "rows": 45,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Suhl",
+      "gid": "1552118357",
+      "file": "Suhl.json",
+      "rows": 35,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Trier",
+      "gid": "1100213637",
+      "file": "Trier.json",
+      "rows": 37,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Ulm",
+      "gid": "1228801727",
+      "file": "Ulm.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Villingen-Schwenningen",
+      "gid": "2012766181",
+      "file": "Villingen-Schwenningen.json",
+      "rows": 36,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Weingarten",
+      "gid": "507631223",
+      "file": "Weingarten.json",
+      "rows": 36,
+      "cols": 12,
+      "ok": true
+    },
+    {
+      "sheetName": "Wiesbaden",
+      "gid": "1836041803",
+      "file": "Wiesbaden.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Wuppertal",
+      "gid": "1054092440",
+      "file": "Wuppertal.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "Würzburg",
+      "gid": "143260539",
+      "file": "Würzburg.json",
+      "rows": 10,
+      "cols": 8,
+      "ok": true
+    },
+    {
+      "sheetName": "VSW_Mainz",
+      "gid": "1100327178",
+      "file": "VSW_Mainz.json",
+      "rows": 32,
+      "cols": 7,
+      "ok": true
+    }
+  ],
+  "failures": []
+}

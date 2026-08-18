@@ -1,0 +1,577 @@
+{
+  "sheetName": "Emden/Ostfriesland",
+  "gid": "903743547",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=903743547",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer für Ostfriesland und Papenburg Niedersachsen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Ostfriesland und Papenburg Ringstraße 4, 26721 Emden 04921 8901-0 https://www.ihk-emden.de Astrid Janssen , Meike Westerman 04921 8901-638 , 04921 8901-631 astrid.janssen@emden.ihk.de , meike.westerman@emden.ihk.de Kombi (schriftlich + mündlich) Papierform ja nein 5-7 Tage ja",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "📌 DATENSTATUS ✔ Mehrere reale Berichte ✔ Struktur mehrfach bestätigt ✔ Hohe Validität ",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "Top 5 Schwerpunktbereiche Fallbeispiel (entscheidend!) Notwehr / Nothilfe Festnahmerecht BGB – Selbsthilfe DGUV Top 25 Prüfungsfragen (Trendgewichtung) Notwehrsatz Unterschied Notwehr / Nothilfe Allgemeine Selbsthilfe Selbsthilfe des Besitzers §127 StPO Wann darf man festhalten? Hausfriedensbruch Deliktsaufbau Vergehen vs Verbrechen Besitz / Eigentum",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "I",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer für Ostfriesland und Papenburg Niedersachsen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "Ostfriesland und Papenburg Ringstraße 4, 26721 Emden 04921 8901-0 https://www.ihk-emden.de Astrid Janssen , Meike Westerman 04921 8901-638 , 04921 8901-631 astrid.janssen@emden.ihk.de , meike.westerman@emden.ihk.de Kombi (schriftlich + mündlich) Papierform ja nein 5-7 Tage ja",
+    "📌 DATENSTATUS ✔ Mehrere reale Berichte ✔ Struktur mehrfach bestätigt ✔ Hohe Validität ",
+    "",
+    "",
+    "Top 5 Schwerpunktbereiche Fallbeispiel (entscheidend!) Notwehr / Nothilfe Festnahmerecht BGB – Selbsthilfe DGUV Top 25 Prüfungsfragen (Trendgewichtung) Notwehrsatz Unterschied Notwehr / Nothilfe Allgemeine Selbsthilfe Selbsthilfe des Besitzers §127 StPO Wann darf man festhalten? Hausfriedensbruch Deliktsaufbau Vergehen vs Verbrechen Besitz / Eigentum",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      "3",
+      null,
+      null,
+      null,
+      "Verbotene Eigenmacht",
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      "3er Gruppe",
+      null,
+      null,
+      null,
+      "Jedermannsrechte",
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      "ja",
+      null,
+      null,
+      null,
+      "Voraussetzungen §34a",
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      "RdöSuO, GewO/BewachV, Datenschutz, BGB, StGB/StPO, DGUV, UmW, UmM, S.Technik",
+      null,
+      null,
+      null,
+      "GewO / BewachV",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "DGUV V1",
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      "ja",
+      null,
+      null,
+      null,
+      "DGUV V23",
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      "nein",
+      null,
+      null,
+      null,
+      "Drei Säulen der Sicherheit",
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      "nein",
+      null,
+      null,
+      null,
+      "Brandklassen",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Panik",
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      "je Thema eine Frage + abschließend entscheidendes Fallbeispiel",
+      null,
+      null,
+      null,
+      "Konflikt",
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      "sehr Definitionslastig",
+      null,
+      null,
+      null,
+      "Deeskalation",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Interkulturelle Kompetenz",
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      "streng, aber hilfsbereit",
+      null,
+      null,
+      null,
+      "Dienstausweis",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Datenschutz – personenbezogene Daten",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Tätigkeiten mit Sachkunde",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Top 5 Fallbeispiele (Trend Emden)",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Weihnachtsmarkt – Kind stiehlt Geldbörse",
+      null,
+      null
+    ],
+    [
+      "Themengebiet",
+      "Risiko",
+      "Begründung",
+      "Legende",
+      null,
+      null,
+      "→ richtige Lösung: Nothilfe (nicht Selbsthilfe!)",
+      null,
+      null
+    ],
+    [
+      "Themengebiet",
+      "Risiko",
+      "Begründung",
+      "🟢 1 = sehr gering",
+      null,
+      null,
+      "Ladendetektiv – Diebstahl",
+      null,
+      null
+    ],
+    [
+      "RdöSuO",
+      "🟠 3",
+      "Rechtsbereiche regelmäßig",
+      null,
+      null,
+      null,
+      "Einlasskontrolle – aggressive Person",
+      null,
+      null
+    ],
+    [
+      "GewO / BewachV",
+      "🟠 3",
+      "Voraussetzungen wichtig",
+      "🟡 2 = gering–mittel",
+      null,
+      null,
+      "Hausverbot durchsetzen",
+      null,
+      null
+    ],
+    [
+      "Datenschutz",
+      "🟡 2",
+      "Basis",
+      null,
+      null,
+      null,
+      "Betrunkene Person im Objekt",
+      null,
+      null
+    ],
+    [
+      "BGB",
+      "🔴 4",
+      "Selbsthilfe stark relevant",
+      "🟠 3 = mittel",
+      null,
+      null,
+      "In Emden entscheidet das Fallbeispiel.",
+      null,
+      null
+    ],
+    [
+      "Straf- & Verfahrensrecht",
+      "🔴 4",
+      "Notwehr + Festnahme",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "DGUV",
+      "🟠 3",
+      "V1 + V23",
+      "🔴 4 = hoch",
+      null,
+      null,
+      "Typische Fehler",
+      null,
+      null
+    ],
+    [
+      "UmM",
+      "🟠 3",
+      "Konflikte",
+      null,
+      null,
+      null,
+      "❌ Selbsthilfe statt Nothilfe",
+      null,
+      null
+    ],
+    [
+      "UmW",
+      "🟡 2",
+      "Basis",
+      "🔴🔴 5 = sehr hoch / Durchfalltreiber",
+      null,
+      null,
+      "❌ §127 falsch angewendet",
+      null,
+      null
+    ],
+    [
+      "Sicherheitstechnik",
+      "🟡 2",
+      "Grundwissen",
+      null,
+      null,
+      null,
+      "❌ Fallbeispiel nicht juristisch gelöst",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "❌ Verhältnismäßigkeit nicht geprüft",
+      null,
+      null
+    ],
+    [
+      "Risikostufe: ",
+      "🔴 Mittel–hoch (4.0 / 5)",
+      null,
+      null,
+      null,
+      null,
+      "❌ Straftatbestand nicht benannt",
+      null,
+      null
+    ],
+    [
+      "Bereich",
+      "Gewichtung",
+      "📈 TRENDENTWICKLUNG",
+      null,
+      null,
+      null,
+      "KO-Risiken",
+      null,
+      null
+    ],
+    [
+      "Strafrecht",
+      "🔴🔴🔴🔴",
+      "Exakte Definitionen erwartet",
+      null,
+      null,
+      null,
+      "🔴 Fallbeispiel falsch bewertet",
+      null,
+      null
+    ],
+    [
+      "BGB",
+      "🔴🔴🔴",
+      "Keine großzügige Auslegung",
+      null,
+      null,
+      null,
+      "🔴 Nothilfe und Selbsthilfe verwechselt",
+      null,
+      null
+    ],
+    [
+      "GewO",
+      "🔴🔴",
+      "Fallbeispiel zentral",
+      null,
+      null,
+      null,
+      "🔴 Straftat nicht korrekt benannt",
+      null,
+      null
+    ],
+    [
+      "DGUV",
+      "🔴🔴",
+      "Fehler im Rechtsgrundlagenbereich kritisch",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Umgang mit Menschen",
+      "🔴",
+      "Wenig „Plauderstil“",
+      null,
+      null,
+      null,
+      "Emden ist einer der wenigen Standorte mit faktischem „Fallbeispiel-KO“.",
+      null,
+      null
+    ],
+    [
+      "Technik",
+      "🔴",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Prüfungsraum-Strategie",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Fallbeispiel immer juristisch lösen:",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "→ Straftat",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "→ Rechtsgrundlage",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "→ Maßnahme",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "→ Verhältnismäßigkeit",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Begriffe sauber verwenden",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Keine Vermutungen",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Emden prüft sehr konkret – nicht philosophisch.",
+      null,
+      null
+    ]
+  ],
+  "numRows": 46,
+  "numCols": 9,
+  "parsedNumHeaders": 18,
+  "warnings": null,
+  "errors": null
+}

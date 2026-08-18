@@ -1,0 +1,16 @@
+{
+  "name": "ihk-pruefungsuebersicht-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "IHK Prüfungsübersicht – automatisierter Import und Datenplattform für §34a Sachkundeprüfung-Informationen",
+  "license": "MIT",
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "test": "npm -w backend test",
+    "import:initial": "npm -w backend run import:initial",
+    "db:generate": "npm -w backend run db:generate",
+    "db:migrate": "npm -w backend run db:migrate"
+  }
+}

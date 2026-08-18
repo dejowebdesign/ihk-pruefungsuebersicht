@@ -1,0 +1,239 @@
+// IHK Prüfungsübersicht – Prisma schema (SQLite, PostgreSQL-ready)
+//
+// Design principles:
+// - Raw data is always preserved (IhkRawRow / Sheet.rawRowsJson) so that no
+//   information is lost when a city register has a different layout.
+// - Normalized IHK location data is derived ONLY from the "Übersicht" sheet,
+//   which has consistent columns for all IHKs.
+// - City-register semantics are stored separately and best-effort only.
+// - Unknown values are stored as NULL, never guessed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // Relative to backend/prisma/. Override via DATABASE_URL for Postgres later.
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: SQLite does not support Prisma enums. To stay PostgreSQL-ready, the
+// allowed values are documented here and enforced in the importer. Allowed
+// values: ImportStatus = RUNNING|SUCCESS|PARTIAL|FAILED;
+// SheetType = OVERVIEW|MASTER_QUESTIONS|MASTER_CASES|FREQUENT_ERRORS|IHK|UNKNOWN.
+
+model ImportRun {
+  id                String      @id @default(cuid())
+  startedAt         DateTime    @default(now())
+  finishedAt        DateTime?
+  status            String     @default("RUNNING") // ImportStatus enum values
+  source            String      // "snapshot" | "google-gviz"
+  sourceRef         String?    // e.g. sheetId or snapshot dir
+  sheetsDetected    Int        @default(0)
+  sheetsImported    Int        @default(0)
+  sheetFailures     Int        @default(0)
+  dataRecords       Int        @default(0)
+  ihkLocations      Int        @default(0)
+  questions         Int        @default(0)
+  caseExamples      Int        @default(0)
+  changeCount       Int        @default(0)
+  errors            String?    // concatenated error messages
+  snapshotVersion   String?    // optional human-readable version tag
+
+  sheets            Sheet[]
+  changeRecords     ChangeRecord[]
+  ihkLocationsRel   IhkLocation[]
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Sheet {
+  id            String     @id @default(cuid())
+  importRunId   String
+  importRun     ImportRun  @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+  gid           String     // Google sheet gid (or "" for gid=0)
+  originalName  String     // exact original register name (Umlauts preserved)
+  sheetType     String     @default("UNKNOWN") // SheetType enum values
+  orderIndex    Int        // original order from manifest
+  rowCount      Int        @default(0)
+  colCount      Int        @default(0)
+  headers       String     // JSON array of header labels
+  rawRowsJson   String     // JSON array of raw rows (full original data)
+  parsedAt      DateTime   @default(now())
+
+  ihkLocations  IhkLocation[]
+  rawRows       IhkRawRow[]
+  semantics     IhkSemantics[]
+  questions     Question[]
+  caseExamples  CaseExample[]
+
+  @@unique([importRunId, originalName])
+  @@index([gid])
+  @@index([sheetType])
+}
+
+// Normalized IHK location — derived ONLY from the "Übersicht" sheet.
+// Columns follow the Übersicht header order (see importer).
+model IhkLocation {
+  id                       String    @id @default(cuid())
+  importRunId              String
+  importRun                ImportRun @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+  sourceSheetId            String    // many IHK locations derive from one Übersicht sheet
+  sourceSheet              Sheet     @relation(fields: [sourceSheetId], references: [id], onDelete: Cascade)
+  sourceRowNumber          Int       // 1-based row in Übersicht
+
+  // Identity
+  nr                       Int?      // "Nr." column (1..81)
+  ihkShortName             String    @unique // "IHK_Kurzform" e.g. "Aachen"
+  officialName             String?   // "IHK_Offizieller_Name"
+
+  // Exam attributes (NULL = unknown / not provided in source)
+  skp                      String?   // "SKP" (✅ / ❌)
+  bundesland               String?   // "Bundesland"
+  writtenForm              String?   // "Schriftliche_Form" (Laptop/PC, Tablet, Papierform, unbekannt)
+  writtenResultImmediate   String?   // "Schriftliche_Ergebnis_sofort" (ja/nein)
+  sameDay                  String?   // "Gleicher_Tag"
+  intervalWrittenOral      String?   // "Abstand"
+  examinerCount            String?   // "Anzahl Prüfer" (kept as string to preserve "3"/"5")
+  groupFormat              String?   // "Einzel / Gruppe"
+  fallbeispiel             String?   // "Fallbeispiel"
+  koFallbeispiel           String?   // "KO-Fallbeispiel"
+  punktesystem             String?   // "Punktesystem"
+  vorbereitung             String?   // "Vorbereitung"
+  notizen                  String?   // "Notizen"
+  dataState                String?   // "Datenstand"
+  lastUpdatedRaw           String?   // "letzte_ Aktualisierung" (raw, may be gviz Date() string)
+
+  // Contact / location block (Übersicht cols 29..36)
+  bezirk                   String?
+  adresse                  String?
+  telefon                  String?
+  website                  String?
+  ansprechpartner          String?
+  durchwahl                String?
+  email                    String?
+  routeUrl                 String?
+
+  changeRecords            ChangeRecord[]
+  semantics                IhkSemantics[]
+  questions                Question[]
+  caseExamples              CaseExample[]
+
+  @@index([bundesland])
+  @@index([ihkShortName])
+  @@index([sourceSheetId])
+}
+
+// Master_Fragen_Muendlich — 244 rows, 10 cols.
+// Columns: ID, Kategorie, Frage, Prüferantwort, Rechtslehre,
+// Schwierigkeit(1-5), Cluster, Folgefrage 1, Folgefrage 2, "Spalte 4"
+model Question {
+  id            String    @id @default(cuid())
+  importRunId   String
+  sourceSheetId String
+  sourceSheet   Sheet     @relation(fields: [sourceSheetId], references: [id], onDelete: Cascade)
+  sourceRowNumber Int
+  ihkLocationId String?
+  ihkLocation   IhkLocation? @relation(fields: [ihkLocationId], references: [id], onDelete: SetNull)
+
+  masterId      String?    // "ID" column (1..100 where present)
+  category      String?    // "Kategorie"
+  question      String     // "Frage"
+  answer        String?    // "Prüferantwort (kompakt & prüfungssicher)"
+  legalBasis    String?    // "Rechtslehre"
+  difficulty    String?    // "Schwierigkeit (1-5)" (kept as string)
+  cluster       String?    // "Cluster"
+  followUp1     String?    // "Folgefrage 1"
+  followUp2     String?    // "Folgefrage 2"
+  extraCol      String?    // "Spalte 4" (raw, semantics unknown)
+
+  changeRecords ChangeRecord[]
+  @@index([sourceSheetId])
+  @@index([ihkLocationId])
+}
+
+// Master_TOP_Fallbeispiele — 30 rows, 27 cols (cols 12..27 empty).
+// Cols: Column11(=ID), Kategorie, Fallbeispiel, Perfekt ausformulierte Antwort,
+// Rechtslehre, Schwierigkeitsgrad, Cluster, Folgefrage 1, Antwort Folgefrage 1,
+// Folgefrage 2, Antwort Folgefrage 2, [16 empty cols]
+model CaseExample {
+  id            String    @id @default(cuid())
+  importRunId   String
+  sourceSheetId String
+  sourceSheet   Sheet     @relation(fields: [sourceSheetId], references: [id], onDelete: Cascade)
+  sourceRowNumber Int
+  ihkLocationId String?
+  ihkLocation   IhkLocation? @relation(fields: [ihkLocationId], references: [id], onDelete: SetNull)
+
+  masterId      String?
+  category      String?
+  scenario      String     // "Fallbeispiel"
+  perfectAnswer String?    // "Perfekt ausformulierte Antwort"
+  legalBasis    String?
+  difficulty    String?
+  cluster       String?
+  followUp1     String?
+  answer1       String?
+  followUp2     String?
+  answer2       String?
+
+  changeRecords ChangeRecord[]
+  @@index([sourceSheetId])
+  @@index([ihkLocationId])
+}
+
+// Original rows of every sheet, preserved verbatim (no normalization loss).
+model IhkRawRow {
+  id            String   @id @default(cuid())
+  sheetId       String
+  sheet         Sheet    @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+  rowIndex      Int      // 0-based data row index within the sheet
+  rowJson       String   // JSON array of cell values (null included)
+
+  @@index([sheetId, rowIndex])
+}
+
+// Best-effort per-IHK semantics derived from the city registers.
+// Only fields that are safely derivable are stored; everything else is NULL.
+model IhkSemantics {
+  id            String   @id @default(cuid())
+  sheetId       String
+  sheet         Sheet    @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+  ihkLocationId String?
+  ihkLocation   IhkLocation? @relation(fields: [ihkLocationId], references: [id], onDelete: SetNull)
+  field         String   // e.g. "Medium", "Ergebnis sofort", "Prüferanzahl"
+  value         String?  // raw value, NULL if not safely derivable
+  sourceRowNumber Int?
+
+  @@unique([sheetId, field])
+  @@index([ihkLocationId])
+}
+
+// Change tracking prepared for later phases; populated only on diffs.
+model ChangeRecord {
+  id            String    @id @default(cuid())
+  importRunId   String
+  importRun     ImportRun @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+  detectedAt    DateTime  @default(now())
+  entityType    String    // "IhkLocation" | "Question" | "CaseExample" | "Sheet"
+  entityId      String    // id of the affected entity
+  sheetName     String?
+  rowId         String?
+  field         String
+  oldValue      String?
+  newValue      String?
+
+  ihkLocationId String?
+  ihkLocation   IhkLocation? @relation(fields: [ihkLocationId], references: [id], onDelete: Cascade)
+
+  questionId    String?
+  question      Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  caseExampleId String?
+  caseExample   CaseExample? @relation(fields: [caseExampleId], references: [id], onDelete: Cascade)
+
+  @@index([importRunId])
+  @@index([entityType, entityId])
+}

@@ -1,0 +1,512 @@
+[
+  {
+    "sheetName": "Übersicht",
+    "json_rows": 82,
+    "json_cols": 37,
+    "tab_title": "Übersicht"
+  },
+  {
+    "sheetName": "Master_Fragen_Muendlich",
+    "json_rows": 244,
+    "json_cols": 10,
+    "tab_title": "Master_Fragen_Muendlich"
+  },
+  {
+    "sheetName": "Master_TOP_Fallbeispiele",
+    "json_rows": 30,
+    "json_cols": 27,
+    "tab_title": "Master_TOP_Fallbeispiele"
+  },
+  {
+    "sheetName": "Häufige_Fehler",
+    "json_rows": 22,
+    "json_cols": 6,
+    "tab_title": "Häufige_Fehler"
+  },
+  {
+    "sheetName": "Aachen",
+    "json_rows": 51,
+    "json_cols": 9,
+    "tab_title": "Aachen"
+  },
+  {
+    "sheetName": "Arnsberg",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Arnsberg"
+  },
+  {
+    "sheetName": "Aschaffenburg",
+    "json_rows": 24,
+    "json_cols": 8,
+    "tab_title": "Aschaffenburg"
+  },
+  {
+    "sheetName": "Augsburg",
+    "json_rows": 43,
+    "json_cols": 23,
+    "tab_title": "Augsburg"
+  },
+  {
+    "sheetName": "Bayreuth",
+    "json_rows": 24,
+    "json_cols": 13,
+    "tab_title": "Bayreuth"
+  },
+  {
+    "sheetName": "Berlin",
+    "json_rows": 39,
+    "json_cols": 12,
+    "tab_title": "Berlin"
+  },
+  {
+    "sheetName": "Bielefeld",
+    "json_rows": 34,
+    "json_cols": 12,
+    "tab_title": "Bielefeld"
+  },
+  {
+    "sheetName": "Bochum",
+    "json_rows": 26,
+    "json_cols": 8,
+    "tab_title": "Bochum"
+  },
+  {
+    "sheetName": "Bonn",
+    "json_rows": 59,
+    "json_cols": 12,
+    "tab_title": "Bonn"
+  },
+  {
+    "sheetName": "Braunschweig",
+    "json_rows": 61,
+    "json_cols": 12,
+    "tab_title": "Braunschweig"
+  },
+  {
+    "sheetName": "Bremen/Bremerhaven",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Bremen／Bremerhaven"
+  },
+  {
+    "sheetName": "Chemnitz",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Chemnitz"
+  },
+  {
+    "sheetName": "Coburg",
+    "json_rows": 24,
+    "json_cols": 8,
+    "tab_title": "Coburg"
+  },
+  {
+    "sheetName": "Cottbus",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Cottbus"
+  },
+  {
+    "sheetName": "Darmstadt",
+    "json_rows": 25,
+    "json_cols": 8,
+    "tab_title": "Darmstadt"
+  },
+  {
+    "sheetName": "Detmold",
+    "json_rows": 24,
+    "json_cols": 8,
+    "tab_title": "Detmold"
+  },
+  {
+    "sheetName": "Dortmund",
+    "json_rows": 43,
+    "json_cols": 26,
+    "tab_title": "Dortmund"
+  },
+  {
+    "sheetName": "Dresden",
+    "json_rows": 43,
+    "json_cols": 26,
+    "tab_title": "Dresden"
+  },
+  {
+    "sheetName": "Duisburg",
+    "json_rows": 26,
+    "json_cols": 8,
+    "tab_title": "Duisburg"
+  },
+  {
+    "sheetName": "Düsseldorf",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Düsseldorf"
+  },
+  {
+    "sheetName": "Emden/Ostfriesland",
+    "json_rows": 46,
+    "json_cols": 9,
+    "tab_title": "Emden／Ostfriesland"
+  },
+  {
+    "sheetName": "Erfurt",
+    "json_rows": 43,
+    "json_cols": 12,
+    "tab_title": "Erfurt"
+  },
+  {
+    "sheetName": "Essen",
+    "json_rows": 43,
+    "json_cols": 12,
+    "tab_title": "Essen"
+  },
+  {
+    "sheetName": "Flensburg",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Flensburg"
+  },
+  {
+    "sheetName": "Frankfurt",
+    "json_rows": 45,
+    "json_cols": 12,
+    "tab_title": "Frankfurt"
+  },
+  {
+    "sheetName": "Frankfurt.Oder",
+    "json_rows": 38,
+    "json_cols": 12,
+    "tab_title": "Frankfurt.Oder"
+  },
+  {
+    "sheetName": "Freiburg",
+    "json_rows": 47,
+    "json_cols": 12,
+    "tab_title": "Freiburg"
+  },
+  {
+    "sheetName": "Fulda",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Fulda"
+  },
+  {
+    "sheetName": "Gera",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Gera"
+  },
+  {
+    "sheetName": "Gießen",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Gießen"
+  },
+  {
+    "sheetName": "Hagen",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Hagen"
+  },
+  {
+    "sheetName": "Halle/Dessau",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Halle／Dessau"
+  },
+  {
+    "sheetName": "Hamburg",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Hamburg"
+  },
+  {
+    "sheetName": "Hanau",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Hanau"
+  },
+  {
+    "sheetName": "Hannover",
+    "json_rows": 47,
+    "json_cols": 26,
+    "tab_title": "Hannover"
+  },
+  {
+    "sheetName": "Heidenheim",
+    "json_rows": 35,
+    "json_cols": 12,
+    "tab_title": "Heidenheim"
+  },
+  {
+    "sheetName": "Heilbronn",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Heilbronn"
+  },
+  {
+    "sheetName": "Konstanz",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Konstanz"
+  },
+  {
+    "sheetName": "Karlsruhe",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Karlsruhe"
+  },
+  {
+    "sheetName": "Kassel",
+    "json_rows": 40,
+    "json_cols": 26,
+    "tab_title": "Kassel"
+  },
+  {
+    "sheetName": "Kiel",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Kiel"
+  },
+  {
+    "sheetName": "Koblenz",
+    "json_rows": 43,
+    "json_cols": 12,
+    "tab_title": "Koblenz"
+  },
+  {
+    "sheetName": "Köln",
+    "json_rows": 43,
+    "json_cols": 12,
+    "tab_title": "Köln"
+  },
+  {
+    "sheetName": "Krefeld",
+    "json_rows": 10,
+    "json_cols": 12,
+    "tab_title": "Krefeld"
+  },
+  {
+    "sheetName": "Lahn-Dill",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Lahn-Dill"
+  },
+  {
+    "sheetName": "Leipzig",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Leipzig"
+  },
+  {
+    "sheetName": "Limburg",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Limburg"
+  },
+  {
+    "sheetName": "Lübeck",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Lübeck"
+  },
+  {
+    "sheetName": "Ludwigshafen",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Ludwigshafen"
+  },
+  {
+    "sheetName": "Lüneburg/Wolfsburg",
+    "json_rows": 35,
+    "json_cols": 12,
+    "tab_title": "Lüneburg／Wolfsburg"
+  },
+  {
+    "sheetName": "Magdeburg",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Magdeburg"
+  },
+  {
+    "sheetName": "Mainz",
+    "json_rows": 42,
+    "json_cols": 12,
+    "tab_title": "Mainz"
+  },
+  {
+    "sheetName": "München",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "München"
+  },
+  {
+    "sheetName": "Münster",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Münster"
+  },
+  {
+    "sheetName": "Gelsenkirchen",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Gelsenkirchen"
+  },
+  {
+    "sheetName": "Neubrandenburg",
+    "json_rows": 45,
+    "json_cols": 12,
+    "tab_title": "Neubrandenburg"
+  },
+  {
+    "sheetName": "Nürnberg",
+    "json_rows": 40,
+    "json_cols": 12,
+    "tab_title": "Nürnberg"
+  },
+  {
+    "sheetName": "Offenbach",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Offenbach"
+  },
+  {
+    "sheetName": "Oldenburg",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Oldenburg"
+  },
+  {
+    "sheetName": "Osnabrück",
+    "json_rows": 36,
+    "json_cols": 12,
+    "tab_title": "Osnabrück"
+  },
+  {
+    "sheetName": "Passau",
+    "json_rows": 41,
+    "json_cols": 12,
+    "tab_title": "Passau"
+  },
+  {
+    "sheetName": "Pforzheim",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Pforzheim"
+  },
+  {
+    "sheetName": "Potsdam",
+    "json_rows": 38,
+    "json_cols": 12,
+    "tab_title": "Potsdam"
+  },
+  {
+    "sheetName": "Regensburg",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Regensburg"
+  },
+  {
+    "sheetName": "Reutlingen",
+    "json_rows": 10,
+    "json_cols": 7,
+    "tab_title": "Reutlingen"
+  },
+  {
+    "sheetName": "Mannheim",
+    "json_rows": 44,
+    "json_cols": 12,
+    "tab_title": "Mannheim"
+  },
+  {
+    "sheetName": "Rostock",
+    "json_rows": 38,
+    "json_cols": 12,
+    "tab_title": "Rostock"
+  },
+  {
+    "sheetName": "Saarbrücken",
+    "json_rows": 38,
+    "json_cols": 12,
+    "tab_title": "Saarbrücken"
+  },
+  {
+    "sheetName": "Schwerin",
+    "json_rows": 36,
+    "json_cols": 12,
+    "tab_title": "Schwerin"
+  },
+  {
+    "sheetName": "Siegen",
+    "json_rows": 16,
+    "json_cols": 8,
+    "tab_title": "Siegen"
+  },
+  {
+    "sheetName": "Stade",
+    "json_rows": 36,
+    "json_cols": 12,
+    "tab_title": "Stade"
+  },
+  {
+    "sheetName": "Stuttgart",
+    "json_rows": 45,
+    "json_cols": 12,
+    "tab_title": "Stuttgart"
+  },
+  {
+    "sheetName": "Suhl",
+    "json_rows": 35,
+    "json_cols": 12,
+    "tab_title": "Suhl"
+  },
+  {
+    "sheetName": "Trier",
+    "json_rows": 37,
+    "json_cols": 12,
+    "tab_title": "Trier"
+  },
+  {
+    "sheetName": "Ulm",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Ulm"
+  },
+  {
+    "sheetName": "Villingen-Schwenningen",
+    "json_rows": 36,
+    "json_cols": 12,
+    "tab_title": "Villingen-Schwenningen"
+  },
+  {
+    "sheetName": "Weingarten",
+    "json_rows": 36,
+    "json_cols": 12,
+    "tab_title": "Weingarten"
+  },
+  {
+    "sheetName": "Wiesbaden",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Wiesbaden"
+  },
+  {
+    "sheetName": "Wuppertal",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Wuppertal"
+  },
+  {
+    "sheetName": "Würzburg",
+    "json_rows": 10,
+    "json_cols": 8,
+    "tab_title": "Würzburg"
+  },
+  {
+    "sheetName": "VSW_Mainz",
+    "json_rows": 32,
+    "json_cols": 7,
+    "tab_title": "VSW_Mainz"
+  }
+]

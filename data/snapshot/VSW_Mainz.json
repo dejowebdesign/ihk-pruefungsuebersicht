@@ -1,0 +1,347 @@
+{
+  "sheetName": "VSW_Mainz",
+  "gid": "1100327178",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=1100327178",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Verband für Sicherheit in der Wirtschaft  Hessen - Rheinland-Pfalz - Saarland e.V. ",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Hessen - Rheinland-Pfalz - Saarland Lise-Meitner-Straße 1, 55129 Mainz  06131 576070 https://www.vsw.de/ Frau Kristina Kappaun 06131 576070 Basis-Qualifikation Schutz und Sicherheit Kombi (schriftlich + mündlich) teilweise",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "Datenlage  Gut dokumentiert ( ablauf,Fragen,Bestehen) reale Daten + Rheinland Pfalz- Cluster ",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "TOP Schwerpunkte  Tatsächliche Prüfungsfragen  Was ist die Bedürfnispyramide nach Maslow? Welche BGB-Grundlagen sind relevant?",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Verband für Sicherheit in der Wirtschaft  Hessen - Rheinland-Pfalz - Saarland e.V. ",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand",
+    "Hessen - Rheinland-Pfalz - Saarland Lise-Meitner-Straße 1, 55129 Mainz  06131 576070 https://www.vsw.de/ Frau Kristina Kappaun 06131 576070 Basis-Qualifikation Schutz und Sicherheit Kombi (schriftlich + mündlich) teilweise",
+    "Datenlage  Gut dokumentiert ( ablauf,Fragen,Bestehen) reale Daten + Rheinland Pfalz- Cluster ",
+    "",
+    "TOP Schwerpunkte  Tatsächliche Prüfungsfragen  Was ist die Bedürfnispyramide nach Maslow? Welche BGB-Grundlagen sind relevant?",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Letzte Aktualisierung",
+      "19.04.2026",
+      null,
+      null,
+      "Was sind Brandklassen?",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Was ist Raub?",
+      null
+    ],
+    [
+      "SCHRIFTLICHE PRÜFUNG",
+      "Medium",
+      "Papierform",
+      null,
+      null,
+      "Was ist räuberischer Diebstahl?",
+      null
+    ],
+    [
+      null,
+      "Ergebnis sofort",
+      "nein",
+      null,
+      null,
+      "Was ist Einbruch?",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Welche Kommunikationsarten gibt es?",
+      null
+    ],
+    [
+      "ZEITLICHER ABLAUF",
+      "Gleicher Tag",
+      "ja",
+      null,
+      null,
+      "Was ist ein kleiner Waffenschein?",
+      null
+    ],
+    [
+      null,
+      "Abstand schriftlich/mündlich",
+      "❌",
+      null,
+      null,
+      "Welche Waffen sind verboten?",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Was ist aggressiver Notstand?",
+      null
+    ],
+    [
+      "MÜNDLICHE PRÜFUNG",
+      "Prüfung vorhanden",
+      "ja",
+      null,
+      null,
+      "Was ist defensiver Notstand?",
+      null
+    ],
+    [
+      null,
+      "Prüferanzahl",
+      "3",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      "Einzel",
+      null,
+      null,
+      "Wahrscheinliche zusätzliche Fragen (Modell)",
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      "ja",
+      null,
+      null,
+      "(auf Basis Struktur + Cluster)",
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      "StGB/StPO, S.Technik, UmM",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Notwehr",
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      "nein",
+      null,
+      null,
+      "§127 StPO",
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      "ja",
+      null,
+      null,
+      "Besitz / Eigentum",
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      "ja",
+      null,
+      null,
+      "Hausrecht",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Deeskalation",
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      "Frage- Frage- Frage",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      "Thema für Thema ",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      "ausgeglichen streng, hilfsbereit aber auch fordernd. ",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Themengebiet",
+      "Risiko",
+      "Spalte 1",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "RdöSuO",
+      "🟡 2",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "GewO / BewachV",
+      "🟠 3",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Datenschutz",
+      "🟡 2",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "BGB",
+      "🟠 3",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Straf- & Verfahrensrecht",
+      "🔴 4",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "DGUV",
+      "🟡 2",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Umgang mit Menschen",
+      "🟠 3",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Umgang mit Waffen",
+      "🟠 3",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Sicherheitstechnik",
+      "🔴 4",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Risikostufe : ",
+      "🔴 Mittel–hoch (3.8 / 5)",
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 32,
+  "numCols": 7,
+  "parsedNumHeaders": 10,
+  "warnings": null,
+  "errors": null
+}

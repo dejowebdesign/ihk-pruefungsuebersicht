@@ -1,0 +1,229 @@
+{
+  "sheetName": "Häufige_Fehler",
+  "gid": "1556635097",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=1556635097",
+  "cols": [
+    {
+      "id": "A",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      "Wo verlieren Teilnehmer (TN) in der mündlichen Prüfung Punkte?",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Datengrundlage (kombiniert):",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "TN-Protokolle aus allen Regionen",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "offizielle Bewertungslogiken (z. B. Münster)",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "wiederkehrende Prüfer-Nachfragen",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Teilantwort-Bewertungen (+/–)",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Hilfestellungen (–5 / –10 Punkte)",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Themengebiet",
+      null,
+      "Häufige Fehlerursache",
+      "Typischer Prüferhinweis",
+      null,
+      null
+    ],
+    [
+      "Notwehr (StGB §32 / BGB §227)",
+      null,
+      "Definition unvollständig, Voraussetzungen vergessen",
+      "„Was heißt gegenwärtig?“",
+      null,
+      null
+    ],
+    [
+      "Notstand (StGB §34 / BGB §§228/904)",
+      null,
+      "Güterabwägung fehlt, falsches Schutzobjekt",
+      "„Wessen Gut überwiegt?“",
+      null,
+      null
+    ],
+    [
+      "Öffentliches vs. privates Recht",
+      null,
+      "Subordination/Koordination nicht genannt",
+      "„Wer steht über wem?“",
+      null,
+      null
+    ],
+    [
+      "Jedermannsrechte / §127 StPO",
+      null,
+      "Voraussetzungen unvollständig",
+      "„Wann genau dürfen Sie festhalten?“",
+      null,
+      null
+    ],
+    [
+      "Verbotene Eigenmacht (§858 BGB)",
+      null,
+      "Abwehr vs. Selbsthilfe vermischt",
+      "„Was dürfen Sie konkret tun?“",
+      null,
+      null
+    ],
+    [
+      "Selbsthilfe (§229 BGB)",
+      null,
+      "Anspruch/Vereitelung nicht genannt",
+      "„Warum dürfen Sie handeln?“",
+      null,
+      null
+    ],
+    [
+      "Körperverletzung (223/224/226)",
+      null,
+      "Abgrenzung nicht sauber",
+      "„Warum ist das jetzt gefährlich?“",
+      null,
+      null
+    ],
+    [
+      "GewO §34a / BewachV",
+      null,
+      "Pflichten nicht klar benannt",
+      "„Wessen Pflicht ist das?“",
+      null,
+      null
+    ],
+    [
+      "UVV / DGUV (1 & 23)",
+      null,
+      "Verbote vergessen (Alkohol, Brille)",
+      "„Was ist ausdrücklich verboten?“",
+      null,
+      null
+    ],
+    [
+      "Panik / Massenverhalten",
+      null,
+      "Maßnahmen zu allgemein",
+      "„Was tun Sie konkret?“",
+      null,
+      null
+    ],
+    [
+      "Umgang mit Menschen (Deeskalation)",
+      null,
+      "keine Struktur im Vorgehen",
+      "„Wie beginnen Sie?“",
+      null,
+      null
+    ],
+    [
+      "Kommunikationsmodelle",
+      null,
+      "Modelle nur aufgezählt",
+      "„Was bedeutet das praktisch?“",
+      null,
+      null
+    ],
+    [
+      "Brandschutz / Brandklassen",
+      null,
+      "Löschmittel falsch gewählt",
+      "„Warum dieses Mittel?“",
+      null,
+      null
+    ],
+    [
+      "Datenschutz",
+      null,
+      "zu abstrakt, keine Beispiele",
+      "„Nennen Sie ein Beispiel“",
+      null,
+      null
+    ]
+  ],
+  "numRows": 22,
+  "numCols": 6,
+  "parsedNumHeaders": 0,
+  "warnings": null,
+  "errors": null
+}

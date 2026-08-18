@@ -1,0 +1,305 @@
+{
+  "sheetName": "Aschaffenburg",
+  "gid": "1462760577",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=1462760577",
+  "cols": [
+    {
+      "id": "A",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      "IHK-STAMMDATEN",
+      "Bezirk",
+      "kreisfreie Stadt Aschaffenburg, Landkreise Aschaffenburg und Miltenberg",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Industrie- und Handelskammer Aschaffenburg",
+      "Adresse",
+      "Kerschensteinerstraße 9 ,63741 Aschaffenburg",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Telefon",
+      "06021 880-0",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Bayern",
+      "Website",
+      "https://www.aschaffenburg.ihk.de",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ansprechpartner SKP",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ansprechpartner SKP",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Prüfungsform",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Datenstand",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Letzte Aktualisierung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "SCHRIFTLICHE PRÜFUNG",
+      "Medium",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZEITLICHER ABLAUF",
+      "Gleicher Tag",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Abstand schriftlich/mündlich",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "MÜNDLICHE PRÜFUNG",
+      "Prüfung vorhanden",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Prüferanzahl",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 24,
+  "numCols": 8,
+  "parsedNumHeaders": 0,
+  "warnings": null,
+  "errors": null
+}

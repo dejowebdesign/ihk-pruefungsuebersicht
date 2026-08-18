@@ -1,0 +1,632 @@
+{
+  "sheetName": "Aachen",
+  "gid": "267650592",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=267650592",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer Aachen Nordrhein-Westfalen ",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Städteregion Aachen, Kreise Düren, Euskirchen, Heinsberg Theaterstraße 6–10, 52062 Aachen 0241 4460-0 https://www.ihk.de/aachen Heike Polz 0241 4460-285 heike.polz@aachen.ihk.de Kombi (schriftlich + mündlich) teilweise",
+      "type": "string"
+    },
+    {
+      "id": "D",
+      "label": "📌 DATENSTATUS ✔ ausreichend valide Datensätze ✔ Trendanalyse möglich",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "Top 5 Schwerpunktbereiche Notwehr (Definition exakt) Besitz / Eigentum / Besitzdiener Verbotene Waffen DGUV Vorschriften Aggression / Frustration Top 25 Prüfungsfragen (Trendgewichtung) Wie lautet der Notwehrsatz?",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "I",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer Aachen Nordrhein-Westfalen ",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand",
+    "Städteregion Aachen, Kreise Düren, Euskirchen, Heinsberg Theaterstraße 6–10, 52062 Aachen 0241 4460-0 https://www.ihk.de/aachen Heike Polz 0241 4460-285 heike.polz@aachen.ihk.de Kombi (schriftlich + mündlich) teilweise",
+    "📌 DATENSTATUS ✔ ausreichend valide Datensätze ✔ Trendanalyse möglich",
+    "",
+    "",
+    "Top 5 Schwerpunktbereiche Notwehr (Definition exakt) Besitz / Eigentum / Besitzdiener Verbotene Waffen DGUV Vorschriften Aggression / Frustration Top 25 Prüfungsfragen (Trendgewichtung) Wie lautet der Notwehrsatz?",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Letzte Aktualisierung",
+      "23.10.2025",
+      "✔ Gewichtung belastbar",
+      null,
+      null,
+      "Tatbestandsmerkmale Notwehr",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Was ist Besitz?",
+      null,
+      null
+    ],
+    [
+      "SCHRIFTLICHE PRÜFUNG",
+      "Medium",
+      "Laptop/PC",
+      null,
+      null,
+      null,
+      "Was ist Eigentum?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis sofort",
+      "Ja",
+      null,
+      null,
+      null,
+      "Was ist ein Besitzdiener?",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Nennen Sie 5 verbotene Waffen",
+      null,
+      null
+    ],
+    [
+      "ZEITLICHER ABLAUF",
+      "Gleicher Tag",
+      "nein",
+      null,
+      null,
+      null,
+      "Welche Behörde ist zuständig?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Abstand schriftlich/mündlich",
+      "2-3_Wochen",
+      null,
+      null,
+      null,
+      "Welche Gesetze sind wichtig fürs Wachgewerbe?",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "DGUV V23 – was regelt sie?",
+      null,
+      null
+    ],
+    [
+      "MÜNDLICHE PRÜFUNG",
+      "Prüfung vorhanden",
+      "Ja",
+      null,
+      null,
+      null,
+      "DGUV V1 – was steht darin?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Prüferanzahl",
+      "3",
+      null,
+      null,
+      null,
+      "Welche Berufsgenossenschaft zuständig?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      "Gruppe/Einzel möglich",
+      null,
+      null,
+      null,
+      "Was ist Aggression?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      "ja",
+      null,
+      null,
+      null,
+      "Was ist Frustration?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      "RdöSuO, BGB, StGB/StPO",
+      null,
+      null,
+      null,
+      "Was ist Frustrationstoleranz?",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Unterschied Aggression / Frustration",
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      "Nein",
+      null,
+      null,
+      null,
+      "Hauptschlüsselanlage erklären",
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      "Ja",
+      null,
+      null,
+      null,
+      "Was ist GHS?",
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      "Ja",
+      null,
+      null,
+      null,
+      "Jedermannsrechte BGB",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Gefährliche Körperverletzung",
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      "Klassische Gruppenprüfung mit vielen Rechtsfragen",
+      null,
+      null,
+      null,
+      "Unterschied Vergehen / Verbrechen",
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      "Starker Fokus auf Waffenrecht & Besitzverhältnisse",
+      null,
+      null,
+      null,
+      "Tatbestandsmerkmale Straftat",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Welche Voraussetzungen §34a?",
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      "Sachlich, eher streng, sehr rechtsorientiert",
+      null,
+      null,
+      null,
+      "Unterschied öffentlich / privat",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Notstand erklären",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Dienstanweisung – Inhalt",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Top 5 Fallbeispiele (Trend)",
+      null,
+      null
+    ],
+    [
+      "Themengebiet",
+      "Risiko",
+      "Begründung",
+      "Legende",
+      null,
+      null,
+      "Ladendetektiv – Diebstahl",
+      null,
+      null
+    ],
+    [
+      "RdöSuO",
+      "🟠 3",
+      "Öffentlich/privat + Gewaltenteilung",
+      "🟢 1 = sehr gering",
+      null,
+      null,
+      "Aggressive Person – Deeskalation",
+      null,
+      null
+    ],
+    [
+      "GewO / BewachV",
+      "🟠 3",
+      "Voraussetzungen, Tätigkeiten",
+      null,
+      null,
+      null,
+      "Waffenfrage im Dienst",
+      null,
+      null
+    ],
+    [
+      "Datenschutz",
+      "🟡 2",
+      "Grundwissen ausreichend",
+      "🟡 2 = gering–mittel",
+      null,
+      null,
+      "Besitzstörung im Objekt",
+      null,
+      null
+    ],
+    [
+      "BGB",
+      "🟠 3",
+      "Besitz, Selbsthilfe, Besitzdiener",
+      null,
+      null,
+      null,
+      "Festhalten nach Diebstahl",
+      null,
+      null
+    ],
+    [
+      "Straf- & Verfahrensrecht",
+      "🟠 3",
+      "Notwehr solide, aber nicht extrem tief",
+      "🟠 3 = mittel",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "DGUV",
+      "🟠 3",
+      "V1 + V23 erwartet",
+      null,
+      null,
+      null,
+      "Typische Fehler",
+      null,
+      null
+    ],
+    [
+      "UmM",
+      "🟡 2",
+      "Aggression/Frustration",
+      "🔴 4 = hoch",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "UmW",
+      "🟡 2",
+      "Verbotene Waffen Grundwissen",
+      null,
+      null,
+      null,
+      "❌ Besitz und Eigentum verwechselt",
+      null,
+      null
+    ],
+    [
+      "Sicherheitstechnik",
+      "🟡 2",
+      "Nur Basis",
+      "🔴🔴 5 = sehr hoch / Durchfalltreiber",
+      null,
+      null,
+      "❌ Besitzdiener unvollständig",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "❌ Notwehr nicht strukturiert",
+      null,
+      null
+    ],
+    [
+      "Risikostufe:",
+      "🟠 Hoch (4.1 / 5)",
+      null,
+      null,
+      null,
+      null,
+      "❌ Verbotene Waffen unsicher",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "❌ DGUV nur grob gelernt",
+      null,
+      null
+    ],
+    [
+      "Bereich",
+      "Gewichtung",
+      "📈 TRENDENTWICKLUNG",
+      null,
+      null,
+      null,
+      "KO-Risiken",
+      null,
+      null
+    ],
+    [
+      "Strafrecht",
+      "🔴🔴🔴🔴",
+      "Starker Fokus auf saubere Definitionen.",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "BGB / Hausrecht",
+      "🔴🔴🔴",
+      "Notwehr + Jedermannsrechte fast immer vertreten.",
+      null,
+      null,
+      null,
+      "🔴 Notwehr ohne Gegenwärtigkeit",
+      null,
+      null
+    ],
+    [
+      "GewO",
+      "🔴🔴",
+      "Psychologische Begriffe (Frustration, Aggression) werden gezielt abgefragt.",
+      null,
+      null,
+      null,
+      "🔴 Besitzdiener falsch",
+      null,
+      null
+    ],
+    [
+      "DGUV",
+      "🔴🔴",
+      "Wenig Techniklastig.",
+      null,
+      null,
+      null,
+      "🔴 Verbotene Waffen nicht benennbar",
+      null,
+      null
+    ],
+    [
+      "Umgang mit Menschen",
+      "🔴🔴",
+      "Mehr Wert auf juristische Struktur als auf Modelle.",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "Sicherheitstechnik",
+      "🔴",
+      null,
+      null,
+      null,
+      null,
+      "Prüfungsraum-Strategie",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Definition zuerst",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Fachbegriffe verwenden",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Beispiel bringen",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Nicht ausschweifen",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Sicher auftreten",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Prüfer erwarten Sachlichkeit, kein Improvisieren.",
+      null,
+      null
+    ]
+  ],
+  "numRows": 51,
+  "numCols": 9,
+  "parsedNumHeaders": 9,
+  "warnings": null,
+  "errors": null
+}

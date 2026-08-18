@@ -1,0 +1,166 @@
+{
+  "sheetName": "Wiesbaden",
+  "gid": "1836041803",
+  "sheetId": "1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk",
+  "source": "https://docs.google.com/spreadsheets/d/1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk/gviz/tq?tqx=out:json&gid=1836041803",
+  "cols": [
+    {
+      "id": "A",
+      "label": "IHK-STAMMDATEN Industrie- und Handelskammer Wiesbaden Hessen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+      "type": "string"
+    },
+    {
+      "id": "B",
+      "label": "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+      "type": "string"
+    },
+    {
+      "id": "C",
+      "label": "Region Wiesbaden / Rheingau-Taunus Wilhelmstraße 24–26, 65183 Wiesbaden 0611 1500-0 https://www.ihk.de/wiesbaden/ Jutta Nitschke 0611 1500-151 j.nitschke@wiesbaden.ihk.de ",
+      "type": "number",
+      "pattern": "General"
+    },
+    {
+      "id": "D",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "E",
+      "label": "Die IHK Wiesbaden bietet die Sachkundeprüfung in Kooperation mit der IHK Frankfurt an.   Die Sachkundeprüfung kann bei den unten aufgeführten IHKs abgelegt werden: Ansprechpartnerin bei der IHK Rheinhessen:\nDagmar Riester, Telefon: 06131 262-1501, E-Mail: dagmar.riester@rheinhessen.ihk24.de Ansprechpartnerin bei der Vereinigung für die Sicherheit der Wirtschaft e.V. (VSW) Branka Bernges, Telefon: 06131 57607-20, E-Mail: bernges@vsw.de ",
+      "type": "string"
+    },
+    {
+      "id": "F",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "G",
+      "label": "",
+      "type": "string"
+    },
+    {
+      "id": "H",
+      "label": "",
+      "type": "string"
+    }
+  ],
+  "headers": [
+    "IHK-STAMMDATEN Industrie- und Handelskammer Wiesbaden Hessen SCHRIFTLICHE PRÜFUNG ZEITLICHER ABLAUF MÜNDLICHE PRÜFUNG",
+    "Bezirk Adresse Telefon Website Ansprechpartner SKP Ansprechpartner SKP Prüfungsform Datenstand Letzte Aktualisierung Medium Ergebnis sofort Gleicher Tag Abstand schriftlich/mündlich Prüfung vorhanden",
+    "Region Wiesbaden / Rheingau-Taunus Wilhelmstraße 24–26, 65183 Wiesbaden 0611 1500-0 https://www.ihk.de/wiesbaden/ Jutta Nitschke 0611 1500-151 j.nitschke@wiesbaden.ihk.de ",
+    "",
+    "Die IHK Wiesbaden bietet die Sachkundeprüfung in Kooperation mit der IHK Frankfurt an.   Die Sachkundeprüfung kann bei den unten aufgeführten IHKs abgelegt werden: Ansprechpartnerin bei der IHK Rheinhessen:\nDagmar Riester, Telefon: 06131 262-1501, E-Mail: dagmar.riester@rheinhessen.ihk24.de Ansprechpartnerin bei der Vereinigung für die Sicherheit der Wirtschaft e.V. (VSW) Branka Bernges, Telefon: 06131 57607-20, E-Mail: bernges@vsw.de ",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    [
+      null,
+      "Prüferanzahl",
+      3.0,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Einzel / Gruppe",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Ergebnis bekannt",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Hauptschwerpunkte",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ZERTIFIKAT",
+      "Zertifikat sofort",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Bescheinigung",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Zertifikat per Post",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFUNGSABLAUF",
+      "Ablauf",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      "Besonderheiten",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "PRÜFER-EINDRUCK",
+      "Eindruck",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "numRows": 10,
+  "numCols": 8,
+  "parsedNumHeaders": 18,
+  "warnings": null,
+  "errors": null
+}

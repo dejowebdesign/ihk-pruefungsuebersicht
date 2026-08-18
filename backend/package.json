@@ -1,0 +1,28 @@
+{
+  "name": "ihk-pruefungsuebersicht",
+  "version": "0.1.0",
+  "private": true,
+  "description": "IHK Prüfungsübersicht – automatisierter Import und Datenplattform für §34a Sachkundeprüfung-Informationen",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "import:initial": "tsx src/scripts/initial-import.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev --name init",
+    "db:studio": "prisma studio"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}
