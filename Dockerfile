@@ -2,6 +2,13 @@
 FROM node:20-slim AS build
 WORKDIR /app
 
+# OpenSSL is required by the Prisma query-engine binary at `prisma generate`
+# time. node:20-slim ships without it, so Prisma falls back to guessing the
+# libssl version — which works on some hosts but fails with exit 1 on stricter
+# build environments (e.g. Portainer). Installing it makes generate deterministic.
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+
 # Install prisma-related native deps for db push at runtime (sqlite better-sqlite3).
 COPY backend/package.json backend/package-lock.json* ./backend/
 COPY package.json package-lock.json* ./
