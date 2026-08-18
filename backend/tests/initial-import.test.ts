@@ -86,7 +86,9 @@ describe("initial import (snapshot -> SQLite)", () => {
   });
 
   it("links IhkSemantics to the right IHK location", async () => {
-    const aachenLoc = await client.ihkLocation.findUnique({ where: { ihkShortName: "Aachen" } });
+    const aachenLoc = await client.ihkLocation.findFirst({
+      where: { importRunId: shared.importRunId, ihkShortName: "Aachen" },
+    });
     expect(aachenLoc).toBeTruthy();
     const sem = await client.ihkSemantics.findMany({
       where: { ihkLocationId: aachenLoc!.id },

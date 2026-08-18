@@ -86,7 +86,7 @@ model IhkLocation {
 
   // Identity
   nr                       Int?      // "Nr." column (1..81)
-  ihkShortName             String    @unique // "IHK_Kurzform" e.g. "Aachen"
+  ihkShortName             String // "IHK_Kurzform" e.g. "Aachen"; unique per ImportRun, not global
   officialName             String?   // "IHK_Offizieller_Name"
 
   // Exam attributes (NULL = unknown / not provided in source)
@@ -122,6 +122,7 @@ model IhkLocation {
   caseExamples              CaseExample[]
 
   @@index([bundesland])
+  @@unique([importRunId, ihkShortName])
   @@index([ihkShortName])
   @@index([sourceSheetId])
 }
