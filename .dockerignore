@@ -1,0 +1,19 @@
+# Build artifacts and runtime files that must not enter the image.
+**/node_modules
+**/dist
+**/.turbo
+**/*.log
+**/.env
+**/.env.local
+**/prisma/*.db
+**/prisma/*.db-journal
+**/data
+.git
+.gitignore
+**/coverage
+**/.vitest
+**/tests
+**/*.test.ts
+**/_dbg*.test.ts
+**/dev.db
+**/dev.db-journal

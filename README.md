@@ -31,9 +31,9 @@ Google Sheet (öffentliche Quelle)
 | Importer | Node.js + TypeScript, Google Visualization API (gviz) | ✅ Snapshot-Import |
 | Datenbank | SQLite + Prisma (PostgreSQL-ready) | ✅ Schema + Migration |
 | Validierung | Eigene Logik, Fail-safe | ✅ |
-| API | REST (Next.js API / Express) | Phase 5 |
+| API | REST (Hono) | ✅ Phase 4 |
 | Frontend | Next.js + TypeScript | Phase 6+ |
-| Scheduler | Cron + „Jetzt aktualisieren“ | später |
+| Scheduler | Mutex-Scheduler + „Jetzt aktualisieren“ | ✅ |
 
 ---
 
@@ -169,7 +169,87 @@ ihk-pruefungsuebersicht/
 - Keine Secrets im Repository.
 - `.env` ist gitignored; nur `.env.example` wird committet.
 - Google-Sheet-ID ist Konfiguration, kein Secret.
-- Spätere Admin-Auth kommt ausschließlich über Umgebungsvariablen.
+- Admin-Auth ausschließlich über Umgebungsvariable `ADMIN_TOKEN` (constant-time Vergleich, fails-closed bei fehlendem Token).
+- API gibt nie Stacktraces oder Secrets zurück; Fehler werden sauber als JSON gemeldet.
+- Öffentliche Endpunkte greifen nur auf die SQLite-Datenbank zu — niemals auf Google Sheets.
+
+---
+
+## API (Phase 4)
+
+Die API läuft mit [Hono](https://hono.dev/) auf Node.js. Alle öffentlichen Endpunkte greifen **nur auf die lokale Datenbank** zu und sind auf den letzten erfolgreichen ImportRun begrenzt. Pagination via `?page=1&limit=50` (Limit max. 200, Default 50). Auth nur für `/api/admin/*` erforderlich.
+
+### Starten
+
+```bash
+cd backend
+cp ../.env.example ../.env        # ADMIN_TOKEN setzen!
+npm run serve                     # http://localhost:3001
+npm run serve:scheduler           # API + Scheduler zusammen
+```
+
+### Endpunkte
+
+| Methode | URL | Auth | Beschreibung |
+|---|---|---|---|
+| GET | `/api/health` | nein | `{status, database, timestamp, version}` — Docker Healthcheck |
+| GET | `/api` | nein | Endpoint-Übersicht |
+| GET | `/api/ihk` | nein | IHK-Liste, filterbar, paginiert |
+| GET | `/api/ihk/search?q=...` | nein | Suche in Kurzname/offizieller Name/Bundesland |
+| GET | `/api/ihk/:id` | nein | IHK-Detail + Provenienz (Sheet, Importzeit) |
+| GET | `/api/sheets` | nein | Alle 85 Register (Metadaten), paginiert |
+| GET | `/api/sheets/:id` | nein | Register-Metadaten + Counts (keine Rohdaten) |
+| GET | `/api/questions` | nein | Fragen, filterbar/durchsuchbar, paginiert |
+| GET | `/api/questions/:id` | nein | Einzelfrage |
+| GET | `/api/case-examples` | nein | Fallbeispiele, filterbar/durchsuchbar, paginiert |
+| GET | `/api/case-examples/:id` | nein | Einzelfallbeispiel |
+| GET | `/api/import/status` | nein | Letzter Erfolg + letzter Versuch, Counts, letzter Fehler |
+| GET | `/api/import/runs` | nein | Import-Historie (nur Metadaten), paginiert |
+| GET | `/api/admin/status` | **ja** | Import- + Scheduler-Status kombiniert |
+| GET | `/api/admin/scheduler` | **ja** | Scheduler-Status (running, Intervall, last success/attempt) |
+| POST | `/api/admin/import` | **ja** | Manuelles Import-Trigger (mutex-geschützt, 409 wenn belegt) |
+
+### Query-Parameter
+
+- **Pagination:** `?page=1&limit=50` (auf allen Listenendpunkten)
+- **IHK-Filter:** `?bundesland=`, `?skp=`, `?writtenForm=`, `?writtenResultImmediate=`, `?sameDay=`, `?intervalWrittenOral=`, `?groupFormat=`
+- **IHK-Suche:** `?q=bie` (mindestens 2 Zeichen, durchsucht `ihkShortName`, `officialName`, `bundesland`)
+- **Sheets-Filter:** `?sheetType=IHK`
+- **Fragen-Filter/Suche:** `?category=`, `?difficulty=`, `?cluster=`, `?q=` (Frage/Antwort/Rechtslehre)
+- **Fallbeispiele-Filter/Suche:** `?category=`, `?cluster=`, `?q=` (Szenario/Antwort/Rechtslehre)
+
+### Beispielantworten
+
+`GET /api/health`
+```json
+{ "status": "ok", "database": "ok", "timestamp": "2026-08-17T15:51:10Z", "version": "0.4.0" }
+```
+
+`GET /api/ihk?limit=2`
+```json
+{
+  "data": [
+    { "id": "...", "nr": 1, "ihkShortName": "Aachen", "officialName": "...", "skp": "✅", "bundesland": "Nordrhein-Westfalen", "writtenForm": "Laptop/PC", ... }
+  ],
+  "pagination": { "page": 1, "limit": 2, "total": 82, "totalPages": 41 }
+}
+```
+
+`GET /api/import/status`
+```json
+{
+  "lastSuccess": { "id": "...", "status": "SUCCESS", "sheetsImported": 85, "ihkLocations": 82, "changeCount": 0, "lastError": null, ... },
+  "lastAttempt": { "id": "...", "status": "SUCCESS", ... }
+}
+```
+
+### Authentifizierung (Admin)
+
+Admin-Endpunkte benötigen `Authorization: Bearer <ADMIN_TOKEN>`. Token via Umgebungsvariable `ADMIN_TOKEN` (z. B. `openssl rand -hex 32`). Ohne gesetzten `ADMIN_TOKEN` antworten alle Admin-Endpunkte mit `503` (deaktiviert, fails-closed). Falscher/fehlender Token → `401`. Die Architektur ist so gehalten, dass später auf JWT/Sessions umgestellt werden kann, ohne Route-Handler zu ändern.
+
+### Statuscodes
+
+`200` OK · `207` Partial · `400` Bad Request · `401` Unauthorized · `403/404` Not Found · `409` Import bereits laufend · `500` Serverfehler · `503` Keine Daten/Admin deaktiviert.
 
 ---
 

@@ -13,6 +13,8 @@
     "import:initial": "tsx src/scripts/initial-import.ts",
     "import:live": "tsx src/scripts/live-import.ts",
     "scheduler:start": "tsx src/scripts/scheduler.ts",
+    "serve": "tsx src/scripts/serve.ts",
+    "serve:scheduler": "tsx src/scripts/serve.ts -- --with-scheduler",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",
     "db:studio": "prisma studio"
@@ -25,6 +27,8 @@
     "vitest": "^2.1.0"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@hono/node-server": "^2.1.1",
+    "@prisma/client": "^5.22.0",
+    "hono": "^4.13.3"
   }
 }
