@@ -42,7 +42,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:3000/"]
+      # node:20-slim ships no curl; use node itself for the probe so no extra
+      # runtime dependency is needed.
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       start_period: 20s

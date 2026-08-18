@@ -24,15 +24,29 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Standalone Next.js server + static assets. The rewrites proxy forwards
+# Standalone Next.js server + static assets. The middleware proxy forwards
 # /api/* to the backend service (BACKEND_URL) at runtime.
+#
+# Standalone layout (npm workspace build, monorepo tracing root):
+#   .next/standalone/
+#     ├─ package.json
+#     ├─ node_modules/        (traced deps, hoisted)
+#     └─ frontend/
+#          ├─ server.js       (standalone server entry)
+#          └─ .next/          (server chunks, NO static)
+# So copying standalone/* into /app yields /app/frontend/server.js. Static
+# assets are emitted separately into .next/static and must be copied on top.
 COPY --from=build /app/frontend/.next/standalone ./
-COPY --from=build /app/frontend/.next/standalone/frontend ./frontend
 COPY --from=build /app/frontend/.next/static ./frontend/.next/static
-COPY --from=build /app/frontend/public ./frontend/public
+# NOTE: public/ is intentionally NOT copied. The app ships no static public
+# assets (no favicon/icons referenced in metadata), and the directory is empty
+# and untracked — copying it would break builds from a fresh checkout
+# ("COPY failed: file not found"). Add a public/ COPY here only if real
+# public assets are introduced.
 
 EXPOSE 3000
 
-# Next standalone server reads from frontend/ when the app was built as a workspace.
+# Standalone server.js lives under frontend/ (workspace build) and expects
+# .next/ adjacent; node_modules is resolved from the parent /app.
 WORKDIR /app/frontend
 CMD ["node", "server.js"]
