@@ -2,12 +2,14 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { api, ApiClientError, type IhkLocation } from "@/lib/api";
+import {
+  loadCompareIds,
+  saveCompareIds,
+  clearCompareIds,
+} from "@/lib/compare";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { SkeletonGrid } from "@/components/Skeleton";
 import { ErrorState, EmptyState } from "@/components/States";
-
-const STORAGE_KEY = "ihk-compare-ids";
-const MAX = 4;
 
 export default function VergleichPage() {
   const [ids, setIds] = useState<string[]>([]);
@@ -15,14 +17,9 @@ export default function VergleichPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load selected IDs from localStorage on mount.
+  // Load selected IDs from localStorage on mount (shared with the overview).
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setIds(JSON.parse(raw).slice(0, MAX));
-    } catch {
-      /* ignore */
-    }
+    setIds(loadCompareIds());
   }, []);
 
   const load = useCallback(async () => {
@@ -34,9 +31,8 @@ export default function VergleichPage() {
     setLoading(true);
     setError(null);
     try {
-      const results = await Promise.all(ids.map((id) => api.ihkList({ limit: 1 }).then(() => null).catch(() => null)));
-      // Fetch each IHK detail (we need the full record; ihkDetail returns
-      // IhkDetail which extends IhkLocation, so it works for the table).
+      // Fetch each IHK detail (ihkDetail returns IhkDetail which extends
+      // IhkLocation, so it works for the table).
       const fetched = await Promise.all(
         ids.map((id) =>
           api.ihkDetail(id).then(
@@ -45,7 +41,6 @@ export default function VergleichPage() {
           ),
         ),
       );
-      void results;
       setIhks(fetched.filter(Boolean) as IhkLocation[]);
     } catch (e: unknown) {
       setError(e instanceof ApiClientError ? e.message : null);
@@ -61,14 +56,14 @@ export default function VergleichPage() {
   function remove(id: string) {
     setIds((prev) => {
       const next = prev.filter((x) => x !== id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      saveCompareIds(next);
       return next;
     });
   }
 
   function clearAll() {
     setIds([]);
-    localStorage.removeItem(STORAGE_KEY);
+    clearCompareIds();
   }
 
   return (

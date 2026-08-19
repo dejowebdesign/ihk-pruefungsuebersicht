@@ -6,6 +6,12 @@ import {
   type IhkLocation,
   type Paginated,
 } from "@/lib/api";
+import {
+  loadCompareIds,
+  saveCompareIds,
+  toggleCompareId,
+  MAX_COMPARE,
+} from "@/lib/compare";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterPanel, EMPTY_FILTERS, type FilterValues, hasActiveFilters } from "@/components/FilterPanel";
 import { IhkCard } from "@/components/IhkCard";
@@ -14,7 +20,6 @@ import { SkeletonGrid } from "@/components/Skeleton";
 import { EmptyState, ErrorState } from "@/components/States";
 
 const LIMIT = 12;
-const MAX_COMPARE = 4;
 type Sort = "name" | "bundesland";
 
 export default function HomePage() {
@@ -25,9 +30,29 @@ export default function HomePage() {
   const [data, setData] = useState<Paginated<IhkLocation> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Compare selection lives in localStorage (shared with /vergleich) so it
+  // survives navigation and refresh. State mirrors storage for the UI; the
+  // empty initial value avoids SSR/hydration mismatches, then mounts from
+  // storage.
   const [compare, setCompare] = useState<string[]>([]);
+  // `mounted` gates the persist effect so the initial mount run (compare=[])
+  // never wipes a stored selection before the restore effect has read it.
+  const [mounted, setMounted] = useState(false);
 
   const hasFilters = hasActiveFilters(filters);
+
+  // Restore selection from storage on mount (client only), then allow persist.
+  useEffect(() => {
+    setCompare(loadCompareIds());
+    setMounted(true);
+  }, []);
+
+  // Persist selection whenever it changes — but only after the restore has
+  // happened, so we never overwrite stored ids with the initial empty state.
+  useEffect(() => {
+    if (!mounted) return;
+    saveCompareIds(compare);
+  }, [compare, mounted]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,11 +95,7 @@ export default function HomePage() {
   }, [search, filters, sort]);
 
   function toggleCompare(id: string) {
-    setCompare((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= MAX_COMPARE) return prev;
-      return [...prev, id];
-    });
+    setCompare((prev) => toggleCompareId(prev, id));
   }
 
   function resetFilters() {
