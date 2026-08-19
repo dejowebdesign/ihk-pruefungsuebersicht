@@ -8,6 +8,7 @@
   --text: #1a2233;
   --text-muted: #5a6678;
   --text-faint: #8b95a7;
+  --placeholder: #9aa3b2;
   --primary: #1b4d8c;
   --primary-hover: #163f72;
   --primary-soft: #e8f0fb;
@@ -41,22 +42,23 @@
   --bg: #0f141b;
   --bg-elevated: #161d27;
   --bg-subtle: #1d2632;
-  --border: #283340;
-  --border-strong: #364354;
-  --text: #e7eaf0;
-  --text-muted: #9fa9b8;
-  --text-faint: #6a7585;
-  --primary: #5b9bd5;
-  --primary-hover: #74aee0;
+  --border: #2e3744;
+  --border-strong: #4d5869;
+  --text: #e9ecf2;
+  --text-muted: #a6b0bf;
+  --text-faint: #8b94a3;
+  --placeholder: #7d8698;
+  --primary: #6db0e0;
+  --primary-hover: #82c0ec;
   --primary-soft: #16243a;
   --primary-contrast: #ffffff;
   --accent: #3bb0a0;
   --accent-soft: #122c29;
-  --success: #4caf6e;
+  --success: #5dc07f;
   --success-soft: #15281d;
-  --warning: #d4a017;
+  --warning: #e0b438;
   --warning-soft: #2a2410;
-  --danger: #e0654f;
+  --danger: #ec7059;
   --danger-soft: #2a1612;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
@@ -66,6 +68,51 @@
 
 :root {
   color-scheme: light;
+}
+
+/* ── native form controls: shared readability rules ───────────────────────
+   Keeps entered text, placeholders, focus rings and disabled state legible
+   in BOTH themes. Dark mode previously inherited the UA's dark-on-dark text
+   in date/number inputs; these rules pin every surface explicitly so no
+   platform default can leak through. */
+input,
+textarea,
+select {
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
+}
+/* Some UAs render the <select> option list using the OS theme. Forcing a
+   solid background + readable text avoids white-on-white / dark-on-dark
+   option rows in dark mode. */
+select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--text-faint);
+  background: var(--bg-subtle);
+  cursor: not-allowed;
+  opacity: 1;
+}
+/* Date inputs show a calendar glyph that defaults to black; flip it in dark. */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+/* Remove the white inner fill some browsers apply to autofilled inputs. */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-elevated) inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 * {
@@ -919,6 +966,20 @@ button {
   border-radius: var(--radius-sm);
   font-family: monospace;
   font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+.token-input::placeholder {
+  color: var(--placeholder);
+}
+.token-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.token-input:disabled {
+  color: var(--text-faint);
+  background: var(--bg-subtle);
 }
 
 /* ── responsive ────────────────────────────────────────────────────────── */
@@ -1015,10 +1076,13 @@ button {
 .oral-ratings { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
 .oral-rating-btn { flex: 1 1 140px; padding: 12px; border-radius: var(--radius-sm); border: 2px solid var(--border-strong); background: var(--bg-elevated); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; transition: border-color 0.1s, background 0.1s; }
 .oral-rating-btn:hover { border-color: var(--primary); }
+.oral-rating-btn:focus-visible { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
 .oral-rating-btn--active[data-rate="richtig"] { border-color: var(--success); background: var(--success-soft); color: var(--success); }
 .oral-rating-btn--active[data-rate="teilweise richtig"] { border-color: var(--warning); background: var(--warning-soft); color: var(--warning); }
 .oral-rating-btn--active[data-rate="falsch"] { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
 .oral-note { width: 100%; min-height: 64px; resize: vertical; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 9px 12px; color: var(--text); font: inherit; }
+.oral-note::placeholder { color: var(--placeholder); }
+.oral-note:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
 .oral-take__nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
 .oral-take__score { text-align: center; margin: 16px 0; color: var(--text-muted); font-size: 0.9rem; }
 .oral-take__score strong { color: var(--text); }
