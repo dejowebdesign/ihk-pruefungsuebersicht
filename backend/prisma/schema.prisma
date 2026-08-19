@@ -239,3 +239,123 @@ model ChangeRecord {
   @@index([importRunId])
   @@index([entityType, entityId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Phase 8 — Mündliche Prüfung (oral exam)
+//
+// Completely separate from the public IHK `Question`/`CaseExample` models
+// (those come from the live IHK Google Sheet and stay read-only). The oral
+// exam pool is seeded once from the Excel reference workbook and is then a
+// first-class, writable part of the application.
+//
+// Grading logic is the verbatim mirror of the Excel matrix — see AGENTS.md
+// "Phase 8" and backend/src/oral/scoring.ts. Do NOT alter the math.
+// ─────────────────────────────────────────────────────────────────────────
+
+// Static definition of a Themenbereich and its weight (sum of all weights = 100).
+// Stored so the exam/round logic reads weights from one authoritative place.
+model OralTheme {
+  id        String   @id @default(cuid())
+  orderKey  Int      @unique // 1..8, defines the fixed question order in an exam
+  name      String   @unique // exact Excel label, e.g. "Buergerliches Gesetzbuch / Jedermannsrechte"
+  weight    Int      // Excel "Gewichtung" (10,12,14,14,8,18,8,16). All even.
+
+  questions OralQuestion[]
+
+  @@index([orderKey])
+}
+
+// One question from the Excel "Fragenpool" sheet. `excelId` (e.g. "BGB-02") is
+// preserved as the human reference; the Prisma `id` is the internal key.
+// Duplicate continuation rows from the workbook are merged at seed time.
+model OralQuestion {
+  id         String   @id @default(cuid())
+  excelId    String   @unique // Excel "Frage-ID", preserved verbatim
+  themeId    String
+  theme      OralTheme @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  nr         Int?      // Excel "Nr." within the theme
+  source     String?   // Excel "Quelle"
+  question   String    // Excel "Frage" (merged continuation fragments)
+  answer     String?   // Excel "Erwartungshorizont / Antwortstichpunkte"
+  checked    String?   // Excel "Geprueft?"
+
+  examItems  OralExamQuestion[]
+
+  @@index([themeId])
+  @@index([excelId])
+}
+
+// A candidate (Prüfling). Created by the examiner; one candidate may have
+// multiple exams over time.
+model OralCandidate {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  createdAt  DateTime @default(now())
+
+  exams      OralExam[]
+
+  @@index([name])
+}
+
+// A concrete exam instance for a candidate. The randomly drawn question set is
+// persisted immutably in OralExamQuestion rows (never regenerated).
+//
+// Grading values mirror Excel:
+//   maxPoints = 100 (sum of OralTheme.weight)
+//   totalPoints = sum of OralExamQuestion.points
+//   percent = totalPoints / maxPoints  (Excel G19 = G18/G17)
+//   result = totalPoints >= 50 ? "Bestanden" : "Nicht bestanden" (Excel G20)
+//
+// status: "draft" | "in_progress" | "completed"
+model OralExam {
+  id           String    @id @default(cuid())
+  candidateId  String
+  candidate    OralCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  examDate     DateTime?
+  examiner     String?
+  status       String    @default("draft") // draft | in_progress | completed
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  completedAt  DateTime?
+
+  // Cached final result (computed by the scoring lib, written on completion).
+  maxPoints    Int       @default(100)
+  totalPoints  Int       @default(0)
+  percent      Float     @default(0) // 0..100 (Excel percent × 100). Exact; no rounding needed.
+  result       String?   // "Bestanden" | "Nicht bestanden"
+
+  items        OralExamQuestion[]
+
+  @@index([candidateId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// One question slot within a concrete exam. The `orderKey` matches the theme's
+// fixed order (1..8). The chosen OralQuestion is fixed at exam creation.
+// `rating` stores the examiner's Bewertung: "richtig" | "teilweise richtig" |
+// "falsch" (or NULL = not yet rated). `points` is the cached per-question score
+// (Excel G-column formula) kept in sync by the scoring lib.
+//
+// Excel per-question formula:
+//   points = rating=="richtig" ? weight
+//          : rating=="teilweise richtig" ? weight/2
+//          : 0
+model OralExamQuestion {
+  id          String   @id @default(cuid())
+  examId      String
+  exam        OralExam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+  questionId  String
+  question    OralQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  orderKey    Int        // 1..8, theme order (fixed)
+  themeName   String     // snapshot of the theme name at creation time
+  weight      Int        // snapshot of the theme weight at creation time
+  rating      String?    // "richtig" | "teilweise richtig" | "falsch" | null
+  points      Float      @default(0) // Excel G-column value
+  note        String?    // examiner note
+
+  @@unique([examId, orderKey])
+  @@unique([examId, questionId])
+  @@index([examId])
+  @@index([questionId])
+}

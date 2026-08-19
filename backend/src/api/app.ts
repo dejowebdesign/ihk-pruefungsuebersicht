@@ -10,6 +10,7 @@ import { questions } from "./routes/questions";
 import { caseExamples } from "./routes/case-examples";
 import { imp } from "./routes/import";
 import { admin } from "./routes/admin";
+import { oral } from "./routes/oral";
 
 export function createApp() {
   const app = new Hono();
@@ -22,6 +23,7 @@ export function createApp() {
   app.route("/api/case-examples", caseExamples);
   app.route("/api/import", imp);
   app.route("/api/admin", admin);
+  app.route("/api/oral", oral);
 
   app.get("/api", (c) =>
     c.json({
@@ -43,6 +45,15 @@ export function createApp() {
         "GET /api/admin/status (auth)",
         "GET /api/admin/scheduler (auth)",
         "POST /api/admin/import (auth)",
+        "GET /api/oral/pool",
+        "GET /api/oral/themes",
+        "GET /api/oral/exams",
+        "GET /api/oral/exams/:id",
+        "GET /api/oral/exams/:id/score",
+        "POST /api/oral/exams (auth)",
+        "PATCH /api/oral/exams/:id/questions/:order (auth)",
+        "POST /api/oral/exams/:id/complete (auth)",
+        "PATCH /api/oral/exams/:id (auth)",
       ],
     }),
   );

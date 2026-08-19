@@ -130,6 +130,86 @@ export interface SchedulerStatus {
   lastAttempt: ImportRun | null;
 }
 
+// ── Oral exam (Phase 8) ────────────────────────────────────────────────────
+
+export interface OralTheme {
+  id: string;
+  orderKey: number;
+  name: string;
+  weight: number;
+}
+
+export interface OralQuestion {
+  id: string;
+  excelId: string;
+  themeId: string;
+  nr: number | null;
+  source: string | null;
+  question: string;
+  answer: string | null;
+  checked: string | null;
+  theme: { name: string; weight: number; orderKey: number };
+}
+
+export type OralRating = "richtig" | "teilweise richtig" | "falsch";
+
+export interface OralExamQuestion {
+  id: string;
+  examId: string;
+  questionId: string;
+  orderKey: number;
+  themeName: string;
+  weight: number;
+  rating: OralRating | null;
+  points: number;
+  note: string | null;
+  question: { excelId: string; question: string; answer: string | null; source: string | null };
+}
+
+export interface OralExam {
+  id: string;
+  candidateId: string;
+  candidate: { id: string; name: string };
+  examDate: string | null;
+  examiner: string | null;
+  status: "draft" | "in_progress" | "completed";
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+  maxPoints: number;
+  totalPoints: number;
+  percent: number;
+  result: "Bestanden" | "Nicht bestanden" | null;
+  items?: OralExamQuestion[];
+}
+
+export interface OralExamScore {
+  id: string;
+  maxPoints: number;
+  totalPoints: number;
+  percent: number;
+  result: "Bestanden" | "Nicht bestanden" | null;
+  status: "draft" | "in_progress" | "completed";
+}
+
+export interface OralCreateInput {
+  candidateName: string;
+  examDate?: string | null;
+  examiner?: string | null;
+  status?: "draft" | "in_progress" | "completed";
+}
+
+export interface OralUpdateInput {
+  examDate?: string | null;
+  examiner?: string | null;
+  status?: "draft" | "in_progress" | "completed";
+}
+
+export interface OralRateInput {
+  rating?: OralRating | null;
+  note?: string | null;
+}
+
 export interface AdminStatus {
   lastSuccess: ImportRun | null;
   lastAttempt: ImportRun | null;
@@ -229,6 +309,44 @@ export const api = {
     request<SchedulerStatus>("/api/admin/scheduler", { headers: { Authorization: `Bearer ${token}` } }),
   adminImport: (token: string) =>
     request<{ message: string; runId?: string }>("/api/admin/import", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  // ── Oral exam (Phase 8) ──────────────────────────────────────────────────
+  oralThemes: () => request<{ data: OralTheme[] }>("/api/oral/themes"),
+  oralPool: (page = 1, limit = 300) =>
+    request<Paginated<OralQuestion>>(`/api/oral/pool${buildQuery({ page, limit })}`),
+  oralExams: (page = 1, limit = 50) =>
+    request<Paginated<OralExam>>(`/api/oral/exams${buildQuery({ page, limit })}`),
+  oralExam: (id: string) => request<OralExam>(`/api/oral/exams/${id}`),
+  oralExamScore: (id: string) => request<OralExamScore>(`/api/oral/exams/${id}/score`),
+
+  oralCreateExam: (token: string, input: OralCreateInput) =>
+    request<{ examId: string }>("/api/oral/exams", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    }),
+  oralRateQuestion: (token: string, examId: string, order: number, input: OralRateInput) =>
+    request<{ ok: true }>(`/api/oral/exams/${examId}/questions/${order}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    }),
+  oralCompleteExam: (token: string, examId: string) =>
+    request<{ ok: true }>(`/api/oral/exams/${examId}/complete`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+  oralUpdateExam: (token: string, examId: string, input: OralUpdateInput) =>
+    request<{ ok: true }>(`/api/oral/exams/${examId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(input),
+    }),
+  oralSeedPool: (token: string) =>
+    request<{ message: string; themes: number; questions: number }>("/api/oral/seed", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     }),

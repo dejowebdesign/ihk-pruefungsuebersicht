@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/vergleich", label: "Vergleich" },
   { href: "/fragen", label: "Fragen" },
   { href: "/fallbeispiele", label: "Fallbeispiele" },
+  { href: "/muendliche-pruefung", label: "Mündliche Prüfung" },
 ];
 
 export function Header() {
