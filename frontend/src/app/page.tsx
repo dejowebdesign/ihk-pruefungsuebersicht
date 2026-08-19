@@ -13,18 +13,25 @@ import {
   MAX_COMPARE,
 } from "@/lib/compare";
 import { SearchBar } from "@/components/SearchBar";
-import { FilterPanel, EMPTY_FILTERS, type FilterValues, hasActiveFilters } from "@/components/FilterPanel";
+import { BundeslandFilter } from "@/components/FilterPanel";
 import { IhkCard } from "@/components/IhkCard";
 import { Pagination } from "@/components/Pagination";
 import { SkeletonGrid } from "@/components/Skeleton";
 import { EmptyState, ErrorState } from "@/components/States";
 
 const LIMIT = 12;
+// One-shot fetch size to derive the distinct Bundesländer from the IHK data
+// (not hardcoded). The IHK dataset is small (~80–150 rows), so a single
+// high-limit list call is cheap and avoids any backend change.
+const BUNDESLAND_FETCH_LIMIT = 500;
 type Sort = "name" | "bundesland";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<FilterValues>(EMPTY_FILTERS);
+  // The ONLY remaining filter on the overview is the Bundesland dropdown.
+  // "" means "Alle Bundesländer".
+  const [bundesland, setBundesland] = useState("");
+  const [bundeslaender, setBundeslaender] = useState<string[]>([]);
   const [sort, setSort] = useState<Sort>("name");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<Paginated<IhkLocation> | null>(null);
@@ -39,12 +46,33 @@ export default function HomePage() {
   // never wipes a stored selection before the restore effect has read it.
   const [mounted, setMounted] = useState(false);
 
-  const hasFilters = hasActiveFilters(filters);
+  const hasFilter = bundesland !== "";
 
   // Restore selection from storage on mount (client only), then allow persist.
   useEffect(() => {
     setCompare(loadCompareIds());
     setMounted(true);
+  }, []);
+
+  // Derive the distinct Bundesländer from the IHK data (once, on mount) so the
+  // dropdown options are never hardcoded.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.ihkList({ page: 1, limit: BUNDESLAND_FETCH_LIMIT });
+        if (cancelled) return;
+        const distinct = Array.from(
+          new Set(res.data.map((i) => i.bundesland).filter(Boolean) as string[]),
+        ).sort();
+        setBundeslaender(distinct);
+      } catch {
+        // Non-fatal: dropdown just shows "Alle Bundesländer".
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Persist selection whenever it changes — but only after the restore has
@@ -60,19 +88,13 @@ export default function HomePage() {
     try {
       let res: Paginated<IhkLocation>;
       const q = search.trim();
-      if (q.length >= 2 && !hasFilters) {
+      if (q.length >= 2 && !hasFilter) {
         res = await api.ihkSearch(q, page, LIMIT);
       } else {
         res = await api.ihkList({
           page,
           limit: LIMIT,
-          bundesland: filters.bundesland,
-          skp: filters.skp,
-          writtenForm: filters.writtenForm,
-          writtenResultImmediate: filters.writtenResultImmediate,
-          sameDay: filters.sameDay,
-          intervalWrittenOral: filters.intervalWrittenOral,
-          groupFormat: filters.groupFormat,
+          bundesland,
         });
       }
       setData(res);
@@ -83,23 +105,23 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [search, page, filters, hasFilters]);
+  }, [search, page, bundesland, hasFilter]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  // Reset to page 1 when search/filters/sort change.
+  // Reset to page 1 when search/filter/sort change.
   useEffect(() => {
     setPage(1);
-  }, [search, filters, sort]);
+  }, [search, bundesland, sort]);
 
   function toggleCompare(id: string) {
     setCompare((prev) => toggleCompareId(prev, id));
   }
 
   function resetFilters() {
-    setFilters(EMPTY_FILTERS);
+    setBundesland("");
     setSearch("");
     setPage(1);
   }
@@ -147,18 +169,6 @@ export default function HomePage() {
       <div className="container">
         <div className="toolbar">
           <div className="toolbar__left">
-            <button
-              className={`filter-trigger${hasFilters ? " filter-trigger--active" : ""}`}
-              onClick={() => {
-                const p = document.getElementById("filter-panel");
-                if (p) p.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z" strokeLinejoin="round" />
-              </svg>
-              Filter {hasFilters && `(${Object.values(filters).filter(Boolean).length})`}
-            </button>
             <label className="filter-trigger" style={{ gap: 8 }}>
               <span>Sortierung:</span>
               <select
@@ -176,9 +186,7 @@ export default function HomePage() {
           {data && <span className="toolbar__count">{data.pagination.total} IHK-Standorte</span>}
         </div>
 
-        <div id="filter-panel">
-          <FilterPanel values={filters} onChange={setFilters} onReset={resetFilters} />
-        </div>
+        <BundeslandFilter value={bundesland} options={bundeslaender} onChange={setBundesland} />
 
         {loading ? (
           <SkeletonGrid count={6} />

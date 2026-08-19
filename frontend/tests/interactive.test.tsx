@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SearchBar } from "@/components/SearchBar";
-import { FilterPanel, EMPTY_FILTERS, hasActiveFilters } from "@/components/FilterPanel";
+import { BundeslandFilter } from "@/components/FilterPanel";
 
 describe("SearchBar", () => {
   it("debounces onChange (real timers)", async () => {
@@ -25,7 +25,6 @@ describe("SearchBar", () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<SearchBar value="test" onChange={onChange} debounceMs={0} />);
-
     const clear = screen.getByRole("button", { name: "Suche löschen" });
     await user.click(clear);
     expect(onChange).toHaveBeenCalledWith("");
@@ -40,51 +39,57 @@ describe("SearchBar", () => {
   });
 });
 
-describe("FilterPanel", () => {
-  it("toggles a chip and calls onChange", async () => {
-    const onChange = vi.fn();
-    const user = userEvent.setup();
-    render(<FilterPanel values={EMPTY_FILTERS} onChange={onChange} onReset={() => {}} />);
+describe("BundeslandFilter", () => {
+  const OPTIONS = ["Bayern", "Hessen", "Nordrhein-Westfalen"];
 
-    const chip = screen.getByRole("button", { name: "Bayern" });
-    await user.click(chip);
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ bundesland: "Bayern" }));
+  it("renders 'Alle Bundesländer' plus the derived options", () => {
+    render(<BundeslandFilter value="" options={OPTIONS} onChange={() => {}} />);
+    const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
+    expect(select.value).toBe("");
+    expect([...select.options].map((o) => o.textContent)).toEqual([
+      "Alle Bundesländer",
+      "Bayern",
+      "Hessen",
+      "Nordrhein-Westfalen",
+    ]);
   });
 
-  it("deselects active chip on second click", async () => {
+  it("selecting an option calls onChange with that Bundesland", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<BundeslandFilter value="" options={OPTIONS} onChange={onChange} />);
+    const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
+    await user.selectOptions(select, "Nordrhein-Westfalen");
+    expect(onChange).toHaveBeenCalledWith("Nordrhein-Westfalen");
+  });
+
+  it("resetting back to 'Alle Bundesländer' calls onChange with empty string", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(
-      <FilterPanel
-        values={{ ...EMPTY_FILTERS, bundesland: "Bayern" }}
-        onChange={onChange}
-        onReset={() => {}}
-      />,
+      <BundeslandFilter value="Nordrhein-Westfalen" options={OPTIONS} onChange={onChange} />,
     );
-    const chip = screen.getByRole("button", { name: "Bayern" });
-    expect(chip).toHaveAttribute("aria-pressed", "true");
-    await user.click(chip);
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ bundesland: "" }));
+    const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
+    expect(select.value).toBe("Nordrhein-Westfalen");
+    await user.selectOptions(select, "");
+    expect(onChange).toHaveBeenCalledWith("");
   });
 
-  it("renders reset button only when filters active", () => {
-    const { rerender } = render(
-      <FilterPanel values={EMPTY_FILTERS} onChange={() => {}} onReset={() => {}} />,
-    );
-    expect(screen.queryByRole("button", { name: "Zurücksetzen" })).not.toBeInTheDocument();
-
-    rerender(
-      <FilterPanel
-        values={{ ...EMPTY_FILTERS, skp: "✅" }}
-        onChange={() => {}}
-        onReset={() => {}}
-      />,
-    );
-    expect(screen.getByRole("button", { name: "Zurücksetzen" })).toBeInTheDocument();
+  it("does NOT render any of the removed filter chips", () => {
+    render(<BundeslandFilter value="" options={OPTIONS} onChange={() => {}} />);
+    expect(screen.queryByText("SKP verfügbar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Schriftliche Prüfungsform")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ergebnis sofort")).not.toBeInTheDocument();
+    expect(screen.queryByText("Gleicher Tag")).not.toBeInTheDocument();
+    expect(screen.queryByText("Gruppenformat")).not.toBeInTheDocument();
   });
 
-  it("hasActiveFilters detects empty and non-empty", () => {
-    expect(hasActiveFilters(EMPTY_FILTERS)).toBe(false);
-    expect(hasActiveFilters({ ...EMPTY_FILTERS, skp: "✅" })).toBe(true);
+  it("derives options from provided data (no hardcoded list)", () => {
+    render(<BundeslandFilter value="" options={["Bayern"]} onChange={() => {}} />);
+    const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
+    expect([...select.options].map((o) => o.textContent)).toEqual([
+      "Alle Bundesländer",
+      "Bayern",
+    ]);
   });
 });
