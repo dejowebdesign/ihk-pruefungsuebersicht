@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LINKS = [
   { href: "/", label: "IHKs" },
@@ -50,6 +51,8 @@ export function Header() {
             <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
           </svg>
         </button>
+
+        <ThemeToggle />
       </div>
     </header>
   );
