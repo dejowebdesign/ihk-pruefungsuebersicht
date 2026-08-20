@@ -5,7 +5,8 @@
 import { serve } from "@hono/node-server";
 import { createApp } from "../api/app";
 import { maybeInitialImport, startScheduler, stopScheduler } from "../scheduler/scheduler";
-import { disconnectPrisma } from "../db/prisma";
+import { ensureOralPoolSeeded } from "../oral/seed";
+import { prisma, disconnectPrisma } from "../db/prisma";
 
 async function main() {
   const port = Number(process.env.PORT ?? 3000);
@@ -19,6 +20,25 @@ async function main() {
     void maybeInitialImport().catch((e) =>
       console.error("Initial import failed:", e),
     );
+  }
+
+  // Bootstrap the oral-exam question pool BEFORE the HTTP listener starts.
+  // A fresh deploy (empty SQLite volume) ships zero OralQuestion rows, which
+  // would make "create oral exam" fail with "pool is empty — run seed first".
+  // This is idempotent (counts first; upserts only on an empty/partial pool)
+  // and never touches existing exams/ratings, so repeated restarts are safe.
+  // Runs unconditionally (not gated on --with-scheduler) because oral exams
+  // are a core feature available on every deployment, scheduler or not.
+  try {
+    const r = await ensureOralPoolSeeded(prisma());
+    if (r.seeded) {
+      console.log(`Oral question pool seeded: ${r.themes} themes, ${r.questions} questions`);
+    }
+  } catch (e) {
+    // Never block startup: a transient DB error defers to the next start,
+    // matching the maybeInitialImport philosophy. OralExam creation will
+    // surface a clear error until the pool is available.
+    console.error("Oral pool self-seed failed:", e);
   }
 
   const app = createApp();

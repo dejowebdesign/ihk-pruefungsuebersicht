@@ -8,7 +8,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { execSync } from "node:child_process";
 import { setPrismaClient, disconnectPrisma } from "../src/db/prisma";
-import { seedOralPool } from "../src/oral/seed";
+import { seedOralPool, ensureOralPoolSeeded } from "../src/oral/seed";
 import { createExam, rateQuestion, completeExam } from "../src/oral/service";
 import { mulberry32 } from "../src/oral/randomize";
 import { ORAL_THEMES } from "../src/oral/themes";
@@ -249,5 +249,65 @@ describe("oral API routes", () => {
     const body = await exam.json();
     expect(body.status).toBe("completed");
     expect(body.percent).toBe(100);
+  });
+});
+
+describe("ensureOralPoolSeeded — startup self-bootstrap", () => {
+  // The already-seeded `client` has the full pool (beforeAll ran seedOralPool).
+  // A second call must be a no-op: report seeded=false and not change counts.
+  it("is a no-op when the pool is already full (idempotent restart)", async () => {
+    const before = { t: await client.oralTheme.count(), q: await client.oralQuestion.count() };
+    const res = await ensureOralPoolSeeded(client);
+    const after = { t: await client.oralTheme.count(), q: await client.oralQuestion.count() };
+    expect(res.seeded).toBe(false);
+    expect(after.t).toBe(before.t);
+    expect(after.q).toBe(before.q);
+    // every exam referenced question still resolves (no row replaced/removed)
+    const exams = await client.oralExamQuestion.findMany({ select: { questionId: true } });
+    for (const it of exams) {
+      const q = await client.oralQuestion.findUnique({ where: { id: it.questionId } });
+      expect(q).toBeTruthy();
+    }
+  });
+
+  // A fresh, empty DB must be seeded to exactly the seed count, no duplicates.
+  it("seeds an empty pool on a fresh deploy (no manual command)", async () => {
+    const freshPath = path.join(os.tmpdir(), `ihk-oral-bootstrap-${Date.now()}.db`);
+    if (fs.existsSync(freshPath)) fs.unlinkSync(freshPath);
+    const env = { ...process.env, DATABASE_URL: `file:${freshPath}` };
+    execSync("npx prisma db push --skip-generate --force-reset --accept-data-loss", {
+      cwd: path.resolve(__dirname, ".."),
+      stdio: "ignore",
+      env,
+    });
+    const fresh = new PrismaClient({ datasources: { db: { url: `file:${freshPath}` } } });
+    try {
+      // schema created, but zero oral questions — mirrors a fresh Docker volume
+      expect(await fresh.oralQuestion.count()).toBe(0);
+
+      const res = await ensureOralPoolSeeded(fresh);
+      expect(res.seeded).toBe(true);
+      expect(res.themes).toBe(ORAL_THEMES.length);
+      expect(res.questions).toBe(218);
+
+      // 8 themes, exact weights/order preserved, one question per theme present
+      const themes = await fresh.oralTheme.findMany({ orderBy: { orderKey: "asc" } });
+      expect(themes.map((t) => t.weight)).toEqual(ORAL_THEMES.map((t) => t.weight));
+      expect(themes.map((t) => t.name)).toEqual(ORAL_THEMES.map((t) => t.name));
+      for (const t of themes) {
+        expect(await fresh.oralQuestion.count({ where: { themeId: t.id } })).toBeGreaterThan(0);
+      }
+
+      // re-run: idempotent — no duplicates, no count growth
+      const res2 = await ensureOralPoolSeeded(fresh);
+      expect(res2.seeded).toBe(false);
+      expect(await fresh.oralQuestion.count()).toBe(218);
+      // excelId uniqueness preserved (no duplicate rows)
+      const all = await fresh.oralQuestion.findMany({ select: { excelId: true } });
+      expect(new Set(all.map((q) => q.excelId)).size).toBe(all.length);
+    } finally {
+      await fresh.$disconnect();
+      if (fs.existsSync(freshPath)) fs.unlinkSync(freshPath);
+    }
   });
 });
