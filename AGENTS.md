@@ -151,3 +151,23 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
 - **E2E verified** in-browser: create exam → rate 8 questions → live %
   updates → complete → result screen (100 %, Bestanden) → copy button →
   appears in list. Dark mode renders correctly.
+- **PDF-Auswertung + Prüfung löschen** (branch
+  `feat/oral-pdf-export-and-delete`, PR #1):
+  - `backend/src/oral/pdf.ts` — pdfkit renderer, A4 portrait, 50pt margins,
+    `compress:false` (text streams human-readable/verifiable). Renders ONLY
+    stored values (no recompute) → UI % == PDF %. Route
+    `GET /api/oral/exams/:id/pdf` (`?download=1` → attachment; 404 unknown,
+    409 not-completed). `oralExamPdfUrl()`/`oralDeleteExam()` in `lib/api.ts`.
+    Frontend PDF buttons render ONLY when `status==="completed"`.
+  - `deleteExam()` in `service.ts` — transactional; cascade removes
+    `OralExamQuestion` slots; pool (`OralQuestion`/`OralTheme`) NEVER touched
+    (`onDelete: Restrict`); shared candidate GC'd only when orphaned. Route
+    `DELETE /api/oral/exams/:id` (admin auth; 401/404). Frontend confirm modal
+    in `page.tsx` (`pendingDelete` state; `.oral-modal*` CSS; `.btn--danger`).
+  - **Middleware gotcha** (`frontend/src/middleware.ts`): bodyless non-GET
+    requests (DELETE) MUST NOT set `init.body = await request.text()` — it
+    returns `""` and, with a forwarded `Content-Length: 0`, makes the upstream
+    `fetch` throw (surfaced as 502). Guard with `content-length` > 0.
+- **Test suite sizes now**: backend 183 (22 oral-pdf/delete), frontend 107
+  (11 oral-pdf/delete). Full backend run takes ~160s (change-detection tests
+  are slow; give it ≥280s timeout, not the default 120s).
