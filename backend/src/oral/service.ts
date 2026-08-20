@@ -187,6 +187,51 @@ export async function updateExam(
   if (input.status) await recomputeScore(db, examId);
 }
 
+/**
+ * Delete an exam and its dependent data.
+ *
+ * Referential integrity:
+ *   - OralExamQuestion.exam → onDelete: Cascade, so deleting the exam removes
+ *     its question slots automatically (we still do it explicitly inside the
+ *     tx for clarity and to keep the order deterministic).
+ *   - OralExamQuestion.question → onDelete: Restrict protects the pool; the
+ *     pool (OralQuestion/OralTheme) is NEVER touched by a delete.
+ *   - The candidate row is removed ONLY when it would otherwise be orphaned
+ *     (no remaining exams). A shared candidate (e.g. a retest name reuse) is
+ *     kept so other exams stay intact.
+ *
+ * Returns { deleted: true } on success; throws "exam not found" otherwise.
+ * Pure transactional — no schema migration, no impact on existing exams or
+ * the question pool.
+ */
+export async function deleteExam(
+  db: PrismaClient,
+  examId: string,
+): Promise<{ deleted: true; candidateId: string | null }> {
+  return db.$transaction(async (tx) => {
+    const exam = await tx.oralExam.findUnique({
+      where: { id: examId },
+      select: { id: true, candidateId: true },
+    });
+    if (!exam) throw new Error("exam not found");
+
+    // Remove the exam; OralExamQuestion rows cascade away with it.
+    await tx.oralExam.delete({ where: { id: examId } });
+
+    // Garbage-collect the candidate only if orphaned (no other exams). This
+    // never breaks a candidate that still has exams attached.
+    let candidateId: string | null = exam.candidateId;
+    if (candidateId) {
+      const remaining = await tx.oralExam.count({ where: { candidateId } });
+      if (remaining === 0) {
+        await tx.oralCandidate.delete({ where: { id: candidateId } }).catch(() => {});
+        candidateId = null;
+      }
+    }
+    return { deleted: true as const, candidateId };
+  });
+}
+
 /** Tx-scoped recompute (used inside transactions). */
 async function recomputeScoreTx(
   tx: Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0],

@@ -325,6 +325,33 @@ function ResultView(props: {
   items: OralExamQuestion[];
 }) {
   const { exam, onCopy, copied, items } = props;
+
+  // Download the PDF evaluation as a file attachment.
+  async function downloadPdf() {
+    try {
+      const res = await fetch(api.oralExamPdfUrl(exam.id, true));
+      if (!res.ok) throw new Error("PDF konnte nicht erzeugt werden.");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safe = exam.candidate.name.replace(/[^\p{L}\p{N} _-]/gu, "_").trim() || "Pruefling";
+      a.download = `Auswertung_${safe}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // fallback: open inline in a new tab
+      window.open(api.oralExamPdfUrl(exam.id, false), "_blank");
+    }
+  }
+
+  // Open the PDF inline in a new tab (browser preview).
+  function openPdf() {
+    window.open(api.oralExamPdfUrl(exam.id, false), "_blank");
+  }
+
   return (
     <div className="oral-card oral-result">
       <h2>Gesamtergebnis</h2>
@@ -333,9 +360,17 @@ function ResultView(props: {
         {exam.totalPoints} / {exam.maxPoints} Punkte —{" "}
         <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>{exam.result}</span>
       </p>
-      <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
-        {copied ? "Kopiert ✓" : "Gesamtwert kopieren"}
-      </button>
+      <div className="oral-result__actions">
+        <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
+          {copied ? "Kopiert ✓" : "Gesamtwert kopieren"}
+        </button>
+        <button className="btn btn--ghost" onClick={downloadPdf} data-testid="oral-pdf-download">
+          PDF-Auswertung
+        </button>
+        <button className="btn btn--ghost" onClick={openPdf} data-testid="oral-pdf-open">
+          PDF öffnen
+        </button>
+      </div>
 
       <details style={{ marginTop: 24, textAlign: "left" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Detaillierte Auswertung</summary>

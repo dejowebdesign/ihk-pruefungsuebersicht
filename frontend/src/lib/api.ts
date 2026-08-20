@@ -345,9 +345,21 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(input),
     }),
+  oralDeleteExam: (token: string, examId: string) =>
+    request<{ ok: true }>(`/api/oral/exams/${examId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   oralSeedPool: (token: string) =>
     request<{ message: string; themes: number; questions: number }>("/api/oral/seed", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     }),
+  /**
+   * Download the PDF evaluation for a completed exam. Returns the binary PDF
+   * (so callers can trigger a browser download). Does NOT go through the JSON
+   * `request()` helper because the response is not JSON.
+   */
+  oralExamPdfUrl: (examId: string, download = false) =>
+    `/api/oral/exams/${examId}/pdf${download ? "?download=1" : ""}`,
 };

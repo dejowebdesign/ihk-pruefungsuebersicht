@@ -14,12 +14,14 @@ import {
   rateQuestion,
   completeExam,
   updateExam,
+  deleteExam,
   EXAM_STATUSES,
   type ExamStatus,
 } from "../../oral/service";
 import { isRating, scoreExam, type Rating } from "../../oral/scoring";
 import { ORAL_THEMES } from "../../oral/themes";
 import { seedOralPool } from "../../oral/seed";
+import { generateExamPdf } from "../../oral/pdf";
 
 export const oral = new Hono();
 
@@ -199,6 +201,97 @@ oral.patch("/exams/:id", adminAuth, async (c) => {
   } catch (e) {
     return apiError(c, 400, e instanceof Error ? e.message : "could not update exam");
   }
+});
+
+// ---- write: delete exam (admin) ----
+// Destructive: removes the exam + its OralExamQuestion slots (cascade). The
+// question pool (OralQuestion/OralTheme) is NEVER touched — only exam-level
+// data is deleted. A shared candidate is kept if other exams still reference
+// it. Requires admin auth; never public.
+
+oral.delete("/exams/:id", adminAuth, async (c) => {
+  const examId = c.req.param("id");
+  try {
+    await deleteExam(prisma(), examId);
+    return c.json({ ok: true });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "could not delete exam";
+    if (msg === "exam not found") return apiError(c, 404, msg);
+    return apiError(c, 400, msg);
+  }
+});
+
+// ---- public read: PDF evaluation (completed exams only) ----
+// Streams the print-ready A4 PDF for a completed exam. The PDF renders only
+// values already stored by the scoring logic (no recomputation), so the
+// percent shown matches the web UI exactly. Public like the other exam reads;
+// the data is the same as GET /exams/:id. Authentication is not required to
+// view an exam, and the PDF carries the same information as that public read.
+//
+// A `?download=1` query switches Content-Disposition from inline to
+// attachment (default: inline so the browser can preview/open it).
+
+oral.get("/exams/:id/pdf", async (c) => {
+  const examId = c.req.param("id");
+  const exam = await prisma().oralExam.findUnique({
+    where: { id: examId },
+    include: {
+      candidate: { select: { id: true, name: true } },
+      items: {
+        orderBy: { orderKey: "asc" },
+        include: { question: { select: { excelId: true, question: true, answer: true, source: true } } },
+      },
+    },
+  });
+  if (!exam) return apiError(c, 404, "exam not found");
+  if (exam.status !== "completed") {
+    return apiError(c, 409, "PDF export is only available for completed exams");
+  }
+
+  let pdfBuffer: Buffer;
+  try {
+    pdfBuffer = await generateExamPdf({
+      id: exam.id,
+      candidate: exam.candidate,
+      examiner: exam.examiner,
+      examDate: exam.examDate,
+      status: exam.status,
+      maxPoints: exam.maxPoints,
+      totalPoints: exam.totalPoints,
+      percent: exam.percent,
+      result: exam.result as "Bestanden" | "Nicht bestanden" | null,
+      items: exam.items.map((it) => ({
+        orderKey: it.orderKey,
+        themeName: it.themeName,
+        weight: it.weight,
+        rating: it.rating,
+        points: it.points,
+        note: it.note,
+        question: it.question,
+      })),
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "could not generate PDF";
+    if (msg.includes("completed")) return apiError(c, 409, msg);
+    return apiError(c, 500, "could not generate PDF");
+  }
+
+  const download = c.req.query("download") === "1";
+  const safeName = exam.candidate.name.replace(/[^\p{L}\p{N} _-]/gu, "_").trim() || "Pruefling";
+  const filename = `Auswertung_${safeName}.pdf`;
+  const disposition = download
+    ? `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`
+    : `inline; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+
+  return new Response(pdfBuffer, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": disposition,
+      "Content-Length": String(pdfBuffer.length),
+      "Cache-Control": "private, no-store",
+    },
+  });
 });
 
 // silence unused import in some build configs
