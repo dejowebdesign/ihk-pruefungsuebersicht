@@ -50,10 +50,12 @@ export function createApp() {
         "GET /api/oral/exams",
         "GET /api/oral/exams/:id",
         "GET /api/oral/exams/:id/score",
+        "GET /api/oral/exams/:id/pdf",
         "POST /api/oral/exams (auth)",
         "PATCH /api/oral/exams/:id/questions/:order (auth)",
         "POST /api/oral/exams/:id/complete (auth)",
         "PATCH /api/oral/exams/:id (auth)",
+        "DELETE /api/oral/exams/:id (auth)",
       ],
     }),
   );

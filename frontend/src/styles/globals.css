@@ -529,6 +529,16 @@ button {
   padding: 6px 12px;
   font-size: 0.85rem;
 }
+.btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.btn--danger:hover {
+  background: var(--danger);
+  filter: brightness(0.92);
+  border-color: var(--danger);
+}
 
 /* ── IHK grid + card ────────────────────────────────────────────────────── */
 .ihk-grid {
@@ -1089,6 +1099,44 @@ button {
 .oral-result { text-align: center; }
 .oral-result__big { font-size: 3.5rem; font-weight: 800; margin: 8px 0; color: var(--primary); }
 .oral-result__copy { margin: 12px auto; }
+.oral-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px auto;
+}
+.oral-delete-btn { color: var(--danger); }
+.oral-delete-btn:hover { background: var(--danger-soft); }
+
+/* Delete confirmation modal (dark + light mode safe via CSS vars). */
+.oral-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.oral-modal {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+.oral-modal h3 { margin-top: 0; }
+.oral-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
 @media (max-width: 640px) {
   .oral-field { flex: 1 1 100%; }
 }

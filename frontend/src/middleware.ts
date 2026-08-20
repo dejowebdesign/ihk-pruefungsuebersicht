@@ -20,7 +20,13 @@ export async function middleware(request: NextRequest) {
     headers,
     redirect: "manual",
   };
-  if (request.method !== "GET" && request.method !== "HEAD") {
+  // Only forward a request body when the client actually sent one. Bodyless
+  // non-GET requests (e.g. DELETE) arrive with an empty stream; calling
+  // request.text() returns "" and, combined with a forwarded Content-Length: 0
+  // / Content-Type header, makes the upstream fetch throw (surfaced as a 502).
+  // Skipping the body for empty requests lets DELETE through cleanly.
+  const contentLength = request.headers.get("content-length");
+  if (request.method !== "GET" && request.method !== "HEAD" && contentLength && contentLength !== "0") {
     init.body = await request.text();
   }
 
