@@ -159,75 +159,77 @@ export default function OralExamsPage() {
         </div>
       ) : (
         <div className="oral-card" style={{ padding: 0 }}>
-          <table className="oral-table">
-            <thead>
-              <tr>
-                <th>Prüfling</th>
-                <th>Datum</th>
-                <th>Ergebnis</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((exam) => (
-                <tr key={exam.id}>
-                  <td>{exam.candidate.name}</td>
-                  <td>{exam.examDate ? new Date(exam.examDate).toLocaleDateString("de-DE") : "—"}</td>
-                  <td>
-                    {exam.status === "completed" && exam.result ? (
-                      <>
-                        <strong>{Math.round(exam.percent)} %</strong>{" "}
-                        <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>
-                          {exam.result}
-                        </span>
-                      </>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td>
-                    <span className={`oral-status oral-status--${exam.status}`}>{statusLabel(exam.status)}</span>
-                  </td>
-                  <td>
-                    <div className="oral-row-actions">
-                      <Link className="btn btn--ghost btn--sm" href={`/muendliche-pruefung/${exam.id}`}>
-                        {exam.status === "completed" ? "Ansehen" : "Fortsetzen"}
-                      </Link>
-                      {exam.status === "completed" && (
-                        <>
-                          <a
-                            className="btn btn--ghost btn--sm"
-                            href={api.oralExamPdfUrl(exam.id)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            PDF öffnen
-                          </a>
-                          <a className="btn btn--ghost btn--sm" href={api.oralExamPdfUrl(exam.id, true)}>
-                            PDF herunterladen
-                          </a>
-                        </>
-                      )}
-                      {canManage && (
-                        <button
-                          type="button"
-                          className="btn btn--danger-ghost btn--sm"
-                          onClick={() => {
-                            setDeleteError(null);
-                            setNotice(null);
-                            setPendingDelete(exam);
-                          }}
-                        >
-                          Löschen
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          <div className="table-scroll">
+            <table className="oral-table">
+              <thead>
+                <tr>
+                  <th>Prüfling</th>
+                  <th>Datum</th>
+                  <th>Ergebnis</th>
+                  <th>Status</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.data.map((exam) => (
+                  <tr key={exam.id}>
+                    <td>{exam.candidate.name}</td>
+                    <td>{exam.examDate ? new Date(exam.examDate).toLocaleDateString("de-DE") : "—"}</td>
+                    <td>
+                      {exam.status === "completed" && exam.result ? (
+                        <>
+                          <strong>{Math.round(exam.percent)} %</strong>{" "}
+                          <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>
+                            {exam.result}
+                          </span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      <span className={`oral-status oral-status--${exam.status}`}>{statusLabel(exam.status)}</span>
+                    </td>
+                    <td>
+                      <div className="oral-row-actions">
+                        <Link className="btn btn--ghost btn--sm" href={`/muendliche-pruefung/${exam.id}`}>
+                          {exam.status === "completed" ? "Ansehen" : "Fortsetzen"}
+                        </Link>
+                        {exam.status === "completed" && (
+                          <>
+                            <a
+                              className="btn btn--ghost btn--sm"
+                              href={api.oralExamPdfUrl(exam.id)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              PDF öffnen
+                            </a>
+                            <a className="btn btn--ghost btn--sm" href={api.oralExamPdfUrl(exam.id, true)}>
+                              PDF herunterladen
+                            </a>
+                          </>
+                        )}
+                        {canManage && (
+                          <button
+                            type="button"
+                            className="btn btn--danger-ghost btn--sm"
+                            onClick={() => {
+                              setDeleteError(null);
+                              setNotice(null);
+                              setPendingDelete(exam);
+                            }}
+                          >
+                            Löschen
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

@@ -1,32 +1,79 @@
-/* ── IHK Prüfungsübersicht — global design tokens ─────────────────────────── */
+/* ── IHK Prüfungsübersicht — global design tokens ───────────────────────────
+   Leitmotiv: Matte Slate Grey + Frosted Glass + Deep Navy.
+
+   Every colour below was contrast-checked against the surfaces it is actually
+   used on (see the ratios in the comments). The three text steps — --text,
+   --text-muted, --text-faint — are all ≥ 4.5:1 on --bg, --bg-subtle,
+   --bg-solid and the frosted card, so no combination drops below WCAG AA for
+   normal text. Two deliberate deviations from the raw palette are marked
+   "AA fix" and exist because the suggested value was too light to read. */
 :root {
-  --bg: #f7f8fa;
-  --bg-elevated: #ffffff;
-  --bg-subtle: #eef1f5;
-  --border: #e2e6ec;
-  --border-strong: #c9d0da;
-  --text: #1a2233;
-  --text-muted: #5a6678;
-  --text-faint: #8b95a7;
-  --placeholder: #9aa3b2;
-  --primary: #1b4d8c;
-  --primary-hover: #163f72;
-  --primary-soft: #e8f0fb;
-  --primary-contrast: #ffffff;
-  --accent: #2a9d8f;
-  --accent-soft: #e6f5f2;
-  --success: #2e7d4f;
-  --success-soft: #e6f4ec;
-  --warning: #b8860b;
-  --warning-soft: #faf3e0;
-  --danger: #c0392b;
-  --danger-soft: #fbeae7;
+  /* Surfaces — matte slate grey instead of a white page. */
+  --bg: #d9dde1;
+  --bg-subtle: #e2e5e8;
+  --bg-solid: #eceff1; /* opaque raised surface (rows, inputs, chips) */
+  --bg-elevated: #eceff1; /* legacy alias kept for existing rules */
+  --glass: rgba(244, 246, 248, 0.76); /* frosted card / panel fill */
+  --glass-strong: rgba(246, 248, 250, 0.88); /* dialog, sticky header */
+  --glass-blur: 14px;
+  --glass-blur-sm: 8px;
+
+  /* Hairline contours — deliberately translucent so glass layers stack. */
+  --border: rgba(78, 91, 104, 0.22);
+  --border-strong: rgba(78, 91, 104, 0.36);
+  --border-solid: #c8ced4; /* where a crisp 1px line is needed */
+
+  /* Text — 10.2:1 / 5.2:1 / 4.6:1 on --bg. */
+  --text: #252d35;
+  --text-muted: #4e5964;
+  --text-faint: #57616c; /* AA fix: #6b7480 was 3.5:1 */
+  --placeholder: #6b7480; /* non-text, so 3:1 is sufficient */
+
+  /* Deep navy primary. */
+  --primary: #304c69;
+  --primary-hover: #243c54;
+  --primary-soft: #dce5ee;
+  --primary-contrast: #ffffff; /* 8.9:1 on --primary */
+
+  /* Restrained petrol. --accent is a SURFACE colour only (white on it is
+     4.1:1, just short of AA); --accent-ink is the readable text variant
+     (5.2:1 on --bg, 5.8:1 on --accent-soft) and is what text must use. */
+  --accent: #56877f;
+  --accent-deep: #3a655e; /* white on it is 6.6:1 — for filled petrol */
+  --accent-ink: #356058;
+  --accent-soft: #dfeae8;
+
+  /* Status inks are all ≥ 4.7:1 on --bg and ≥ 5.2:1 on their own soft chip.
+     Each status pairs an ink with a glyph in the UI, so meaning never depends
+     on colour alone. */
+  --success: #1f6b41;
+  --success-soft: #ddebe1;
+  --warning: #7a5906;
+  --warning-soft: #f1e9d4;
+  --danger: #9e3227;
+  --danger-soft: #f2ddd9;
+  --danger-contrast: #ffffff; /* 7.1:1 on --danger */
+
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 18px;
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --shadow: 0 2px 8px rgba(16, 24, 40, 0.08);
-  --shadow-lg: 0 10px 30px rgba(16, 24, 40, 0.12);
+
+  /* Soft, low-contrast shadows — the depth comes from the glass, not from a
+     heavy drop shadow. */
+  --shadow-sm: 0 1px 2px rgba(37, 45, 53, 0.06);
+  --shadow: 0 2px 10px rgba(37, 45, 53, 0.09);
+  --shadow-lg: 0 12px 32px rgba(37, 45, 53, 0.14);
+  --shadow-glass: 0 1px 2px rgba(37, 45, 53, 0.05), 0 8px 24px rgba(37, 45, 53, 0.08);
+  --ring: 0 0 0 3px rgba(48, 76, 105, 0.28);
+  /* Barely-there radial wash. Gives the frosted layers something to blur and
+     keeps the page from reading as one flat grey sheet. */
+  --wash: radial-gradient(
+    1200px 620px at 12% -10%,
+    rgba(255, 255, 255, 0.5),
+    transparent 62%
+  ),
+  radial-gradient(900px 520px at 88% 0%, rgba(86, 135, 127, 0.1), transparent 60%);
+
   --maxw: 1200px;
   --header-h: 64px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
@@ -35,34 +82,60 @@
 
 /* ── dark theme tokens ────────────────────────────────────────────────────
    Applied via data-theme="dark" on <html> (set by the blocking init script
-   before paint and by the toggle at runtime). The brand colours (blue primary,
-   teal accent) stay recognisable, just brightened for contrast on dark. The
-   background is a very dark blue-grey rather than pure black. */
+   before paint and by the toggle at runtime). The same leitmotiv, inverted:
+   a deep navy-slate page with frosted panels that sit *above* the background.
+
+   The dark palette deliberately raises the petrol accent to a bright mint
+   (--accent-ink) rather than reusing the light petrol, because the light
+   petrol only reaches 3.4:1 on this background. All text steps are ≥ 5:1. */
 [data-theme="dark"] {
-  --bg: #0f141b;
-  --bg-elevated: #161d27;
-  --bg-subtle: #1d2632;
-  --border: #2e3744;
-  --border-strong: #4d5869;
-  --text: #e9ecf2;
-  --text-muted: #a6b0bf;
-  --text-faint: #8b94a3;
-  --placeholder: #7d8698;
-  --primary: #6db0e0;
-  --primary-hover: #82c0ec;
-  --primary-soft: #16243a;
-  --primary-contrast: #ffffff;
-  --accent: #3bb0a0;
-  --accent-soft: #122c29;
-  --success: #5dc07f;
-  --success-soft: #15281d;
-  --warning: #e0b438;
+  --bg: #101720;
+  --bg-subtle: #1e2833;
+  --bg-solid: #182029;
+  --bg-elevated: #182029;
+  --glass: rgba(30, 39, 50, 0.72);
+  --glass-strong: rgba(26, 34, 44, 0.9);
+
+  --border: rgba(148, 165, 184, 0.2);
+  --border-strong: rgba(148, 165, 184, 0.36);
+  --border-solid: #2f3a47;
+
+  --text: #e8ecf1;
+  --text-muted: #a9b4c0;
+  --text-faint: #8b97a5;
+  --placeholder: #7f8b99;
+
+  --primary: #7fb2de;
+  /* Dark-mode primary is a LIGHT blue, so the contrast colour must be dark —
+     white on it is only 2.3:1. */
+  --primary-hover: #97c2e8;
+  --primary-soft: #17253a;
+  --primary-contrast: #0c1319;
+
+  --accent: #6fb3a8;
+  --accent-deep: #7fc0b4;
+  --accent-ink: #7fc0b4;
+  --accent-soft: #152a28;
+
+  --success: #6bc98d;
+  --success-soft: #16281e;
+  --warning: #e3ba55;
   --warning-soft: #2a2410;
-  --danger: #ec7059;
-  --danger-soft: #2a1612;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --danger: #f08a73;
+  --danger-soft: #2b1713;
+  --danger-contrast: #0c1319;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.55);
+  --shadow-glass: 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.45);
+  --ring: 0 0 0 3px rgba(127, 178, 222, 0.32);
+  --wash: radial-gradient(
+    1200px 620px at 12% -10%,
+    rgba(127, 178, 222, 0.14),
+    transparent 62%
+  ),
+  radial-gradient(900px 520px at 88% 0%, rgba(111, 179, 168, 0.1), transparent 60%);
   color-scheme: dark;
 }
 
@@ -71,16 +144,15 @@
 }
 
 /* ── native form controls: shared readability rules ───────────────────────
-   Keeps entered text, placeholders, focus rings and disabled state legible
-   in BOTH themes. Dark mode previously inherited the UA's dark-on-dark text
-   in date/number inputs; these rules pin every surface explicitly so no
-   platform default can leak through. */
+   Inputs and selects stay on the SOLID raised surface rather than glass: a
+   blurred field makes entered text and the caret hard to read, and the brief
+   asks for readable controls over decorative ones. */
 input,
 textarea,
 select {
   font-family: inherit;
   color: var(--text);
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
 }
 input::placeholder,
 textarea::placeholder {
@@ -91,7 +163,7 @@ textarea::placeholder {
    solid background + readable text avoids white-on-white / dark-on-dark
    option rows in dark mode. */
 select option {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   color: var(--text);
 }
 input:disabled,
@@ -111,7 +183,7 @@ select:disabled {
 input:-webkit-autofill,
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--text);
-  -webkit-box-shadow: 0 0 0 1000px var(--bg-elevated) inset;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-solid) inset;
   transition: background-color 9999s ease-in-out 0s;
 }
 
@@ -127,9 +199,19 @@ body {
   color: var(--text);
   font-family: var(--font);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* A very low-contrast wash behind everything. It is what the frosted panels
+   actually blur — without it, glass over a flat fill is invisible — and it is
+   subtle enough that it never competes with the content. Fixed so the wash
+   does not scroll away from the sticky header. */
+body {
+  background-image: var(--wash);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 a {
@@ -145,10 +227,44 @@ button {
   cursor: pointer;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  letter-spacing: -0.011em;
+}
+
+/* Keyboard focus only — a mouse click never leaves a ring behind. */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 3px;
+}
+
+/* ── motion ───────────────────────────────────────────────────────────────
+   Hover lifts and the progress bar are decoration; anyone who has asked their
+   system for reduced motion gets the end state with no transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── responsive table wrapper ─────────────────────────────────────────────
+   A wide table scrolls inside its own box instead of stretching the page and
+   forcing the whole layout sideways on a phone. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-solid);
 }
 
 /* ── layout ─────────────────────────────────────────────────────────────── */
@@ -163,18 +279,24 @@ button {
   padding: 28px 0 56px;
 }
 
-/* ── header ─────────────────────────────────────────────────────────────── */
+/* ── header ───────────────────────────────────────────────────────────────
+   Sticky, translucent, blurred. The opaque background is the fallback and the
+   @supports block swaps in the frosted version. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
   height: var(--header-h);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: saturate(180%) blur(10px);
+  background: var(--bg-subtle);
   border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
-[data-theme="dark"] .site-header {
-  background: rgba(22, 29, 39, 0.9);
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header {
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .site-header__inner {
   max-width: var(--maxw);
@@ -183,60 +305,76 @@ button {
   padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--text);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 .brand:hover {
   text-decoration: none;
 }
+/* Petrol-to-navy mark. --accent-deep (not --accent) so the white "IHK"
+   reaches 6.6:1 instead of 4.1:1. */
 .brand__mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(140deg, var(--accent-deep), var(--primary));
   display: grid;
   place-items: center;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+[data-theme="dark"] .brand__mark {
+  background: linear-gradient(140deg, var(--accent-deep), var(--primary));
+  color: #0c1319;
 }
 .nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   margin-left: auto;
 }
 .nav a {
   color: var(--text-muted);
   font-weight: 500;
-  padding: 8px 14px;
+  padding: 8px 13px;
   border-radius: var(--radius-sm);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  transition: background 0.14s ease, color 0.14s ease;
 }
 .nav a:hover {
-  background: var(--bg-subtle);
+  background: var(--bg-solid);
   color: var(--text);
   text-decoration: none;
 }
 .nav a.active {
   color: var(--primary);
   background: var(--primary-soft);
+  font-weight: 600;
 }
 .nav__toggle {
   display: none;
-  background: none;
-  border: 1px solid var(--border);
+  background: var(--bg-solid);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 8px 10px;
   color: var(--text);
+  transition: border-color 0.14s ease;
+}
+.nav__toggle:hover {
+  border-color: var(--primary);
 }
 
 /* ── theme toggle ───────────────────────────────────────────────────────── */
@@ -246,12 +384,13 @@ button {
   width: 38px;
   height: 38px;
   margin-left: 8px;
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  color: var(--text);
+  color: var(--text-muted);
   position: relative;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  flex-shrink: 0;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
 }
 .theme-toggle:hover {
   border-color: var(--primary);
@@ -281,26 +420,38 @@ button {
   transform: rotate(0) scale(1);
 }
 
-/* ── hero ───────────────────────────────────────────────────────────────── */
+/* ── hero ─────────────────────────────────────────────────────────────────
+   A frosted band rather than a white-to-grey gradient, so the top of the page
+   reads as matte slate instead of glaring white. */
 .hero {
-  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
-  padding: 48px 0 32px;
+  padding: 52px 0 36px;
+  margin-bottom: 8px;
   border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
 }
-[data-theme="dark"] .hero {
-  background: linear-gradient(180deg, #161d27 0%, var(--bg) 100%);
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero {
+    background: linear-gradient(
+      180deg,
+      var(--glass-strong) 0%,
+      rgba(244, 246, 248, 0.4) 100%
+    );
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
+  }
 }
 .hero__title {
-  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 0 0 8px;
   color: var(--text);
 }
 .hero__subtitle {
-  font-size: 1.08rem;
+  font-size: 1.06rem;
   color: var(--text-muted);
-  margin: 0 0 28px;
+  margin: 0 0 26px;
+  max-width: 62ch;
 }
 
 /* ── search bar ─────────────────────────────────────────────────────────── */
@@ -310,19 +461,22 @@ button {
 }
 .searchbar__input {
   width: 100%;
-  height: 56px;
+  height: 54px;
   padding: 0 56px 0 52px;
-  border: 1.5px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
-  font-size: 1.05rem;
-  background: var(--bg-elevated);
-  box-shadow: var(--shadow);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  font-size: 1.02rem;
+  background: var(--bg-solid);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.searchbar__input:hover {
+  border-color: var(--primary);
 }
 .searchbar__input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--primary-soft);
+  box-shadow: var(--ring);
 }
 .searchbar__icon {
   position: absolute;
@@ -338,16 +492,19 @@ button {
   top: 50%;
   transform: translateY(-50%);
   background: var(--bg-subtle);
-  border: none;
+  border: 1px solid transparent;
   border-radius: 50%;
   width: 32px;
   height: 32px;
   color: var(--text-muted);
   display: grid;
   place-items: center;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
 }
 .searchbar__clear:hover {
-  background: var(--border);
+  background: var(--bg-solid);
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 /* ── toolbar (filters + sort + count) ──────────────────────────────────── */
@@ -369,18 +526,20 @@ button {
   color: var(--text-muted);
   font-size: 0.92rem;
   white-space: nowrap;
+  font-weight: 500;
 }
 .filter-trigger {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 9px 14px;
   font-size: 0.92rem;
   font-weight: 500;
   color: var(--text);
+  transition: border-color 0.14s ease;
 }
 .filter-trigger:hover {
   border-color: var(--primary);
@@ -391,74 +550,43 @@ button {
   color: var(--primary);
 }
 .sort-select {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 9px 12px;
   font-size: 0.92rem;
   color: var(--text);
   font-family: inherit;
+  transition: border-color 0.14s ease;
+}
+.sort-select:hover {
+  border-color: var(--primary);
 }
 
-/* ── filter panel (drawer on mobile) ────────────────────────────────────── */
+/* ── filter panel (frosted) ─────────────────────────────────────────────── */
 .filter-panel {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-glass);
   margin-bottom: 24px;
 }
-.filter-panel__title {
-  font-weight: 700;
-  font-size: 1rem;
-  margin: 0 0 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.filter-group {
-  margin-bottom: 18px;
-}
-.filter-group:last-child {
-  margin-bottom: 0;
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .filter-panel {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .filter-group__label {
   display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--text-faint);
   margin-bottom: 8px;
-}
-.filter-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.filter-chip {
-  background: var(--bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  transition: all 0.12s;
-}
-.filter-chip:hover {
-  border-color: var(--primary);
-  color: var(--text);
-}
-.filter-chip--active {
-  background: var(--primary);
-  color: var(--primary-contrast);
-  border-color: var(--primary);
-}
-.filter-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 18px;
 }
 
 /* ── single Bundesland filter (overview) ───────────────────────────────── */
@@ -466,7 +594,8 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 360px;
+  max-width: 380px;
+  padding: 16px 18px;
 }
 .bundesland-filter {
   position: relative;
@@ -477,7 +606,7 @@ button {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234e5964' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
@@ -485,10 +614,10 @@ button {
 .bundesland-select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
+  box-shadow: var(--ring);
 }
 [data-theme="dark"] .bundesland-select {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a9b4c0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
 /* ── buttons ────────────────────────────────────────────────────────────── */
@@ -497,22 +626,35 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  /* One shared height so buttons, inputs and selects line up in a row. */
+  min-height: 40px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  padding: 10px 18px;
-  font-size: 0.95rem;
+  padding: 9px 16px;
+  font-size: 0.93rem;
   font-weight: 500;
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   color: var(--text);
-  transition: background 0.12s, border-color 0.12s;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease,
+    box-shadow 0.14s ease, transform 0.14s ease;
 }
 .btn:hover {
   background: var(--bg-subtle);
+  border-color: var(--border-strong);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 .btn--primary {
   background: var(--primary);
   border-color: var(--primary);
   color: var(--primary-contrast);
+  box-shadow: var(--shadow-sm);
 }
 .btn--primary:hover {
   background: var(--primary-hover);
@@ -521,40 +663,59 @@ button {
 .btn--ghost {
   background: transparent;
   border-color: transparent;
+  color: var(--text-muted);
 }
 .btn--ghost:hover {
-  background: var(--bg-subtle);
+  background: var(--bg-solid);
+  border-color: var(--border);
+  color: var(--text);
 }
 .btn--sm {
-  padding: 6px 12px;
-  font-size: 0.85rem;
+  min-height: 32px;
+  padding: 5px 11px;
+  font-size: 0.84rem;
 }
 
 /* ── IHK grid + card ────────────────────────────────────────────────────── */
 .ihk-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
 }
+/* The whole card is one <a>; it carries the frost, a hairline contour and a
+   soft shadow. Hover lifts it slightly and firms the contour — no colour
+   change, so the affordance survives both themes. */
 .ihk-card {
   position: relative;
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
   text-decoration: none;
   color: inherit;
   height: 100%;
+  box-shadow: var(--shadow-glass);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ihk-card {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .ihk-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
   border-color: var(--border-strong);
   text-decoration: none;
+}
+.ihk-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 .ihk-card__head {
   display: flex;
@@ -563,36 +724,39 @@ button {
   gap: 12px;
 }
 .ihk-card__name {
-  font-size: 1.18rem;
+  font-size: 1.15rem;
   font-weight: 700;
   margin: 0;
   color: var(--text);
+  letter-spacing: -0.012em;
 }
 .ihk-card__region {
-  font-size: 0.88rem;
+  font-size: 0.87rem;
   color: var(--text-muted);
-  margin: 2px 0 0;
+  margin: 3px 0 0;
 }
 .ihk-card__attrs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 14px;
+  gap: 12px 14px;
   margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 .attr {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .attr__label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-faint);
-  font-weight: 600;
+  font-weight: 700;
 }
 .attr__value {
-  font-size: 0.92rem;
+  font-size: 0.91rem;
   font-weight: 500;
   color: var(--text);
 }
@@ -604,25 +768,31 @@ button {
   gap: 5px;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   white-space: nowrap;
+  border: 1px solid transparent;
+  align-self: flex-start;
 }
 .badge--success {
   background: var(--success-soft);
   color: var(--success);
+  border-color: var(--success);
 }
 .badge--neutral {
   background: var(--bg-subtle);
   color: var(--text-muted);
+  border-color: var(--border-strong);
 }
 .badge--warning {
   background: var(--warning-soft);
   color: var(--warning);
+  border-color: var(--warning);
 }
 .badge--danger {
   background: var(--danger-soft);
   color: var(--danger);
+  border-color: var(--danger);
 }
 
 /* ── info row (detail page) ─────────────────────────────────────────────── */
@@ -632,21 +802,22 @@ button {
   gap: 16px;
 }
 .info-tile {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px;
+  box-shadow: var(--shadow-sm);
 }
 .info-tile__label {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-faint);
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 8px;
 }
 .info-tile__value {
-  font-size: 1.05rem;
+  font-size: 1.04rem;
   font-weight: 600;
   color: var(--text);
 }
@@ -657,12 +828,13 @@ button {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
 }
 .section-h__title {
-  font-size: 1.35rem;
+  font-size: 1.32rem;
   font-weight: 700;
   margin: 0;
+  letter-spacing: -0.015em;
 }
 
 /* ── pagination ─────────────────────────────────────────────────────────── */
@@ -671,24 +843,26 @@ button {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 32px;
+  margin-top: 34px;
   flex-wrap: wrap;
 }
 .pagination__btn {
   min-width: 38px;
   height: 38px;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-solid);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-weight: 500;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
 }
 .pagination__btn:hover:not(:disabled) {
   border-color: var(--primary);
   color: var(--primary);
+  background: var(--primary-soft);
 }
 .pagination__btn--active {
   background: var(--primary);
@@ -696,7 +870,7 @@ button {
   color: var(--primary-contrast);
 }
 .pagination__btn:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 .pagination__ellipsis {
@@ -707,111 +881,102 @@ button {
 /* ── states ────────────────────────────────────────────────────────────── */
 .state {
   text-align: center;
-  padding: 60px 20px;
-  background: var(--bg-elevated);
+  padding: 56px 20px;
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .state {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .state__icon {
   margin-bottom: 14px;
   color: var(--text-faint);
 }
 .state__title {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 600;
   margin: 0 0 8px;
 }
 .state__text {
   color: var(--text-muted);
   margin: 0 0 18px;
-  max-width: 420px;
+  max-width: 440px;
   margin-left: auto;
   margin-right: auto;
+}
+/* Inline usage: the oral and admin pages reuse .state as a compact notice
+   (they pass an inline padding). Drop the big-state chrome there. */
+p.state {
+  padding: 12px 14px;
+  text-align: left;
+  box-shadow: none;
 }
 
 /* skeleton */
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
 }
 .skeleton-card {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
   height: 200px;
 }
 .skeleton {
-  background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--bg-elevated) 37%, var(--bg-subtle) 63%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-subtle) 25%,
+    var(--bg-solid) 37%,
+    var(--bg-subtle) 63%
+  );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
   border-radius: 6px;
 }
 @keyframes shimmer {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 .skeleton__line {
   height: 12px;
   margin-bottom: 10px;
 }
-.skeleton__line--w40 { width: 40%; }
-.skeleton__line--w60 { width: 60%; }
-.skeleton__line--w80 { width: 80%; }
-
-/* ── comparison table ───────────────────────────────────────────────────── */
-.cmp-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-elevated);
+.skeleton__line--w40 {
+  width: 40%;
 }
-.cmp-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 520px;
+.skeleton__line--w60 {
+  width: 60%;
 }
-.cmp-table th,
-.cmp-table td {
-  text-align: left;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  vertical-align: top;
-}
-.cmp-table th:last-child,
-.cmp-table td:last-child {
-  border-right: none;
-}
-.cmp-table thead th {
-  background: var(--bg-subtle);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-.cmp-table tbody tr:last-child td {
-  border-bottom: none;
-}
-.cmp-table__feature {
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg-subtle);
-  width: 180px;
-}
-.cmp-empty {
-  text-align: center;
-  padding: 48px;
-  color: var(--text-muted);
+.skeleton__line--w80 {
+  width: 80%;
 }
 
 /* ── questions / case examples list ─────────────────────────────────────── */
 .qa-item {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.qa-item:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
 }
 .qa-item__head {
   display: flex;
@@ -821,12 +986,13 @@ button {
   flex-wrap: wrap;
 }
 .qa-item__cat {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 700;
   color: var(--primary);
   background: var(--primary-soft);
   padding: 3px 10px;
   border-radius: 999px;
+  letter-spacing: 0.01em;
 }
 .qa-item__diff {
   font-size: 0.78rem;
@@ -834,37 +1000,51 @@ button {
 }
 .qa-item__q {
   font-weight: 600;
-  font-size: 1.02rem;
+  font-size: 1.01rem;
   margin: 0 0 8px;
   color: var(--text);
+  line-height: 1.45;
 }
 .qa-item__a {
   color: var(--text-muted);
   margin: 0;
   white-space: pre-wrap;
+  line-height: 1.6;
 }
 
 /* ── detail page ────────────────────────────────────────────────────────── */
 .detail-head {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 28px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-glass);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .detail-head {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .detail-head__back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.89rem;
   margin-bottom: 16px;
+  font-weight: 500;
+}
+.detail-head__back:hover {
+  color: var(--primary);
 }
 .detail-head__name {
-  font-size: 1.8rem;
+  font-size: 1.75rem;
   font-weight: 800;
   margin: 0 0 4px;
+  letter-spacing: -0.025em;
 }
 .detail-head__official {
   color: var(--text-muted);
@@ -885,17 +1065,24 @@ button {
   padding-top: 18px;
   border-top: 1px solid var(--border);
   color: var(--text-muted);
-  font-size: 0.88rem;
+  font-size: 0.87rem;
   flex-wrap: wrap;
 }
 
 /* ── footer ─────────────────────────────────────────────────────────────── */
 .site-footer {
   border-top: 1px solid var(--border);
-  background: var(--bg-elevated);
-  padding: 18px 0;
-  font-size: 0.86rem;
+  background: var(--bg-subtle);
+  padding: 20px 0;
+  font-size: 0.85rem;
   color: var(--text-muted);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-footer {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
+  }
 }
 .site-footer__inner {
   max-width: var(--maxw);
@@ -915,15 +1102,36 @@ button {
 
 /* ── admin ─────────────────────────────────────────────────────────────── */
 .admin-card {
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .admin-card {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
 }
 .admin-card h3 {
   margin: 0 0 12px;
-  font-size: 1.05rem;
+  font-size: 1.04rem;
+}
+/* Generic raised panel used by /admin (previously had no styling at all). */
+.card {
+  background: var(--bg-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.card__text {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
 }
 .kv {
   display: grid;
@@ -932,33 +1140,10 @@ button {
 }
 .kv__k {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.89rem;
 }
 .kv__v {
   font-weight: 500;
-}
-.token-input {
-  width: 100%;
-  max-width: 480px;
-  padding: 10px 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--bg-elevated);
-}
-.token-input::placeholder {
-  color: var(--placeholder);
-}
-.token-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
-}
-.token-input:disabled {
-  color: var(--text-faint);
-  background: var(--bg-subtle);
 }
 
 /* ── responsive ────────────────────────────────────────────────────────── */
@@ -972,21 +1157,29 @@ button {
     top: var(--header-h);
     left: 0;
     right: 0;
-    background: var(--bg-elevated);
+    background: var(--bg-solid);
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 12px;
     gap: 4px;
     box-shadow: var(--shadow-lg);
   }
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .nav--open {
+      background: var(--glass-strong);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+      backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    }
+  }
   .nav__toggle {
     display: inline-flex;
     margin-left: auto;
   }
   .hero {
-    padding: 32px 0 24px;
+    padding: 34px 0 26px;
   }
-  .ihk-grid {
+  .ihk-grid,
+  .skeleton-grid {
     grid-template-columns: 1fr;
   }
   .toolbar__count {
@@ -997,7 +1190,29 @@ button {
     padding: 20px;
   }
   .detail-head__name {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
+  }
+  .site-header__inner {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Keep the session block from crowding the header on a phone. */
+  .session__user {
+    display: none;
+  }
+  .section-h {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .kv {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+  }
+  .kv__k {
+    margin-top: 8px;
   }
 }
 
@@ -1011,65 +1226,343 @@ button {
   }
 }
 
-/* ── Mündliche Prüfung (Phase 8) ──────────────────────────────────────────
-   Uses the existing theme tokens so light/dark mode works automatically. */
-.oral-page { max-width: var(--maxw); margin: 0 auto; padding: 24px 20px 48px; }
+/* ── Mündliche Prüfung ────────────────────────────────────────────────────
+   Built from the same tokens, so both themes follow automatically. Tables stay
+   on the solid surface (frosted table rows hurt legibility), while the panels
+   around them use the shared glass recipe. */
+.oral-page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 26px 20px 52px;
+}
 .oral-hero {
-  background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft));
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 28px 24px;
+  padding: 28px 26px;
   margin-bottom: 24px;
+  box-shadow: var(--shadow-glass);
 }
-.oral-hero h1 { margin: 0 0 4px; font-size: 1.5rem; }
-.oral-hero p { margin: 0; color: var(--text-muted); }
-.oral-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 20px; }
-.oral-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px; }
-.oral-field label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
-.oral-field input, .oral-field select {
-  background: var(--bg-elevated); border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm); padding: 9px 12px; color: var(--text); font: inherit;
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .oral-hero {
+    background: linear-gradient(
+      135deg,
+      var(--glass-strong),
+      rgba(244, 246, 248, 0.6)
+    );
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
+  [data-theme="dark"] .oral-hero {
+    background: linear-gradient(135deg, var(--glass-strong), rgba(30, 39, 50, 0.6));
+  }
 }
-.oral-field input:focus, .oral-field select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
-.oral-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
-.oral-table { width: 100%; border-collapse: collapse; }
-.oral-table th, .oral-table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-.oral-table th { background: var(--bg-subtle); font-weight: 600; color: var(--text-muted); }
-.oral-table tr:last-child td { border-bottom: none; }
-.oral-status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-.oral-status--draft { background: var(--bg-subtle); color: var(--text-muted); }
-.oral-status--in_progress { background: var(--warning-soft); color: var(--warning); }
-.oral-status--completed { background: var(--success-soft); color: var(--success); }
-.oral-status--pass { background: var(--success-soft); color: var(--success); }
-.oral-status--fail { background: var(--danger-soft); color: var(--danger); }
-.oral-take { max-width: 760px; margin: 0 auto; padding: 20px 16px 64px; }
-.oral-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem; }
-.oral-progress__bar { flex: 1; height: 8px; background: var(--bg-subtle); border-radius: 999px; overflow: hidden; }
-.oral-progress__fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width 0.15s ease; }
-.oral-take__card { padding: 24px; }
-.oral-take__theme { font-size: 0.8rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
-.oral-take__weight { color: var(--text-muted); font-size: 0.85rem; margin-left: 8px; }
-.oral-take__question { font-size: 1.1rem; line-height: 1.5; margin: 12px 0 16px; }
-.oral-take__answer { background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; color: var(--text-muted); white-space: pre-wrap; }
-.oral-take__answer-label { font-size: 0.75rem; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 6px; }
-.oral-ratings { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-.oral-rating-btn { flex: 1 1 140px; padding: 12px; border-radius: var(--radius-sm); border: 2px solid var(--border-strong); background: var(--bg-elevated); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; transition: border-color 0.1s, background 0.1s; }
-.oral-rating-btn:hover { border-color: var(--primary); }
-.oral-rating-btn:focus-visible { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
-.oral-rating-btn--active[data-rate="richtig"] { border-color: var(--success); background: var(--success-soft); color: var(--success); }
-.oral-rating-btn--active[data-rate="teilweise richtig"] { border-color: var(--warning); background: var(--warning-soft); color: var(--warning); }
-.oral-rating-btn--active[data-rate="falsch"] { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
-.oral-note { width: 100%; min-height: 64px; resize: vertical; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 9px 12px; color: var(--text); font: inherit; }
-.oral-note::placeholder { color: var(--placeholder); }
-.oral-note:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
-.oral-take__nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
-.oral-take__score { text-align: center; margin: 16px 0; color: var(--text-muted); font-size: 0.9rem; }
-.oral-take__score strong { color: var(--text); }
-.oral-result { text-align: center; }
-.oral-result__big { font-size: 3.5rem; font-weight: 800; margin: 8px 0; color: var(--primary); }
-.oral-result__copy { margin: 12px auto; }
+.oral-hero h1 {
+  margin: 0 0 4px;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+}
+.oral-hero p {
+  margin: 0;
+  color: var(--text-muted);
+}
+.oral-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+.oral-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1 1 200px;
+}
+.oral-field label {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.oral-field input,
+.oral-field select {
+  background: var(--bg-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--text);
+  font: inherit;
+  min-height: 40px;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.oral-field input:focus,
+.oral-field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+.oral-card {
+  background: var(--bg-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .oral-card {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
+}
+/* A card that wraps a table lets the table fill it edge to edge: the card keeps
+   the outer outline and clips the corners, the table supplies the scrolling.
+   Plain direct-child selectors (not :has) so no browser is left with a double
+   border. */
+.oral-card > .table-scroll,
+.admin-card > .table-scroll {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.oral-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-solid);
+}
+.oral-table th,
+.oral-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.89rem;
+  vertical-align: middle;
+}
+.oral-table th {
+  background: var(--bg-subtle);
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.oral-table tbody tr {
+  transition: background 0.12s ease;
+}
+.oral-table tbody tr:hover {
+  background: var(--bg-subtle);
+}
+.oral-table tr:last-child td {
+  border-bottom: none;
+}
+.oral-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.oral-status--draft {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border-color: var(--border-strong);
+}
+.oral-status--in_progress {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-color: var(--warning);
+}
+.oral-status--completed,
+.oral-status--pass {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: var(--success);
+}
+.oral-status--fail {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.oral-take {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 22px 16px 64px;
+}
+.oral-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.oral-progress__bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.oral-progress__fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.18s ease;
+}
+.oral-take__card {
+  padding: 26px;
+}
+.oral-take__theme {
+  font-size: 0.76rem;
+  font-weight: 700;
+  /* --accent-ink, not --accent: the petrol surface colour is only 3.0:1 as
+     small text on the page background. */
+  color: var(--accent-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.oral-take__weight {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  margin-left: 8px;
+}
+.oral-take__question {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  margin: 12px 0 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.oral-take__answer {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+.oral-take__answer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 6px;
+}
+.oral-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+/* Each rating also carries a glyph in the markup, so the active state is
+   never communicated by colour alone. */
+.oral-rating-btn {
+  flex: 1 1 140px;
+  min-height: 46px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-strong);
+  background: var(--bg-solid);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease,
+    transform 0.14s ease;
+}
+.oral-rating-btn:hover {
+  border-color: var(--primary);
+  background: var(--bg-subtle);
+}
+.oral-rating-btn:active {
+  transform: translateY(1px);
+}
+.oral-rating-btn:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+.oral-rating-btn--active[data-rate="richtig"] {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+}
+.oral-rating-btn--active[data-rate="teilweise richtig"] {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.oral-rating-btn--active[data-rate="falsch"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.oral-note {
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  background: var(--bg-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.oral-note::placeholder {
+  color: var(--placeholder);
+}
+.oral-note:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+.oral-take__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+.oral-take__score {
+  text-align: center;
+  margin: 16px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.oral-take__score strong {
+  color: var(--text);
+}
+.oral-result {
+  text-align: center;
+}
+.oral-result__big {
+  font-size: 3.4rem;
+  font-weight: 800;
+  margin: 8px 0;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.oral-result__copy {
+  margin: 12px auto;
+}
 @media (max-width: 640px) {
-  .oral-field { flex: 1 1 100%; }
+  .oral-field {
+    flex: 1 1 100%;
+  }
+  .oral-take__card {
+    padding: 20px;
+  }
 }
 
 /* ── session / identity (header) ────────────────────────────────────────── */
@@ -1094,37 +1587,38 @@ button {
   white-space: nowrap;
 }
 .session__role {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: var(--bg-subtle);
   color: var(--text-muted);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
 .session__role--admin {
   background: var(--primary-soft);
   color: var(--primary);
   border-color: transparent;
 }
+/* --accent-ink, not --accent, so the petrol label stays readable. */
 .session__role--examiner {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-ink);
   border-color: transparent;
 }
 .badge-soft {
   margin-left: 8px;
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 2px 6px;
+  padding: 3px 7px;
   border-radius: 999px;
   background: var(--bg-subtle);
   color: var(--text-faint);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
 
 /* ── login ──────────────────────────────────────────────────────────────── */
@@ -1135,18 +1629,28 @@ button {
   justify-content: center;
   padding: 32px 20px;
 }
+/* Frosted auth card — the one place where glass is purely decorative, since
+   the form fields inside stay solid. */
 .login-card {
   width: 100%;
   max-width: 420px;
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 32px;
   box-shadow: var(--shadow-lg);
 }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .login-card {
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  }
+}
 .login-card__title {
   margin: 0 0 6px;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
 }
 .login-card__subtitle {
   margin: 0 0 24px;
@@ -1159,32 +1663,38 @@ button {
 }
 .login-field label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 .login-field input {
   width: 100%;
+  min-height: 42px;
   padding: 10px 12px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   color: var(--text);
   font: inherit;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
 }
 .login-field input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
+  box-shadow: var(--ring);
 }
+/* The "!" prefix is what makes this read as an error without relying on the
+   red tint, which is the only cue a colour-blind user could miss. */
 .login-error {
   margin: 0 0 14px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   background: var(--danger-soft);
   color: var(--danger);
+  border: 1px solid var(--danger);
   font-size: 0.86rem;
+  font-weight: 500;
 }
 .login-submit {
   width: 100%;
@@ -1193,10 +1703,12 @@ button {
   margin: 18px 0 0;
   font-size: 0.82rem;
   color: var(--text-faint);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* ── modal / confirmation dialog ────────────────────────────────────────── */
+/* ── modal / confirmation dialog ──────────────────────────────────────────
+   Matte, slightly translucent panel clearly separated from a dimmed, blurred
+   backdrop. The dialog body stays on the solid surface for legibility. */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1205,32 +1717,41 @@ button {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(16, 24, 40, 0.5);
-  backdrop-filter: blur(2px);
+  background: rgba(23, 30, 39, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 .modal {
   width: 100%;
   max-width: 460px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--bg-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-lg);
 }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .modal {
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+}
 .modal__title {
   margin: 0 0 12px;
-  font-size: 1.2rem;
+  font-size: 1.18rem;
+  letter-spacing: -0.015em;
 }
 .modal__body {
   color: var(--text-muted);
   font-size: 0.92rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .modal__body p {
   margin: 0 0 10px;
 }
 .modal__hint {
-  font-size: 0.84rem;
+  font-size: 0.83rem;
   color: var(--text-faint);
 }
 .modal__actions {
@@ -1238,16 +1759,17 @@ button {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 22px;
+  flex-wrap: wrap;
 }
 
 /* ── danger buttons ─────────────────────────────────────────────────────── */
 .btn--danger {
   background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--danger-contrast);
 }
 .btn--danger:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
   background: var(--danger);
 }
 .btn--danger-ghost {
@@ -1259,14 +1781,18 @@ button {
   border-color: var(--danger);
 }
 
-/* ── inline notices ─────────────────────────────────────────────────────── */
+/* ── inline notices ───────────────────────────────────────────────────────
+   Success/notice carries a "✓"-style prefix in the markup where it matters;
+   the tint alone is never the only signal. */
 .inline-notice {
   margin: 12px 0;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   background: var(--success-soft);
   color: var(--success);
+  border: 1px solid var(--success);
   font-size: 0.88rem;
+  font-weight: 500;
 }
 .muted {
   color: var(--text-muted);
@@ -1275,8 +1801,8 @@ button {
 /* ── admin grid + user form ─────────────────────────────────────────────── */
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
 }
 .admin-card .btn {
   margin-top: 12px;
@@ -1298,9 +1824,10 @@ button {
   padding: 9px 12px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
+  background: var(--bg-solid);
   color: var(--text);
   font: inherit;
+  min-height: 40px;
 }
 
 /* ── oral table row actions + result actions ────────────────────────────── */
@@ -1329,5 +1856,11 @@ button {
   }
   .session__name {
     max-width: 90px;
+  }
+  .modal__actions {
+    flex-direction: column-reverse;
+  }
+  .modal__actions .btn {
+    width: 100%;
   }
 }

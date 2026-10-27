@@ -195,28 +195,30 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
       {!isCompleted && canManage && (
         <details className="oral-card" style={{ marginTop: 16 }}>
           <summary style={{ cursor: "pointer", fontWeight: 600 }}>Fragenübersicht ({items.length})</summary>
-          <table className="oral-table" style={{ marginTop: 12 }}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Themenbereich</th>
-                <th>Frage-ID</th>
-                <th>Bewertung</th>
-                <th>Punkte</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, i) => (
-                <tr key={it.id} style={{ cursor: "pointer", fontWeight: i === current ? 700 : 400 }} onClick={() => setCurrent(i)}>
-                  <td>{it.orderKey}</td>
-                  <td>{it.themeName}</td>
-                  <td>{it.question.excelId}</td>
-                  <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
-                  <td>{pointsFor(it.weight, it.rating)}</td>
+          <div className="table-scroll" style={{ marginTop: 12 }}>
+            <table className="oral-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Themenbereich</th>
+                  <th>Frage-ID</th>
+                  <th>Bewertung</th>
+                  <th>Punkte</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map((it, i) => (
+                  <tr key={it.id} style={{ cursor: "pointer", fontWeight: i === current ? 700 : 400 }} onClick={() => setCurrent(i)}>
+                    <td>{it.orderKey}</td>
+                    <td>{it.themeName}</td>
+                    <td>{it.question.excelId}</td>
+                    <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
+                    <td>{pointsFor(it.weight, it.rating)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </details>
       )}
     </div>
@@ -343,30 +345,32 @@ function ResultView(props: {
 
       <details style={{ marginTop: 24, textAlign: "left" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Detaillierte Auswertung</summary>
-        <table className="oral-table" style={{ marginTop: 12 }}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Themenbereich</th>
-              <th>Frage-ID</th>
-              <th>Bewertung</th>
-              <th>Punkte</th>
-              <th>Notiz</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((it) => (
-              <tr key={it.id}>
-                <td>{it.orderKey}</td>
-                <td>{it.themeName}</td>
-                <td>{it.question.excelId}</td>
-                <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
-                <td>{it.points}</td>
-                <td>{it.note ?? ""}</td>
+        <div className="table-scroll" style={{ marginTop: 12 }}>
+          <table className="oral-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Themenbereich</th>
+                <th>Frage-ID</th>
+                <th>Bewertung</th>
+                <th>Punkte</th>
+                <th>Notiz</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((it) => (
+                <tr key={it.id}>
+                  <td>{it.orderKey}</td>
+                  <td>{it.themeName}</td>
+                  <td>{it.question.excelId}</td>
+                  <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
+                  <td>{it.points}</td>
+                  <td>{it.note ?? ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </div>
   );

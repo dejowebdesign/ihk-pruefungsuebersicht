@@ -106,6 +106,7 @@ function LoginForm() {
 
         {error && (
           <p className="login-error" role="alert">
+            <span aria-hidden="true">! </span>
             {error}
           </p>
         )}
