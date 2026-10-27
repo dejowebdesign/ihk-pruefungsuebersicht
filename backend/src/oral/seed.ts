@@ -4,6 +4,7 @@
 // run repeatedly. The public IHK `Question`/`CaseExample` tables are NOT
 // touched — the oral pool is fully separate.
 
+import { createHash } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
 import { ORAL_THEMES } from "./themes";
 import seedRaw from "../../prisma/seed/oral-questions.json";
@@ -19,6 +20,36 @@ type SeedRow = {
 };
 
 const seedRows = seedRaw as SeedRow[];
+
+/** Stable content fingerprint of the shipped seed file (for logging/diagnostics). */
+export function seedFingerprint(rows: SeedRow[] = seedRows): string {
+  const h = createHash("sha256");
+  for (const r of rows) h.update(`${r.excelId}\u0000${r.frage}\u0000${r.erw ?? ""}\u0000${r.thema}\n`);
+  return h.digest("hex").slice(0, 16);
+}
+
+/**
+ * Does the stored pool already match the shipped seed file, field for field?
+ *
+ * Content comparison (not a row count) is what makes text corrections land on
+ * an already-populated production DB: `ensureOralPoolSeeded` used to skip as
+ * soon as `count() >= seedRows.length`, so a corrected question text in the
+ * JSON never reached a database that already had all 341 rows.
+ */
+async function poolMatchesSeed(db: PrismaClient): Promise<boolean> {
+  const stored = await db.oralQuestion.findMany({
+    select: { excelId: true, question: true, answer: true, nr: true, source: true },
+  });
+  if (stored.length !== seedRows.length) return false;
+  const byId = new Map(stored.map((r) => [r.excelId, r]));
+  for (const s of seedRows) {
+    const r = byId.get(s.excelId);
+    if (!r) return false;
+    if (r.question !== s.frage) return false;
+    if ((r.answer ?? null) !== (s.erw ?? null)) return false;
+  }
+  return true;
+}
 
 /** Upsert themes + questions for the oral exam pool. Returns counts. */
 export async function seedOralPool(
@@ -79,14 +110,16 @@ export async function seedOralPool(
  * independently and automatically.
  *
  * Idempotent & restart-safe:
- *   - Counts OralQuestion; runs the upsert pass ONLY when the pool is empty
- *     (or partially seeded). A fully-populated pool short-circuits after one
- *     COUNT — repeated container restarts are free.
- *   - `seedOralPool` upserts by unique `excelId`/`name`, so even a partial pool
- *     can never produce duplicates or overwrite an exam's referenced question
- *     row (the row's `id` is preserved by upsert).
+ *   - Compares the STORED pool against the shipped seed file field for field.
+ *     A fully up-to-date pool short-circuits (one query); a pool that is
+ *     missing rows *or* carries outdated question/answer text triggers the
+ *     upsert pass, so text corrections reach an already-populated database.
+ *   - `seedOralPool` upserts by unique `excelId`/`name`, so the correction run
+ *     can never duplicate rows, delete rows, or change a question's `id` —
+ *     historical exams keep pointing at the same question rows.
  *   - OralExam/OralExamQuestion/OralCandidate are never touched here, so
- *     existing exams, ratings and scores are immutable across restarts.
+ *     existing exams, ratings, points, weights and results are immutable
+ *     across restarts and across a correction run.
  *
  * Mirrors the `maybeInitialImport` philosophy: safe to call on every start,
  * defers to the next start on failure rather than crashing the server.
@@ -102,9 +135,7 @@ export async function ensureOralPoolSeeded(
     // Defer to the next start rather than crashing — matches maybeInitialImport.
     return { themes: 0, questions: 0, seeded: false };
   }
-  // Full pool already present: nothing to do. Partial pool (< seedRows.length):
-  // run the upsert pass to fill gaps without duplicating existing rows.
-  if (existing >= seedRows.length) {
+  if (existing > 0 && (await poolMatchesSeed(db))) {
     return { themes: ORAL_THEMES.length, questions: existing, seeded: false };
   }
   const res = await seedOralPool(db);
