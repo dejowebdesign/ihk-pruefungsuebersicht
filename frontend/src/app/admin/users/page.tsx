@@ -19,7 +19,7 @@ export default function UsersPage() {
   // create form
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("participant");
+  const [role, setRole] = useState<UserRole>("examiner");
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -68,7 +68,7 @@ export default function UsersPage() {
       await api.createUser({ username: name, password, role });
       setUsername("");
       setPassword("");
-      setRole("participant");
+      setRole("examiner");
       setNotice(`Benutzer „${name}“ wurde angelegt.`);
       await load();
     } catch (e: unknown) {
@@ -120,7 +120,7 @@ export default function UsersPage() {
       <div className="section-h">
         <div>
           <h1 className="section-h__title">Benutzerverwaltung</h1>
-          <p className="muted">Teilnehmerkonten anlegen, Passwörter zurücksetzen, Konten deaktivieren.</p>
+          <p className="muted">Prüferkonten anlegen, Passwörter zurücksetzen, Konten deaktivieren.</p>
         </div>
         <Link className="btn btn--ghost" href="/admin">
           ← Zur Verwaltung
@@ -154,7 +154,7 @@ export default function UsersPage() {
           <div className="oral-field">
             <label htmlFor="new-role">Rolle</label>
             <select id="new-role" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
-              <option value="participant">Teilnehmer</option>
+              <option value="examiner">Prüfer</option>
               <option value="admin">Administrator</option>
             </select>
           </div>

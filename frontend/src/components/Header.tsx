@@ -6,15 +6,14 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIdentity } from "@/lib/use-identity";
 import { roleLabel } from "@/lib/auth";
 
-// Navigation is role-aware: participants only see the areas the server lets
-// them open (`/` and `/muendliche-pruefung`). This is presentation only — the
-// actual restriction is enforced by middleware and the API gate.
+// Navigation is role-aware: examiners only see the areas the server lets them
+// open (`/` and `/muendliche-pruefung`). This is presentation only — the actual
+// restriction is enforced by middleware and the API gate.
 const ALL_LINKS = [
-  { href: "/", label: "IHKs", roles: ["admin", "participant"] },
-  { href: "/vergleich", label: "Vergleich", roles: ["admin"] },
+  { href: "/", label: "IHKs", roles: ["admin", "examiner"] },
   { href: "/fragen", label: "Fragen", roles: ["admin"] },
   { href: "/fallbeispiele", label: "Fallbeispiele", roles: ["admin"] },
-  { href: "/muendliche-pruefung", label: "Mündliche Prüfung", roles: ["admin", "participant"] },
+  { href: "/muendliche-pruefung", label: "Mündliche Prüfung", roles: ["admin", "examiner"] },
   { href: "/admin", label: "Verwaltung", roles: ["admin"] },
 ];
 

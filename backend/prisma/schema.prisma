@@ -243,7 +243,7 @@ model ChangeRecord {
 // ─────────────────────────────────────────────────────────────────────────
 // Authentication & authorization
 //
-// Roles: "admin" | "participant". Passwords are stored ONLY as scrypt hashes
+// Roles: "admin" | "examiner". Passwords are stored ONLY as scrypt hashes
 // (see backend/src/auth/passwords.ts) — never in plaintext, never returned by
 // any API response. Deactivation is soft (`active = false`) so history and
 // audit trail survive; every request re-checks `active`, so a deactivated
@@ -259,7 +259,7 @@ model User {
   id           String    @id @default(cuid())
   username     String    @unique
   passwordHash String // scrypt hash; never exposed via the API
-  role         String    @default("participant") // "admin" | "participant"
+  role         String    @default("examiner") // "admin" | "examiner"
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -356,9 +356,9 @@ model OralExam {
   id           String    @id @default(cuid())
   candidateId  String
   candidate    OralCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  // Owning participant account (null for exams created by the legacy admin
-  // token or by a shared/examiner flow). Participants may only ever read
-  // exams whose userId equals their own; the API enforces this server-side.
+  // Account that created the exam (null for the legacy admin-token flow).
+  // Audit information only: the oral exam area is shared, so every admin and
+  // every examiner may read and run every exam regardless of this field.
   userId       String?
   user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   examDate     DateTime?

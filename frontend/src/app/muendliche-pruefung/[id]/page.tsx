@@ -4,6 +4,7 @@ import Link from "next/link";
 import { api, ApiClientError, type OralExam, type OralExamQuestion, type OralRating } from "@/lib/api";
 import { ErrorState } from "@/components/States";
 import { useIdentity } from "@/lib/use-identity";
+import { canManageExams } from "@/lib/auth";
 
 const RATINGS: OralRating[] = ["richtig", "teilweise richtig", "falsch"];
 const RATING_LABEL: Record<OralRating, string> = {
@@ -21,10 +22,10 @@ function pointsFor(weight: number, rating: OralRating | null): number {
 export default function OralExamPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const { user } = useIdentity();
-  // Rating and completing are admin-only. Participants get a read-only view of
-  // their own completed exams (the server enforces this too — this only avoids
-  // offering buttons that would be rejected).
-  const isAdmin = user?.role === "admin";
+  // Rating, completing and the question overview belong to both staff roles.
+  // The server enforces this too (requireStaff) — this only avoids offering
+  // buttons that would be rejected.
+  const canManage = canManageExams(user?.role);
   const [exam, setExam] = useState<OralExam | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -166,9 +167,9 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
 
       {isCompleted ? (
         <ResultView exam={exam} onCopy={copyOverall} copied={copied} items={items} />
-      ) : !isAdmin ? (
+      ) : !canManage ? (
         <div className="oral-card">
-          Diese Prüfung ist noch nicht abgeschlossen. Die Bewertung erfolgt durch die Prüfungsleitung.
+          Diese Prüfung ist noch nicht abgeschlossen.
         </div>
       ) : item ? (
         <ExamTaker
@@ -191,7 +192,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
         <div className="oral-card">Diese Prüfung hat keine Fragen.</div>
       )}
 
-      {!isCompleted && isAdmin && (
+      {!isCompleted && canManage && (
         <details className="oral-card" style={{ marginTop: 16 }}>
           <summary style={{ cursor: "pointer", fontWeight: 600 }}>Fragenübersicht ({items.length})</summary>
           <table className="oral-table" style={{ marginTop: 12 }}>

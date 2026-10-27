@@ -40,7 +40,7 @@ function exam(over: Partial<OralExam>): OralExam {
 /** Route fetch calls by URL so the page can load normally. */
 function mockApi(opts: {
   exams?: OralExam[];
-  role?: "admin" | "participant";
+  role?: "admin" | "examiner";
   deleteStatus?: number;
   deleteError?: string;
 }) {
@@ -223,14 +223,16 @@ describe("delete confirmation", () => {
 });
 
 describe("role-dependent controls", () => {
-  it("a participant gets no delete button and no create form", async () => {
-    mockApi({ exams: [exam({ id: "e1" })], role: "participant" });
+  it("an examiner gets the delete button and the create form", async () => {
+    // Both staff roles run the exam simulation, so an examiner sees the same
+    // controls an admin does (mirror of the server's requireStaff guard).
+    mockApi({ exams: [exam({ id: "e1" })], role: "examiner" });
     await renderPage();
 
     await screen.findByText("Max Mustermann");
-    expect(screen.queryByRole("button", { name: "Löschen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Neue Prüfung/ })).not.toBeInTheDocument();
-    // Their own completed exam still offers the PDF.
+    expect(screen.getByRole("button", { name: "Löschen" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Neue Prüfung/ })).toBeInTheDocument();
+    // A completed exam offers the PDF.
     expect(screen.getByRole("link", { name: "PDF öffnen" })).toBeInTheDocument();
   });
 

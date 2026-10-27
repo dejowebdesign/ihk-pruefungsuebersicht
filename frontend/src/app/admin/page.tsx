@@ -70,7 +70,7 @@ export default function AdminPage() {
         <section className="admin-card">
           <h3>Benutzerverwaltung</h3>
           <p className="card__text">
-            Teilnehmerkonten anlegen, Passwörter zurücksetzen und Konten deaktivieren.
+            Prüferkonten anlegen, Passwörter zurücksetzen und Konten deaktivieren.
           </p>
           <a className="btn btn--primary" href="/admin/users">
             Benutzer verwalten

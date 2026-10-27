@@ -7,10 +7,12 @@ import {
   writeCachedIdentity,
   clearCachedIdentity,
   roleLabel,
+  canManageExams,
   IDENTITY_CACHE_KEY,
 } from "@/lib/auth";
 
-// The client-side policy must mirror the server's: participants get `/` and
+// The client-side policy must mirror the server's: an examiner gets `/`, the
+// IHK detail pages `/ihk/:id` (reached from the cards) and
 // `/muendliche-pruefung*`, nothing else. These helpers only decide what the UI
 // offers — the enforcement is server-side — but a mismatch would produce
 // confusing dead ends, so the rules are pinned here.
@@ -30,7 +32,7 @@ describe("path matching", () => {
 
   it("does not match a sibling that merely shares a prefix", () => {
     expect(isWithin("/fragen-archiv", ["/fragen"])).toBe(false);
-    expect(isWithin("/vergleich2", ["/vergleich"])).toBe(false);
+    expect(isWithin("/fragenarchiv", ["/fragen"])).toBe(false);
   });
 
   it("treats '/' as the exact root only", () => {
@@ -39,27 +41,36 @@ describe("path matching", () => {
   });
 });
 
-describe("participant access", () => {
-  const allowed = ["/", "/muendliche-pruefung", "/muendliche-pruefung/exam-1"];
+describe("examiner access", () => {
+  const allowed = [
+    "/",
+    "/ihk/abc",
+    "/ihk/ihk-koeln",
+    "/muendliche-pruefung",
+    "/muendliche-pruefung/exam-1",
+  ];
 
   for (const path of allowed) {
-    it(`allows the participant ${path}`, () => {
-      expect(canAccessPath("participant", path)).toBe(true);
+    it(`allows the examiner ${path}`, () => {
+      expect(canAccessPath("examiner", path)).toBe(true);
     });
   }
 
+  // Everything outside the examiner's area — including every admin surface and
+  // the retired compare page — must stay closed.
   const blocked = [
-    "/ihk/abc",
     "/fragen",
     "/fallbeispiele",
     "/vergleich",
     "/admin",
     "/admin/users",
+    "/import",
+    "/tabellen",
   ];
 
   for (const path of blocked) {
-    it(`blocks the participant ${path}`, () => {
-      expect(canAccessPath("participant", path)).toBe(false);
+    it(`blocks the examiner ${path}`, () => {
+      expect(canAccessPath("examiner", path)).toBe(false);
     });
   }
 });
@@ -72,7 +83,6 @@ describe("admin access", () => {
     "/ihk/abc",
     "/fragen",
     "/fallbeispiele",
-    "/vergleich",
     "/admin",
     "/admin/users",
   ];
@@ -82,6 +92,22 @@ describe("admin access", () => {
       expect(canAccessPath("admin", path)).toBe(true);
     });
   }
+
+  it("blocks the admin from nothing on this list (sanity check)", () => {
+    expect(paths.every((p) => canAccessPath("admin", p))).toBe(true);
+  });
+});
+
+describe("oral exam rights", () => {
+  it("both roles may run exams", () => {
+    expect(canManageExams("admin")).toBe(true);
+    expect(canManageExams("examiner")).toBe(true);
+  });
+
+  it("no role value means no exam rights", () => {
+    expect(canManageExams(null)).toBe(false);
+    expect(canManageExams(undefined)).toBe(false);
+  });
 });
 
 describe("public routes", () => {
@@ -94,11 +120,11 @@ describe("public routes", () => {
 
 describe("identity cache", () => {
   it("round-trips a valid identity", () => {
-    writeCachedIdentity({ id: "u1", username: "anna", role: "participant", active: true });
+    writeCachedIdentity({ id: "u1", username: "anna", role: "examiner", active: true });
     expect(readCachedIdentity()).toEqual({
       id: "u1",
       username: "anna",
-      role: "participant",
+      role: "examiner",
       active: true,
     });
   });
@@ -136,6 +162,23 @@ describe("identity cache", () => {
 describe("labels", () => {
   it("renders German role names", () => {
     expect(roleLabel("admin")).toBe("Administrator");
-    expect(roleLabel("participant")).toBe("Teilnehmer");
+    expect(roleLabel("examiner")).toBe("Prüfer");
+  });
+});
+
+describe("retired participant role", () => {
+  it("is not a valid cached role any more", () => {
+    localStorage.setItem(
+      IDENTITY_CACHE_KEY,
+      JSON.stringify({ id: "u", username: "x", role: "participant", active: true }),
+    );
+    expect(readCachedIdentity()).toBeNull();
+  });
+
+  it("grants no page access (it is not a known role)", () => {
+    // canAccessPath only knows admin/examiner; the retired role must not be
+    // treated as an examiner by accident.
+    expect(canAccessPath("participant" as never, "/")).toBe(false);
+    expect(canAccessPath("participant" as never, "/muendliche-pruefung")).toBe(false);
   });
 });

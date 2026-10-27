@@ -8,18 +8,18 @@ Next.js 14 Frontend, das die read-only Hono-REST-API (Phase 4) konsumiert.
 - **Sprache:** TypeScript 5.4
 - **Styling:** Globales CSS (`src/styles/globals.css`), kein UI-Framework
 - **API-Anbindung:** typed fetch helpers in `src/lib/api.ts`, Proxy über Edge-Middleware
-- **Tests:** Vitest + Testing Library (30 Tests, 4 Suites)
+- **Tests:** Vitest + Testing Library (152 Tests, 12 Suites)
 
 ## Seiten
 
 | Route | Beschreibung |
 |-------|-------------|
-| `/` | IHK-Liste mit Suche, Filtern (Bundesland, SKP, Prüfungsform) und Paginierung |
+| `/` | IHK-Liste mit Suche, Bundesland-Filter und Paginierung |
 | `/ihk/[id]` | Detailansicht einer IHK (Quelle, Import-Status, Semantik) |
-| `/vergleich` | Tabellarischer Vergleich ausgewählter IHKs |
 | `/fragen` | Fragen-Katalog mit Filter |
 | `/fallbeispiele` | Fallbeispiele mit Filter |
-| `/admin` | Admin-Bereich (Import triggern, API-Status) — erfordert Admin-Token |
+| `/muendliche-pruefung` | Mündliche §34a-Prüfung (13 Fragen, 9 Themenbereiche) — Prüfer & Admin |
+| `/admin` | Verwaltung (Import triggern, API-Status, Benutzerverwaltung) — nur Admin |
 
 ## Entwicklung
 
@@ -47,8 +47,10 @@ npm run test:watch
 Test-Suiten:
 - `tests/api.test.ts` — API-Client (Pagination, Filter, Search, Detail, Admin-Import, Error-Handling)
 - `tests/display.test.ts` — Display-Helfer (`display()`, `isMissing()`)
-- `tests/components.test.tsx` — Badge, SkpBadge, Pagination, States, ComparisonTable
+- `tests/components.test.tsx` — Badge, SkpBadge, Pagination, States, IhkCard
 - `tests/interactive.test.tsx` — SearchBar (Debounce), FilterPanel (Chip-Toggle, Reset)
+- `tests/auth-access.test.ts`, `tests/auth-ui.test.tsx`, `tests/middleware.test.ts` — Rollen (`admin` | `examiner`), Seiten-/API-Gates, Session
+- `tests/oral-parity.test.tsx`, `tests/oral-admin-ui.test.tsx` — Mündliche Prüfung (13-Fragen-Parität, PDF, Löschen)
 
 ## Production-Build
 

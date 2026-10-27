@@ -14,12 +14,22 @@ import { createHash, randomBytes } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import { hashPassword, verifyPassword, MIN_PASSWORD_LENGTH } from "./passwords";
 
-export type Role = "admin" | "participant";
-export const ROLES: readonly Role[] = ["admin", "participant"] as const;
+export type Role = "admin" | "examiner";
+export const ROLES: readonly Role[] = ["admin", "examiner"] as const;
+
+/**
+ * Roles that may still be ASSIGNED through the API. Identical to ROLES: the
+ * retired "participant" role is intentionally absent, so it can neither be
+ * granted to a new user nor restored via PATCH.
+ */
+export const ASSIGNABLE_ROLES: readonly Role[] = ROLES;
 
 export function isRole(value: unknown): value is Role {
   return typeof value === "string" && (ROLES as readonly string[]).includes(value);
 }
+
+/** The default role for a newly created user. */
+export const DEFAULT_ROLE: Role = "examiner";
 
 export const SESSION_COOKIE = "ihk_session";
 const SESSION_TTL_DAYS = 7;
@@ -54,7 +64,10 @@ function toPublic(u: {
   updatedAt: Date;
   disabledAt: Date | null;
 }): PublicUser {
-  return { ...u, role: u.role === "admin" ? "admin" : "participant" };
+  // Anything that is not an administrator is an examiner. This also covers a
+  // stale "participant" row (should the migration not have run yet): the
+  // retired role can never resurface through the API.
+  return { ...u, role: u.role === "admin" ? "admin" : "examiner" };
 }
 
 export function hashToken(raw: string): string {

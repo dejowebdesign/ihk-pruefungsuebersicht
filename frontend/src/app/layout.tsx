@@ -8,7 +8,7 @@ import "@/styles/globals.css";
 export const metadata: Metadata = {
   title: "IHK Prüfungsübersicht — Sachkundeprüfung §34a",
   description:
-    "Vergleiche Prüfungsbedingungen und Informationen der verschiedenen IHK-Standorte für die Sachkundeprüfung §34a.",
+    "Prüfungsbedingungen und Informationen der verschiedenen IHK-Standorte für die Sachkundeprüfung §34a.",
 };
 
 export const viewport = {

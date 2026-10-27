@@ -8,11 +8,12 @@ import type { NextRequest } from "next/server";
 //      time, while this reads the env var at request time (needed for Docker).
 //
 //   2. Page authorization: the pages themselves are gated here, server-side.
-//      A participant may only reach `/` and `/muendliche-pruefung*`; every other
-//      page is admin-only. The role comes from /api/auth/me (a server-verified
-//      session cookie), never from a client-supplied value.
+//      An examiner may only reach the start page `/`, the IHK detail pages
+//      `/ihk/:id` (reached by clicking a card) and `/muendliche-pruefung*`;
+//      every other page is admin-only. The role comes from /api/auth/me (a
+//      server-verified session cookie), never from a client-supplied value.
 
-const PARTICIPANT_ROUTES = ["/", "/muendliche-pruefung"];
+const EXAMINER_ROUTES = ["/", "/ihk", "/muendliche-pruefung"];
 const PUBLIC_ROUTES = ["/login"];
 
 function isWithin(pathname: string, prefixes: readonly string[]): boolean {
@@ -36,7 +37,7 @@ function isAsset(pathname: string): boolean {
 async function resolveRole(
   request: NextRequest,
   backend: string,
-): Promise<"admin" | "participant" | null> {
+): Promise<"admin" | "examiner" | null> {
   const cookie = request.headers.get("cookie");
   if (!cookie) return null;
   try {
@@ -47,7 +48,9 @@ async function resolveRole(
     if (!res.ok) return null;
     const body = (await res.json()) as { user?: { role?: string } };
     const role = body.user?.role;
-    return role === "admin" ? "admin" : role === "participant" ? "participant" : null;
+    // Anything that is not an administrator is treated as an examiner (this
+    // also covers a not-yet-migrated "participant" row).
+    return role === "admin" ? "admin" : role ? "examiner" : null;
   } catch {
     // Backend unreachable: fail closed for protected pages.
     return null;
@@ -112,8 +115,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (role !== "admin" && !isWithin(pathname, PARTICIPANT_ROUTES)) {
-    // Participants are redirected to the area they are allowed to use rather
+  if (role !== "admin" && !isWithin(pathname, EXAMINER_ROUTES)) {
+    // Examiners are redirected to the area they are allowed to use rather
     // than shown a dead end.
     return NextResponse.redirect(new URL("/", request.url));
   }

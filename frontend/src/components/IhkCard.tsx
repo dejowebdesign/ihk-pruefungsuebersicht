@@ -14,39 +14,24 @@ function Attr({ label, value }: { label: string; value: string | null }) {
   );
 }
 
-export function IhkCard({
-  ihk,
-  selected,
-  onToggleSelect,
-}: {
-  ihk: IhkLocation;
-  selected?: boolean;
-  onToggleSelect?: (id: string) => void;
-}) {
+/**
+ * The whole card is one link to the IHK detail page.
+ *
+ * An `<a>` is natively reachable by mouse, keyboard (Tab + Enter) and touch, so
+ * making the card itself the anchor gives every input method the same, full-size
+ * target. There is deliberately no nested button and no expand toggle: the card
+ * has exactly one action, and a single link is also what keeps the markup valid
+ * (no interactive content nested inside an anchor).
+ */
+export function IhkCard({ ihk }: { ihk: IhkLocation }) {
+  const name = ihk.ihkShortName ?? "IHK-Standort";
   return (
-    <article className="ihk-card">
+    <Link href={`/ihk/${ihk.id}`} className="ihk-card" aria-label={`${name} – Details anzeigen`}>
       <div className="ihk-card__head">
-        <Link href={`/ihk/${ihk.id}`} style={{ textDecoration: "none", color: "inherit", flex: 1 }}>
-          <h3 className="ihk-card__name">{ihk.ihkShortName}</h3>
-          <p className="ihk-card__region">
-            <DisplayValue value={ihk.bundesland} />
-          </p>
-        </Link>
-        {onToggleSelect && (
-          <button
-            className={`ihk-card__select${selected ? " ihk-card__select--selected" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onToggleSelect(ihk.id);
-            }}
-            aria-pressed={selected}
-            aria-label={selected ? "Vom Vergleich entfernen" : "Zum Vergleich hinzufügen"}
-            title={selected ? "Vom Vergleich entfernen" : "Zum Vergleich hinzufügen"}
-          >
-            {selected ? "✓" : "+"}
-          </button>
-        )}
+        <h3 className="ihk-card__name">{name}</h3>
+        <p className="ihk-card__region">
+          <DisplayValue value={ihk.bundesland} />
+        </p>
       </div>
 
       <SkpBadge value={ihk.skp} />
@@ -58,6 +43,6 @@ export function IhkCard({
         <Attr label="Abstand" value={ihk.intervalWrittenOral} />
         <Attr label="Mündlich" value={ihk.groupFormat} />
       </div>
-    </article>
+    </Link>
   );
 }

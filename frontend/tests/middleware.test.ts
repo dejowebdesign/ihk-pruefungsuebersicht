@@ -26,7 +26,7 @@ function stubFetch(handler: (url: string, init: RequestInit) => Response | Promi
   return calls;
 }
 
-function meResponse(role: "admin" | "participant" | null) {
+function meResponse(role: "admin" | "examiner" | null) {
   return new Response(JSON.stringify(role ? { user: { username: "u", role } } : {}), {
     status: role ? 200 : 401,
     headers: { "content-type": "application/json" },
@@ -130,28 +130,44 @@ describe("middleware page authorization", () => {
     expect(res.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("lets a participant open their allowed pages", async () => {
-    for (const path of ["/", "/muendliche-pruefung", "/muendliche-pruefung/abc"]) {
-      stubFetch(() => meResponse("participant"));
+  it("lets an examiner open their allowed pages", async () => {
+    for (const path of [
+      "/",
+      "/ihk/abc",
+      "/muendliche-pruefung",
+      "/muendliche-pruefung/abc",
+    ]) {
+      stubFetch(() => meResponse("examiner"));
       const res = await middleware(req(path, { cookie: "ihk_session=tok" }));
-      expect(res.status, `participant should reach ${path}`).toBe(200);
+      expect(res.status, `examiner should reach ${path}`).toBe(200);
     }
   });
 
-  it("redirects a participant away from every blocked page", async () => {
+  it("redirects an examiner away from every blocked page", async () => {
     for (const path of [
       "/fragen",
       "/fallbeispiele",
       "/vergleich",
       "/admin",
       "/admin/users",
-      "/ihk/abc",
     ]) {
-      stubFetch(() => meResponse("participant"));
+      stubFetch(() => meResponse("examiner"));
       const res = await middleware(req(path, { cookie: "ihk_session=tok" }));
-      expect(res.status, `participant must be blocked from ${path}`).toBe(307);
+      expect(res.status, `examiner must be blocked from ${path}`).toBe(307);
       expect(new URL(res.headers.get("location")!).pathname).toBe("/");
     }
+  });
+
+  it("treats a stale participant session as an examiner (post-migration safety)", async () => {
+    // Even if the backend still reported the retired role, the page gate must
+    // not hand it admin access — it falls back to the examiner area.
+    stubFetch(() => new Response(JSON.stringify({ user: { username: "u", role: "participant" } }), { status: 200 }));
+    const allowed = await middleware(req("/", { cookie: "ihk_session=tok" }));
+    expect(allowed.status).toBe(200);
+
+    stubFetch(() => new Response(JSON.stringify({ user: { username: "u", role: "participant" } }), { status: 200 }));
+    const blocked = await middleware(req("/admin/users", { cookie: "ihk_session=tok" }));
+    expect(blocked.status).toBe(307);
   });
 
   it("bounces a signed-in user away from /login", async () => {

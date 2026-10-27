@@ -7,7 +7,6 @@ import {
   applyResolvedTheme,
   loadThemeMode,
 } from "@/lib/theme";
-import { COMPARE_STORAGE_KEY, loadCompareIds } from "@/lib/compare";
 
 beforeEach(() => {
   localStorage.clear();
@@ -81,27 +80,28 @@ describe("ThemeToggle", () => {
     expect(loadThemeMode()).toBe("dark");
   });
 
-  it("does not touch the compare selection on mount or toggle", async () => {
+  it("does not touch other features' storage on mount or toggle", async () => {
     const user = userEvent.setup();
-    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["ihk-a", "ihk-b"]));
+    const OTHER_KEY = "ihk-other-feature";
+    localStorage.setItem(OTHER_KEY, JSON.stringify(["ihk-a", "ihk-b"]));
     applyResolvedTheme("light");
     localStorage.setItem(THEME_STORAGE_KEY, "light");
 
     const { rerender } = render(<ThemeToggle />);
-    expect(loadCompareIds()).toEqual(["ihk-a", "ihk-b"]);
+    expect(JSON.parse(localStorage.getItem(OTHER_KEY) as string)).toEqual(["ihk-a", "ihk-b"]);
 
     const btn = await screen.findByRole("button", {
       name: "Zum dunklen Design wechseln",
     });
     await user.click(btn);
 
-    // Compare selection is unaffected by the theme toggle.
-    expect(loadCompareIds()).toEqual(["ihk-a", "ihk-b"]);
+    // The unrelated entry is unaffected by the theme toggle.
+    expect(JSON.parse(localStorage.getItem(OTHER_KEY) as string)).toEqual(["ihk-a", "ihk-b"]);
     expect(loadThemeMode()).toBe("dark");
 
     // Re-mount (simulating navigation) keeps both intact.
     rerender(<ThemeToggle />);
-    expect(loadCompareIds()).toEqual(["ihk-a", "ihk-b"]);
+    expect(JSON.parse(localStorage.getItem(OTHER_KEY) as string)).toEqual(["ihk-a", "ihk-b"]);
     expect(loadThemeMode()).toBe("dark");
   });
 

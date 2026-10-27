@@ -22,7 +22,7 @@ import { bootstrapAdmin } from "../src/auth/service";
 
 const TEST_TOKEN = "pdf-delete-token-do-not-use-in-prod-0123456789ab";
 const ADMIN_PW = "pdf-admin-passwort-123";
-const PARTICIPANT_PW = "pdf-teilnehmer-passwort-456";
+const EXAMINER_PW = "pdf-pruefer-passwort-456";
 
 let dbPath: string;
 let client: PrismaClient;
@@ -304,16 +304,17 @@ describe("PDF content matches the stored results", () => {
 describe("PDF access control", () => {
   let ownId: string;
   let foreignId: string;
-  let participantCookie: string;
+  let examinerCookie: string;
 
   beforeAll(async () => {
     await app.request("/api/users", {
       method: "POST",
       headers: { ...adminToken(), "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "pdfteilnehmer", password: PARTICIPANT_PW, role: "participant" }),
+      body: JSON.stringify({ username: "pdfpruefer", password: EXAMINER_PW, role: "examiner" }),
     });
-    const user = await client.user.findUnique({ where: { username: "pdfteilnehmer" } });
+    const user = await client.user.findUnique({ where: { username: "pdfpruefer" } });
 
+    // One exam attributed to that examiner, one created by somebody else.
     ownId = await createRatedExam("Eigene PDF-Prüfung", Array(13).fill("richtig"), 88, user!.id);
     await completeExam(client, ownId);
     foreignId = await createRatedExam("Fremde PDF-Prüfung", Array(13).fill("richtig"), 89);
@@ -322,29 +323,46 @@ describe("PDF access control", () => {
     const login = await app.request("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "pdfteilnehmer", password: PARTICIPANT_PW }),
+      body: JSON.stringify({ username: "pdfpruefer", password: EXAMINER_PW }),
     });
-    participantCookie = (login.headers.get("set-cookie") ?? "").match(/ihk_session=([^;]+)/)![1];
+    examinerCookie = (login.headers.get("set-cookie") ?? "").match(/ihk_session=([^;]+)/)![1];
   });
 
-  it("a participant can download the PDF of their own exam", async () => {
+  // PDF export belongs to the shared examiner area, so any signed-in examiner
+  // may export any exam — the same reach they have for reading and rating.
+  it("an examiner can download the PDF of an exam they created", async () => {
     const res = await app.request(`/api/oral/exams/${ownId}/pdf`, {
-      headers: { cookie: `ihk_session=${participantCookie}` },
+      headers: { cookie: `ihk_session=${examinerCookie}` },
     });
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("application/pdf");
   });
 
-  it("a participant cannot download a foreign exam's PDF (404)", async () => {
+  it("an examiner can also download a colleague's exam PDF", async () => {
     const res = await app.request(`/api/oral/exams/${foreignId}/pdf`, {
-      headers: { cookie: `ihk_session=${participantCookie}` },
+      headers: { cookie: `ihk_session=${examinerCookie}` },
     });
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("application/pdf");
   });
 
   it("the admin can download any PDF", async () => {
     expect((await app.request(`/api/oral/exams/${ownId}/pdf`, { headers: adminToken() })).status).toBe(200);
     expect((await app.request(`/api/oral/exams/${foreignId}/pdf`, { headers: adminToken() })).status).toBe(200);
+  });
+
+  it("anonymous requests are rejected (401)", async () => {
+    expect((await app.request(`/api/oral/exams/${ownId}/pdf`)).status).toBe(401);
+  });
+
+  it("an unknown exam is 404", async () => {
+    expect((await app.request("/api/oral/exams/nope/pdf", { headers: adminToken() })).status).toBe(404);
+  });
+
+  it("a not-yet-completed exam is refused (409)", async () => {
+    const draftId = await createRatedExam("Noch offen", [], 990);
+    const res = await app.request(`/api/oral/exams/${draftId}/pdf`, { headers: adminToken() });
+    expect(res.status).toBe(409);
   });
 });
 
@@ -496,27 +514,28 @@ describe("exam deletion", () => {
     expect(res.status).toBe(200);
   });
 
-  it("refuses anonymous and participant deletion", async () => {
+  it("refuses anonymous deletion", async () => {
     const examId = await createRatedExam("Geschützt", Array(13).fill("richtig"), 110);
     expect(
       (await app.request(`/api/oral/exams/${examId}?confirm=true`, { method: "DELETE" })).status,
     ).toBe(401);
+    expect(await client.oralExam.findUnique({ where: { id: examId } })).toBeTruthy();
+  });
 
+  it("allows an examiner to delete (shared examiner area)", async () => {
+    const examId = await createRatedExam("Prüfer löscht", Array(13).fill("richtig"), 111);
     const login = await app.request("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "pdfteilnehmer", password: PARTICIPANT_PW }),
+      body: JSON.stringify({ username: "pdfpruefer", password: EXAMINER_PW }),
     });
     const cookie = (login.headers.get("set-cookie") ?? "").match(/ihk_session=([^;]+)/)![1];
-    expect(
-      (
-        await app.request(`/api/oral/exams/${examId}?confirm=true`, {
-          method: "DELETE",
-          headers: { cookie: `ihk_session=${cookie}` },
-        })
-      ).status,
-    ).toBe(403);
-    expect(await client.oralExam.findUnique({ where: { id: examId } })).toBeTruthy();
+    const res = await app.request(`/api/oral/exams/${examId}?confirm=true`, {
+      method: "DELETE",
+      headers: { cookie: `ihk_session=${cookie}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await client.oralExam.findUnique({ where: { id: examId } })).toBeNull();
   });
 
   it("the service layer reports an unknown exam without writing", async () => {
