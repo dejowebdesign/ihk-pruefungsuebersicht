@@ -117,3 +117,55 @@ describe("api client", () => {
     expect(url).not.toContain("category=");
   });
 });
+
+describe("api client — 401 redirects to login (session expiry recovery)", () => {
+  // The redirect uses window.location.assign; jsdom forbids real navigation, so
+  // we replace it with a spy and assert the target.
+  function spyLocation(pathname = "/fragen", search = "") {
+    const assign = vi.fn();
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { pathname, search, assign },
+    });
+    return assign;
+  }
+
+  it("redirects to /admin/login with next on a 401", async () => {
+    const assign = spyLocation("/fragen", "?page=2");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockFetch({ status: 401, body: { error: "unauthorized" } }),
+    );
+    await expect(api.questions()).rejects.toMatchObject({ status: 401 });
+    expect(assign).toHaveBeenCalledTimes(1);
+    expect(assign.mock.calls[0][0]).toBe(
+      `/admin/login?next=${encodeURIComponent("/fragen?page=2")}`,
+    );
+  });
+
+  it("does NOT redirect for the auth endpoints (status shown to the caller)", async () => {
+    const assign = spyLocation("/admin/login");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockFetch({ status: 401, body: { error: "invalid credentials" } }),
+    );
+    await expect(api.authLogin("admin", "x")).rejects.toMatchObject({ status: 401 });
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("does NOT redirect when already on the login page (no loop)", async () => {
+    const assign = spyLocation("/admin/login");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockFetch({ status: 401, body: { error: "unauthorized" } }),
+    );
+    await expect(api.ihkList()).rejects.toMatchObject({ status: 401 });
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("does not redirect on non-401 errors", async () => {
+    const assign = spyLocation("/fragen");
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockFetch({ status: 500, body: { error: "boom" } }),
+    );
+    await expect(api.ihkList()).rejects.toMatchObject({ status: 500 });
+    expect(assign).not.toHaveBeenCalled();
+  });
+});
