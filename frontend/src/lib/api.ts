@@ -223,6 +223,22 @@ export interface AdminStatus {
   scheduler: SchedulerStatus;
 }
 
+/**
+ * When the session expires or is revoked mid-visit, any protected API call
+ * returns 401. Send the browser back to the login page (preserving the current
+ * location) instead of leaving a half-rendered page with failed requests.
+ *
+ * Only reacts in a browser, never on the login page itself (avoids a loop), and
+ * never for the auth endpoints — those surface their status to the caller.
+ */
+function handleUnauthorized(path: string) {
+  if (typeof window === "undefined") return;
+  if (path.startsWith("/api/auth/")) return;
+  if (window.location.pathname === "/admin/login") return;
+  const next = window.location.pathname + window.location.search;
+  window.location.assign(`/admin/login?next=${encodeURIComponent(next)}`);
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     // Send/receive the admin session cookie for same-origin API calls.
@@ -244,6 +260,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       (body && typeof body === "object" && "error" in (body as object)
         ? String((body as ApiError).error)
         : null) || "Die Daten konnten momentan nicht geladen werden.";
+    if (res.status === 401) handleUnauthorized(path);
     throw new ApiClientError(msg, res.status);
   }
   return body as T;

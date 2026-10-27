@@ -10,8 +10,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 const replace = vi.fn();
+// Mutable `next` query value so tests can exercise the return-to-page logic.
+let nextParam: string | null = null;
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace, push: vi.fn(), prefetch: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(nextParam ? { next: nextParam } : {}),
 }));
 
 const authMe = vi.fn();
@@ -29,6 +32,7 @@ import { ApiClientError } from "@/lib/api";
 
 beforeEach(() => {
   replace.mockReset();
+  nextParam = null;
   authMe.mockReset().mockResolvedValue({ authenticated: false, username: null });
   authLogin.mockReset();
 });
@@ -52,7 +56,7 @@ describe("admin login page", () => {
     expect((screen.getByLabelText("Passwort") as HTMLInputElement).type).toBe("password");
   });
 
-  it("logs in with valid credentials and redirects to /admin", async () => {
+  it("logs in with valid credentials and redirects to the start page", async () => {
     const user = userEvent.setup();
     authLogin.mockResolvedValue({ ok: true, username: "admin" });
     render(<AdminLoginPage />);
@@ -60,7 +64,41 @@ describe("admin login page", () => {
     await user.type(screen.getByLabelText("Passwort"), "dbasicherheit26");
     await user.click(screen.getByRole("button", { name: "Anmelden" }));
     await waitFor(() => expect(authLogin).toHaveBeenCalledWith("admin", "dbasicherheit26"));
-    await waitFor(() => expect(replace).toHaveBeenCalledWith("/admin"));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
+  });
+
+  it("returns to the originally requested page after login", async () => {
+    const user = userEvent.setup();
+    nextParam = "/muendliche-pruefung";
+    authLogin.mockResolvedValue({ ok: true, username: "admin" });
+    render(<AdminLoginPage />);
+    await user.type(screen.getByLabelText("Benutzername"), "admin");
+    await user.type(screen.getByLabelText("Passwort"), "dbasicherheit26");
+    await user.click(screen.getByRole("button", { name: "Anmelden" }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/muendliche-pruefung"));
+  });
+
+  it("ignores an external next target (no open redirect)", async () => {
+    const user = userEvent.setup();
+    nextParam = "https://evil.example.com/steal";
+    authLogin.mockResolvedValue({ ok: true, username: "admin" });
+    render(<AdminLoginPage />);
+    await user.type(screen.getByLabelText("Benutzername"), "admin");
+    await user.type(screen.getByLabelText("Passwort"), "dbasicherheit26");
+    await user.click(screen.getByRole("button", { name: "Anmelden" }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
+    expect(replace).not.toHaveBeenCalledWith("https://evil.example.com/steal");
+  });
+
+  it("ignores a protocol-relative next target (no open redirect)", async () => {
+    const user = userEvent.setup();
+    nextParam = "//evil.example.com";
+    authLogin.mockResolvedValue({ ok: true, username: "admin" });
+    render(<AdminLoginPage />);
+    await user.type(screen.getByLabelText("Benutzername"), "admin");
+    await user.type(screen.getByLabelText("Passwort"), "dbasicherheit26");
+    await user.click(screen.getByRole("button", { name: "Anmelden" }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
   });
 
   it("shows a friendly error on invalid credentials", async () => {
@@ -83,9 +121,10 @@ describe("admin login page", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Zu viele Fehlversuche");
   });
 
-  it("redirects to /admin when already authenticated", async () => {
+  it("redirects to the requested page when already authenticated", async () => {
+    nextParam = "/fragen";
     authMe.mockResolvedValue({ authenticated: true, username: "admin" });
     render(<AdminLoginPage />);
-    await waitFor(() => expect(replace).toHaveBeenCalledWith("/admin"));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/fragen"));
   });
 });

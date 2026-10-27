@@ -366,3 +366,174 @@ describe("fails closed when nothing is configured", () => {
     expect(res.status).toBe(503);
   });
 });
+
+// ── Site-wide access control (private instance) ─────────────────────────────
+//
+// The whole API is private: every data endpoint must reject unauthenticated
+// callers, while the health check and the auth endpoints stay open. These tests
+// pin that contract endpoint by endpoint.
+
+describe("10. every data endpoint rejects unauthenticated access", () => {
+  // Each entry: [label, path, method]. All must require a credential.
+  const PROTECTED: Array<[string, string, string]> = [
+    ["IHK list", "/api/ihk", "GET"],
+    ["IHK search", "/api/ihk/search?q=aach", "GET"],
+    ["IHK detail", "/api/ihk/anything", "GET"],
+    ["sheets list", "/api/sheets", "GET"],
+    ["sheets detail", "/api/sheets/anything", "GET"],
+    ["questions list", "/api/questions", "GET"],
+    ["questions detail", "/api/questions/anything", "GET"],
+    ["case examples list", "/api/case-examples", "GET"],
+    ["case examples detail", "/api/case-examples/anything", "GET"],
+    ["import status", "/api/import/status", "GET"],
+    ["import runs", "/api/import/runs", "GET"],
+    ["oral pool", "/api/oral/pool", "GET"],
+    ["oral themes", "/api/oral/themes", "GET"],
+    ["oral exams list", "/api/oral/exams", "GET"],
+    ["oral exam detail", "/api/oral/exams/anything", "GET"],
+    ["oral exam score", "/api/oral/exams/anything/score", "GET"],
+    ["admin status", "/api/admin/status", "GET"],
+    ["admin scheduler", "/api/admin/scheduler", "GET"],
+    ["API index", "/api", "GET"],
+    ["oral create (write)", "/api/oral/exams", "POST"],
+    ["oral rate (write)", "/api/oral/exams/x/questions/1", "PATCH"],
+    ["oral complete (write)", "/api/oral/exams/x/complete", "POST"],
+    ["oral update (write)", "/api/oral/exams/x", "PATCH"],
+    ["oral seed (write)", "/api/oral/seed", "POST"],
+    ["admin import (write)", "/api/admin/import", "POST"],
+  ];
+
+  for (const [label, path, method] of PROTECTED) {
+    it(`${label} — ${method} ${path} → 401 without credentials`, async () => {
+      const res = await app.request(path, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: method === "GET" ? undefined : JSON.stringify({}),
+      });
+      expect(res.status).toBe(401);
+      // Must not leak any business payload.
+      const text = await res.text();
+      expect(text).toContain("unauthorized");
+    });
+  }
+
+  it("health stays public (Docker healthcheck) and exposes no business data", async () => {
+    const res = await app.request("/api/health");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.status).toBe("ok");
+    // Only operational fields — no locations/questions/candidates.
+    expect(Object.keys(body).sort()).toEqual(["database", "status", "timestamp", "version"]);
+  });
+
+  it("login/logout/me stay reachable without a session", async () => {
+    expect((await app.request("/api/auth/me")).status).toBe(200);
+    const logout = await app.request("/api/auth/logout", {
+      method: "POST",
+      headers: { Origin: "http://localhost" },
+    });
+    expect(logout.status).toBe(200);
+    expect((await login()).status).toBe(200);
+  });
+});
+
+describe("11. a valid session unlocks every data endpoint", () => {
+  async function withSession(path: string, method = "GET", body?: unknown) {
+    const cookie = sessionCookie(await login())!;
+    return app.request(path, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${ADMIN_SESSION_COOKIE}=${cookie}`,
+        Origin: "http://localhost",
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  }
+
+  it("reads are no longer blocked by auth (200 or 503, never 401)", async () => {
+    // 503 here means "no import data yet" — the auth gate was passed. The point
+    // is that a valid session is never rejected with 401.
+    for (const path of [
+      "/api/ihk?limit=1",
+      "/api/questions?limit=1",
+      "/api/case-examples?limit=1",
+      "/api/sheets?limit=1",
+      "/api/import/status",
+      "/api/import/runs",
+      "/api/oral/themes",
+      "/api/oral/pool?limit=1",
+      "/api/oral/exams?limit=1",
+      "/api/admin/status",
+      "/api/admin/scheduler",
+      "/api",
+    ]) {
+      const res = await withSession(path);
+      expect(res.status, `${path} must not be 401 with a session`).not.toBe(401);
+    }
+  });
+
+  it("endpoints with seeded data return 200", async () => {
+    for (const path of ["/api/oral/themes", "/api/oral/pool?limit=1", "/api/admin/status", "/api"]) {
+      const res = await withSession(path);
+      expect(res.status, `${path} should be 200`).toBe(200);
+    }
+  });
+
+  it("writes succeed with a session cookie", async () => {
+    const res = await withSession("/api/oral/exams", "POST", { candidateName: "Session Client" });
+    expect(res.status).toBe(201);
+  });
+
+  it("the legacy bearer token unlocks reads too (compatible clients)", async () => {
+    const res = await app.request("/api/oral/themes", {
+      headers: { Authorization: `Bearer ${LEGACY_TOKEN}` },
+    });
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("12. logout revokes access to data endpoints", () => {
+  it("after logout the session cookie no longer unlocks anything", async () => {
+    const cookie = sessionCookie(await login())!;
+    // Works before logout.
+    expect(
+      (
+        await app.request("/api/oral/themes", {
+          headers: { Cookie: `${ADMIN_SESSION_COOKIE}=${cookie}` },
+        })
+      ).status,
+    ).toBe(200);
+
+    const out = await app.request("/api/auth/logout", {
+      method: "POST",
+      headers: { Cookie: `${ADMIN_SESSION_COOKIE}=${cookie}`, Origin: "http://localhost" },
+    });
+    expect(out.status).toBe(200);
+
+    // Same cookie, now revoked server-side.
+    const after = await app.request("/api/oral/themes", {
+      headers: { Cookie: `${ADMIN_SESSION_COOKIE}=${cookie}` },
+    });
+    expect(after.status).toBe(401);
+  });
+});
+
+describe("13. expired sessions cannot read data", () => {
+  it("an expired session is rejected on a data endpoint", async () => {
+    // Create an already-expired session directly in the store.
+    const { token } = createSession(ADMIN_USER, -1000);
+    const res = await app.request("/api/oral/themes", {
+      headers: { Cookie: `${ADMIN_SESSION_COOKIE}=${token}` },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("me reports unauthenticated for an expired session", async () => {
+    const { token } = createSession(ADMIN_USER, -1000);
+    const res = await app.request("/api/auth/me", {
+      headers: { Cookie: `${ADMIN_SESSION_COOKIE}=${token}` },
+    });
+    expect(((await res.json()) as { authenticated: boolean }).authenticated).toBe(false);
+  });
+});

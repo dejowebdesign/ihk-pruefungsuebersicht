@@ -154,15 +154,15 @@ describe("oral service — persistence & scoring", () => {
 describe("oral API routes", () => {
   let examId: string;
 
-  it("GET /api/oral/themes is public and returns 8 themes", async () => {
-    const res = await app.request("/api/oral/themes");
+  it("GET /api/oral/themes (auth) returns 8 themes", async () => {
+    const res = await app.request("/api/oral/themes", { headers: authHeaders() });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBe(8);
   });
 
-  it("GET /api/oral/pool is public and returns 218 questions", async () => {
-    const res = await app.request("/api/oral/pool?limit=300");
+  it("GET /api/oral/pool (auth) returns 218 questions", async () => {
+    const res = await app.request("/api/oral/pool?limit=300", { headers: authHeaders() });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.pagination.total).toBe(218);
@@ -190,14 +190,14 @@ describe("oral API routes", () => {
   });
 
   it("GET /api/oral/exams lists the created exam", async () => {
-    const res = await app.request("/api/oral/exams?limit=50");
+    const res = await app.request("/api/oral/exams?limit=50", { headers: authHeaders() });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.some((e: { id: string }) => e.id === examId)).toBe(true);
   });
 
   it("GET /api/oral/exams/:id returns the exam with 8 questions", async () => {
-    const res = await app.request(`/api/oral/exams/${examId}`);
+    const res = await app.request(`/api/oral/exams/${examId}`, { headers: authHeaders() });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.items.length).toBe(8);
@@ -223,7 +223,7 @@ describe("oral API routes", () => {
       });
       expect(res.status).toBe(200);
     }
-    const score = await app.request(`/api/oral/exams/${examId}/score`);
+    const score = await app.request(`/api/oral/exams/${examId}/score`, { headers: authHeaders() });
     const body = await score.json();
     expect(body.totalPoints).toBe(100);
     expect(body.percent).toBe(100);
@@ -245,7 +245,7 @@ describe("oral API routes", () => {
       headers: authHeaders(),
     });
     expect(res.status).toBe(200);
-    const exam = await app.request(`/api/oral/exams/${examId}`);
+    const exam = await app.request(`/api/oral/exams/${examId}`, { headers: authHeaders() });
     const body = await exam.json();
     expect(body.status).toBe("completed");
     expect(body.percent).toBe(100);

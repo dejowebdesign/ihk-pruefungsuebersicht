@@ -12,10 +12,21 @@ import { imp } from "./routes/import";
 import { admin } from "./routes/admin";
 import { oral } from "./routes/oral";
 import { auth } from "./routes/auth";
+import { isPublicApiPath, adminAuth } from "./admin-auth";
 
 export function createApp() {
   const app = new Hono();
   app.use("*", logger());
+
+  // Application-wide access control: this instance is fully private, so every
+  // /api endpoint requires a valid session (or the legacy bearer token). Only
+  // the health check and the auth endpoints themselves stay open — see
+  // `isPublicApiPath`. Applied BEFORE the routers so no route can be reached
+  // unauthenticated, even ones added later.
+  app.use("/api/*", async (c, next) => {
+    if (isPublicApiPath(c.req.path)) return next();
+    return adminAuth(c, next);
+  });
 
   app.route("/api/health", health);
   app.route("/api/ihk", ihk);

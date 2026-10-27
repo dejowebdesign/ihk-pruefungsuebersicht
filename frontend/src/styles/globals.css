@@ -239,6 +239,26 @@ button {
   color: var(--text);
 }
 
+.nav__logout {
+  margin-left: 8px;
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.nav__logout:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.nav__logout:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* ── theme toggle ───────────────────────────────────────────────────────── */
 .theme-toggle {
   display: inline-grid;

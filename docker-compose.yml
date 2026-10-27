@@ -17,8 +17,13 @@ services:
       ADMIN_SESSION_TTL_HOURS: ${ADMIN_SESSION_TTL_HOURS:-8}
       ADMIN_LOGIN_MAX_ATTEMPTS: ${ADMIN_LOGIN_MAX_ATTEMPTS:-5}
       ADMIN_LOGIN_WINDOW_MINUTES: ${ADMIN_LOGIN_WINDOW_MINUTES:-15}
-      # Comma-separated public origin(s) for CSRF checks (e.g. https://ihk.example.com).
+      # Comma-separated public origin(s) for CSRF checks. Behind a reverse proxy
+      # (e.g. Zoraxy) set this to the public HTTPS origin, e.g.
+      # https://ihk.example.com — otherwise cookie-authenticated writes may be
+      # rejected. The request's own Host is always allowed.
       APP_ORIGIN: ${APP_ORIGIN:-}
+      # Force the Secure flag on the session cookie (recommended behind HTTPS).
+      ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-}
       GOOGLE_SHEET_ID: ${GOOGLE_SHEET_ID:-1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk}
       IMPORT_INTERVAL_HOURS: ${IMPORT_INTERVAL_HOURS:-6}
       IMPORT_REQUEST_DELAY_MS: ${IMPORT_REQUEST_DELAY_MS:-400}
@@ -53,8 +58,9 @@ services:
     restart: unless-stopped
     healthcheck:
       # node:20-slim ships no curl; use node itself for the probe so no extra
-      # runtime dependency is needed.
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      # runtime dependency is needed. Probe the LOGIN page: "/" now redirects
+      # unauthenticated visitors there, so this is the cheapest 200 response.
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/admin/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       start_period: 20s

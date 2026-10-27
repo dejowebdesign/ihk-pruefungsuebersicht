@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { api } from "@/lib/api";
 
 const LINKS = [
   { href: "/", label: "IHKs" },
@@ -15,7 +16,25 @@ const LINKS = [
 
 export function Header() {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  // No sign-out control on the login page itself.
+  const showLogout = path !== "/admin/login";
+
+  async function logout() {
+    setLoggingOut(true);
+    try {
+      await api.authLogout();
+    } catch {
+      /* ignore — the server session is cleared regardless of client errors */
+    }
+    setOpen(false);
+    // Full navigation so the middleware re-evaluates the (now absent) session.
+    router.replace("/admin/login");
+    router.refresh();
+  }
 
   return (
     <header className="site-header">
@@ -55,6 +74,17 @@ export function Header() {
         </button>
 
         <ThemeToggle />
+
+        {showLogout && (
+          <button
+            className="nav__logout"
+            onClick={logout}
+            disabled={loggingOut}
+            title="Sitzung beenden"
+          >
+            {loggingOut ? "…" : "Abmelden"}
+          </button>
+        )}
       </div>
     </header>
   );

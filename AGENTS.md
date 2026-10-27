@@ -5,12 +5,16 @@ NOT modify Quiz0r.
 
 ## Architecture
 
-- **backend/** — Hono REST API (read-only) on Prisma + SQLite. Tests via Vitest
+- **backend/** — Hono REST API on Prisma + SQLite. **Fully private**: every
+  `/api` data endpoint requires a login session or the legacy `ADMIN_TOKEN`
+  bearer; only `/api/health` and `/api/auth/*` are public. Tests via Vitest
   (`npm -w backend test`). Start: `npm -w backend run serve` with
   `DATABASE_URL`, `ADMIN_TOKEN` (and/or `ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH`
   for the login), `PORT` env. The `serve` script defaults to
   PORT=3000, so set `PORT=3001` to match docker-compose/`BACKEND_URL`.
 - **frontend/** — Next.js 14 (App Router) Web-GUI consuming the backend API.
+  Also fully private: `src/middleware.ts` redirects unauthenticated page visits
+  to `/admin/login`.
 - **Dockerfile** (root) — backend image. **frontend/Dockerfile** — Next.js image.
 
 ## Phase 5 (Next.js Web-GUI) key learnings
@@ -155,8 +159,10 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
 
 ## Task 10 — Admin login (username + password)
 
-Secure browser login for the admin area, replacing the manual token entry as
-the primary path. The legacy shared secret still works — this is additive.
+Secure browser login. **The whole instance is private**: every page and every
+API data endpoint requires a valid login. Only `/admin/login`, `GET /api/health`
+and the `/api/auth/*` endpoints are reachable without a session. The legacy
+shared secret still works — this is additive.
 
 ### Backend
 - **`backend/src/api/passwords.ts`** — `scrypt` hashing/verification (Node
@@ -172,10 +178,15 @@ the primary path. The legacy shared secret still works — this is additive.
 - **`backend/src/api/csrf.ts`** — Origin/Referer check for cookie-authenticated
   state-changing requests. Allowed origins = `APP_ORIGIN` + `X-Forwarded-Host`
   /`Host` + the request URL's own origin.
-- **`backend/src/api/admin-auth.ts`** — the SINGLE gate. Accepts a valid
+- **`backend/src/api/admin-auth.ts`** — the SINGLE gate, now applied to the
+  **entire** `/api/*` tree (not just admin/write routes). Accepts a valid
   session cookie (CSRF-checked) OR a legacy `Bearer ADMIN_TOKEN` (CSRF-exempt).
   `ADMIN_SESSION_COOKIE = ihk_admin_session`. Fails closed (503) when nothing
-  is configured.
+  is configured. `isPublicApiPath()` is the one place that defines the public
+  allow-list (`/api/health`, `/api/auth/login|logout|me`).
+- **`backend/src/api/app.ts`** — mounts the gate once, before the routers:
+  `app.use("/api/*", … isPublicApiPath … adminAuth)`. New routes are therefore
+  private by default.
 - **`backend/src/api/routes/auth.ts`** — `POST /api/auth/login`,
   `POST /api/auth/logout`, `GET /api/auth/me`. Mounted at `/api/auth` in
   `app.ts`. Cookie: HttpOnly, SameSite=Lax, Path=/, Secure in production (or
@@ -184,31 +195,46 @@ the primary path. The legacy shared secret still works — this is additive.
   `ADMIN_PASSWORD_HASH` value: `npx tsx src/scripts/hash-admin-password.ts 'pw'`.
 
 ### Frontend
+- **`frontend/src/middleware.ts`** — page gate + API proxy. Every page except
+  `/admin/login` redirects unauthenticated visitors to
+  `/admin/login?next=<path>` (the backend `/api/auth/me` is asked, cookie
+  forwarded, and the check **fails closed** if the backend is unreachable).
+  `/api/*` is still proxied to `BACKEND_URL` with `Set-Cookie` forwarded
+  verbatim and `X-Forwarded-Host`/`-Proto` passed for CSRF.
+- **`frontend/src/lib/safe-redirect.ts`** — `safeNextPath()` validates the
+  `next` query value: only same-origin absolute paths; rejects schemes,
+  `//host`, backslash tricks, and the login page itself (no open redirect).
 - **`/admin/login`** — username/password form (password show/hide toggle,
-  loading state, friendly errors incl. 429 lockout). Redirects to `/admin`
-  when already authenticated.
+  loading state, friendly errors incl. 429 lockout). Returns to the requested
+  page (or `/`) when already authenticated.
 - **`/admin`** — session-first: shows the logged-in user + Abmelden; falls back
   to the token form ("Token verwenden") and the login page when unauthenticated.
 - **`frontend/src/lib/api.ts`** — `credentials: "include"` on every request;
-  `authLogin/authLogout/authMe`; `authHeader()` makes the legacy token optional
+  `authLogin/authLogout/authMe`; a 401 on any data call redirects to the login
+  page (session-expiry recovery); `authHeader()` makes the legacy token optional
   on admin/oral write calls (cookie used when absent).
-- **`frontend/src/middleware.ts`** — forwards `Set-Cookie` verbatim (multiple
-  headers) and passes `X-Forwarded-Host`/`-Proto` so backend CSRF sees the real
-  public origin. `Header.tsx` has an "Admin" nav link.
+- **`Header.tsx`** — "Admin" nav link plus an "Abmelden" button on every page
+  except the login page.
 
 ### Config (`.env.example` documents all; real values never committed)
 `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_PASSWORD`, `ADMIN_SESSION_TTL_HOURS`,
 `ADMIN_LOGIN_MAX_ATTEMPTS`, `ADMIN_LOGIN_WINDOW_MINUTES`, `APP_ORIGIN`,
 `ADMIN_COOKIE_SECURE`, plus the pre-existing `ADMIN_TOKEN`. docker-compose
-passes them through with defaults.
+passes them through with defaults; set `APP_ORIGIN` to the public HTTPS origin
+behind a reverse proxy, otherwise cookie writes may be rejected.
 
 ### Tests
-`backend/tests/auth.test.ts` (25: login, invalid creds, unauth writes, access
+`backend/tests/auth.test.ts` (59: login, invalid creds, unauth writes, access
 after login, logout, expiry, CSRF incl. proxy host, rate limit, legacy token,
-fail-closed) and `frontend/tests/admin-login.test.tsx` (6: fields, toggle,
-login+redirect, error, 429, already-authed). Green: backend 186, frontend 102.
-E2E smoke-tested against a live server (login → cookie → CSRF reject → write
-→ logout → 401; legacy bearer still 200; rate limit 429).
+fail-closed, plus a per-endpoint sweep that every data route returns 401
+unauthenticated and is reachable with a session). `frontend/tests/middleware.test.ts`
+(25: page redirects, no loop, fail-closed, API proxy, matcher, `safeNextPath`
+open-redirect cases) and `frontend/tests/admin-login.test.tsx` (9: fields,
+toggle, login+return-to-page, open-redirect rejection, error, 429,
+already-authed). Green: backend 220, frontend 130. E2E smoke-tested against a
+live server (page 307 → login → page/API 200 → CSRF reject → logout → 401;
+legacy bearer still 200; rate limit 429), including the production standalone
+build.
 
 **Initial local credentials:** username `admin`, password `dbasicherheit26`
 (only in the gitignored `.env`; the repo stores no plaintext password).

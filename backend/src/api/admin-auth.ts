@@ -1,5 +1,6 @@
 // Admin authentication middleware — the SINGLE gate for every admin/write
-// endpoint (admin routes, oral writes). Two credentials are accepted:
+// endpoint (admin routes, oral writes) AND, since the app is fully private,
+// for every data endpoint under /api. Two credentials are accepted:
 //
 //   1. Legacy shared secret  — `Authorization: Bearer <ADMIN_TOKEN>`
 //      (kept for backwards compatibility with existing scripts/clients).
@@ -14,7 +15,7 @@
 // Security properties:
 //   - Constant-time comparison of the legacy token.
 //   - Cookie-authenticated state-changing requests are CSRF-checked (Origin).
-//   - Fails closed: when nothing is configured, admin endpoints return 503.
+//   - Fails closed: when nothing is configured, protected endpoints return 503.
 
 import type { Context, MiddlewareHandler } from "hono";
 import { createHash, timingSafeEqual } from "node:crypto";
@@ -32,6 +33,19 @@ export function adminTokenConfigured(): boolean {
 /** True when ANY admin credential is configured (token or username/password). */
 export function adminAuthConfigured(): boolean {
   return adminTokenConfigured() || adminPasswordConfigured();
+}
+
+/**
+ * API paths that must stay reachable WITHOUT a session:
+ *   - /api/health        Docker healthcheck (no business data)
+ *   - /api/auth/login    obtain a session
+ *   - /api/auth/logout   drop a session (no-op without one)
+ *   - /api/auth/me       report auth state so the frontend can decide
+ * Everything else under /api is protected.
+ */
+export function isPublicApiPath(pathname: string): boolean {
+  const p = pathname.replace(/\/+$/, "") || "/";
+  return p === "/api/health" || p === "/api/auth/login" || p === "/api/auth/logout" || p === "/api/auth/me";
 }
 
 function constantTimeEqual(a: string, b: string): boolean {

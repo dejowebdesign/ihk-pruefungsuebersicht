@@ -1,14 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Runtime API proxy: forwards /api/* to the Hono backend (BACKEND_URL).
-// We use middleware instead of next.config rewrites() because rewrites are
-// baked into the build, while middleware reads env at request time — so the
-// backend URL stays configurable via the BACKEND_URL env var in Docker.
-export async function middleware(request: NextRequest) {
-  const backend = process.env.BACKEND_URL || "http://localhost:3001";
+// Two responsibilities, in order:
+//
+//   1. Page access control — this instance is fully private, so every page
+//      except the login page requires a valid session. Unauthenticated
+//      visitors are redirected to /admin/login?next=<original path>.
+//   2. Runtime API proxy — forwards /api/* to the Hono backend (BACKEND_URL).
+//      We use middleware instead of next.config rewrites() because rewrites are
+//      baked into the build, while middleware reads env at request time — so
+//      the backend URL stays configurable via the BACKEND_URL env var in Docker.
+//
+// The backend re-checks every credential itself; this gate only decides which
+// *pages* a browser may render. Protected data is never sent to an
+// unauthenticated client because the API is gated server-side as well.
+
+const LOGIN_PATH = "/admin/login";
+
+function backendBase(): string {
+  return process.env.BACKEND_URL || "http://localhost:3001";
+}
+
+/** Strip the /api prefix and forward the request to the backend. */
+async function proxyApi(request: NextRequest): Promise<NextResponse> {
   const path = request.nextUrl.pathname.replace(/^\/api/, "");
-  const url = `${backend}/api${path}${request.nextUrl.search}`;
+  const url = `${backendBase()}/api${path}${request.nextUrl.search}`;
   const backendUrl = new URL(url);
 
   const headers = new Headers(request.headers);
@@ -56,6 +72,72 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+/**
+ * Ask the backend whether the request carries a valid session. The session
+ * cookie is forwarded so the backend can validate it server-side — the
+ * middleware itself never trusts a client-supplied claim.
+ */
+async function isAuthenticated(request: NextRequest): Promise<boolean> {
+  const cookie = request.headers.get("cookie");
+  try {
+    const res = await fetch(`${backendBase()}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        ...(cookie ? { cookie } : {}),
+        // Same-origin hint so the backend can evaluate CSRF context if needed.
+        "x-forwarded-host": request.headers.get("host") ?? "",
+        "x-forwarded-proto": request.nextUrl.protocol.replace(":", ""),
+      },
+      redirect: "manual",
+      cache: "no-store",
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { authenticated?: boolean };
+    return data.authenticated === true;
+  } catch {
+    // Fail closed: if the backend cannot confirm a session, treat the visitor
+    // as unauthenticated rather than exposing protected pages.
+    return false;
+  }
+}
+
+/**
+ * Build the login redirect. The target is always our own login page; the
+ * original path travels in `next` purely so the login page can send the user
+ * back. We only ever emit a same-origin path here, never an absolute URL.
+ */
+function redirectToLogin(request: NextRequest): NextResponse {
+  const target = request.nextUrl.pathname + request.nextUrl.search;
+  const url = request.nextUrl.clone();
+  url.pathname = LOGIN_PATH;
+  url.search = "";
+  url.searchParams.set("next", target);
+  return NextResponse.redirect(url);
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1) API proxy (login endpoints included — they must work before a session).
+  if (pathname === "/api" || pathname.startsWith("/api/")) {
+    return proxyApi(request);
+  }
+
+  // 2) The login page is always reachable — otherwise we would loop.
+  if (pathname === LOGIN_PATH) {
+    return NextResponse.next();
+  }
+
+  // 3) Everything else is private.
+  if (await isAuthenticated(request)) {
+    return NextResponse.next();
+  }
+  return redirectToLogin(request);
+}
+
 export const config = {
-  matcher: "/api/:path*",
+  // Run on every route EXCEPT Next.js internals and static files, so page
+  // access control cannot be bypassed by a direct URL, and so the login page
+  // still loads its CSS/JS without a session.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
