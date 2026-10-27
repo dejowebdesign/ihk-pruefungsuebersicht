@@ -18,7 +18,7 @@ import {
   type ExamStatus,
 } from "../../oral/service";
 import { isRating, scoreExam, type Rating } from "../../oral/scoring";
-import { ORAL_THEMES } from "../../oral/themes";
+import { ORAL_QUESTIONS_PER_EXAM } from "../../oral/themes";
 import { seedOralPool } from "../../oral/seed";
 
 export const oral = new Hono();
@@ -131,7 +131,7 @@ oral.post("/exams", adminAuth, async (c) => {
 oral.patch("/exams/:id/questions/:order", adminAuth, async (c) => {
   const examId = c.req.param("id");
   const order = Number(c.req.param("order"));
-  if (!Number.isInteger(order) || order < 1 || order > ORAL_THEMES.length) {
+  if (!Number.isInteger(order) || order < 1 || order > ORAL_QUESTIONS_PER_EXAM) {
     return apiError(c, 400, "invalid question order");
   }
   let body: Record<string, unknown>;

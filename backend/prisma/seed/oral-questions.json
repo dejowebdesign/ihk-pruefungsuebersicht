@@ -1960,5 +1960,1112 @@
     "frage": "Wo dürfen keine Waffen (sogar trotz Waffenschein) geführt werden?",
     "erw": "Bei ö2entlichen Veranstaltungen • in Waffenverbotszonen",
     "geprueft": null
+  },
+  {
+    "excelId": "UmM-41",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Deeskalationstechniken kennen Sie?",
+    "erw": "Ruhige Ansprache, Distanz wahren, Ich-Botschaften, aktives Zuhören, klare Grenzen setzen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-42",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Aggressionsarten gibt es?",
+    "erw": "Verbale, körperliche, passive und instrumentelle Aggression.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-43",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Kann Frustration zu Aggression führen?",
+    "erw": "Ja, Frustration kann in Aggression umschlagen, wenn keine Bewältigungsstrategie vorhanden ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-44",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein Vorurteil?",
+    "erw": "Vorgefasste, meist unbegründete Meinung über Personen oder Gruppen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-45",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Panikarten gibt es?",
+    "erw": "Panikstarre, Paniksturm, Massenpanik.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-46",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Distanzzonen gibt es?",
+    "erw": "Intim-, Personal-, Sozial- und Öffentlichkeitszone.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-47",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist das 4-Seiten-Modell?",
+    "erw": "Nach Schulz von Thun: Sach-, Selbstoffenbarungs-, Beziehungs- und Appellseite.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-48",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wie geht man mit Betrunkenen um?",
+    "erw": "Ruhig, respektvoll, klare Anweisungen, Abstand halten, Eskalation vermeiden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-49",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wie geht man mit Jugendlichen um?",
+    "erw": "Respektvoll, klare Kommunikation, deeskalierend, besondere Schutzbedürftigkeit beachten.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmM-50",
+    "thema": "Umgang mit Menschen / Deeskalation",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Diversität?",
+    "erw": "Anerkennung von Vielfalt in Geschlecht, Herkunft, Religion etc.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-39",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Zeit muss höher sein – Widerstandszeit oder Interventionszeit?",
+    "erw": "Die Widerstandszeit muss höher sein als die Interventionszeit.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-40",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet mechanische Sicherheit?",
+    "erw": "Physische Sicherung durch bauliche Maßnahmen wie Türen, Schlösser, Zäune oder Sicherheitsglas.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-41",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet elektronische Sicherheit?",
+    "erw": "Technische Überwachung durch Alarmanlagen, Videoüberwachung oder Zutrittskontrollsysteme.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-42",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet organisatorische Sicherheit?",
+    "erw": "Regelungen und Abläufe wie Dienstanweisungen, Kontrollgänge oder Schlüsselmanagement.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-43",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Gefahrenmeldeanlage (GMA)?",
+    "erw": "Oberbegriff für technische Anlagen zur Meldung von Gefahren wie Einbruch, Brand oder Überfall.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-44",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Einbruchmeldeanlage (EMA)?",
+    "erw": "Anlage zur Erkennung und Meldung unbefugten Eindringens.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-45",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Brandmeldeanlage (BMA)?",
+    "erw": "Anlage zur frühzeitigen Erkennung und Meldung von Bränden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-46",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Bestandteile hat eine EMA?",
+    "erw": "Melder, Zentrale, Alarmgeber, Übertragungsweg, Bedienteil.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-47",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein stiller Alarm?",
+    "erw": "Alarm ohne akustisches Signal vor Ort, direkte Weiterleitung an Leitstelle oder Polizei.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-48",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was sind Löscheffekte?",
+    "erw": "Kühlen, Ersticken, Inhibieren (chemische Unterbrechung).",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-49",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist vorbeugender Brandschutz?",
+    "erw": "Maßnahmen zur Verhinderung von Bränden, z.B. Rauchmelder, Fluchtwege, Unterweisungen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-50",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist abwehrender Brandschutz?",
+    "erw": "Maßnahmen zur Brandbekämpfung, z.B. Feuerwehr, Feuerlöscher.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-51",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein Multifunktionsmelder?",
+    "erw": "Melder, der mehrere Brandkenngrößen kombiniert, z.B. Rauch und Wärme.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-52",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Hauptschlüsselanlage?",
+    "erw": "Ein Hauptschlüssel öffnet mehrere Schlösser, Einzelschlüssel nur bestimmte.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Sicherheitstechnik-53",
+    "thema": "Grundlagen der Sicherheitstechnik",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein Generalhauptschlüssel?",
+    "erw": "Schlüssel, der alle Schlösser einer Anlage öffnen kann.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-01",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was regelt die DGUV Vorschrift 1?",
+    "erw": "Allgemeine Pflichten von Unternehmern und Versicherten, Arbeitsschutz, Unterweisung, Erste Hilfe, Prävention.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-02",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was regelt die DGUV Vorschrift 23?",
+    "erw": "Spezielle Sicherheitsanforderungen für Wach- und Sicherungsdienste, z.B. Ausrüstung, Verhalten, Waffen, Alkohol, Eigensicherung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-03",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet Eigensicherung?",
+    "erw": "Der Sicherheitsmitarbeiter muss sich selbst vor Gefahren schützen und unnötige Risiken vermeiden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-04",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was müssen Brillenträger beachten?",
+    "erw": "Brillenträger müssen geeignete Schutzbrillen tragen, wenn Gefahren für die Augen bestehen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-05",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Pflichten hat der Unternehmer nach DGUV?",
+    "erw": "Sicherer Arbeitsplatz, Unterweisung, geeignete Ausrüstung, Gefährdungsbeurteilung, Erste-Hilfe-Organisation.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-06",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Gefährdungsbeurteilung?",
+    "erw": "Systematische Ermittlung und Bewertung von Gefahren am Arbeitsplatz.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-07",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist bei Alleineinsätzen zu beachten?",
+    "erw": "Erhöhtes Risiko; Kommunikationsmittel, regelmäßige Meldungen, Notfallplan.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-08",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Erste-Hilfe-Pflicht im Betrieb?",
+    "erw": "Unternehmer müssen ausreichende Erste-Hilfe-Maßnahmen und ausgebildete Ersthelfer bereitstellen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-09",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Ab wann benötigt man einen Ersthelfer?",
+    "erw": "Ab zwei anwesenden Versicherten im Betrieb.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-10",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Berufsgenossenschaft ist für das Sicherheitsgewerbe zuständig?",
+    "erw": "Die Verwaltungs-Berufsgenossenschaft (VBG).",
+    "geprueft": null
+  },
+  {
+    "excelId": "UVV-11",
+    "thema": "Unfallverhuetungsvorschriften",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was sind zwei wichtige Verbote aus DGUV V23?",
+    "erw": "Verbot berauschender Mittel; Verbot nicht zugelassener Waffen im Dienst.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-28",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet Führen einer Waffe?",
+    "erw": "Ausübung der tatsächlichen Gewalt außerhalb der eigenen Wohnung oder Geschäftsräume.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-29",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was braucht man um eine Waffe zu erwerben?",
+    "erw": "Zuverlässigkeit, persönliche Eignung, Bedürfnis, Sachkunde, Mindestalter.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-30",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Sind Schreckschusswaffen erlaubt?",
+    "erw": "Nur mit kleinem Waffenschein; im Sicherheitsdienst grundsätzlich unzulässig.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-31",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Darf ein Diensthund zubeißen?",
+    "erw": "Nur im Rahmen der Notwehr oder Nothilfe verhältnismäßig.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-27",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wovor schützt Notwehr im StGB?",
+    "erw": "Sie schließt die Rechtswidrigkeit aus: Wer in Notwehr handelt, handelt nicht rechtswidrig und wird nicht bestraft.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-28",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „gegenwärtiger Angriff“?",
+    "erw": "Der Angriff steht unmittelbar bevor, findet gerade statt oder dauert noch an.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-29",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „rechtswidriger Angriff“?",
+    "erw": "Rechtswidrig ist der Angriff, wenn er objektiv gegen die Rechtsordnung verstößt und nicht gerechtfertigt ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-30",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „erforderliche Verteidigung“?",
+    "erw": "Erforderlich ist das mildeste geeignete Mittel, das den Angriff sicher und sofort beendet.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-31",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Unterschied Notwehr und Notstand?",
+    "erw": "Notwehr: Angriff durch Mensch. Notstand: Gefahr (auch durch Tier/Sache/Ereignis). Notstand verlangt Interessen-/Rechtsgüterabwägung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-32",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist rechtfertigender Notstand?",
+    "erw": "Wer eine gegenwärtige, nicht anders abwendbare Gefahr von einem Rechtsgut abwendet, darf ein anderes beeinträchtigen, wenn das geschützte Interesse wesentlich überwiegt und die Handlung angemessen ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-33",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist entschuldigender Notstand?",
+    "erw": "Er schließt die Schuld aus, wenn jemand zur Abwendung einer gegenwärtigen Gefahr für Leben, Leib oder Freiheit von sich/Angehörigen/nahestehenden Personen handelt und ihm das nicht zuzumuten ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-34",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Putativnotwehr?",
+    "erw": "Irrtum über eine Notwehrlage: Man glaubt fälschlich, angegriffen zu werden. Das ist keine echte Notwehr; es ist ein Irrtumsproblem (regelmäßig über Vorsatz). Wird nur entschuldigt, wenn der Irrtum nicht vermeidbar war.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-35",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Notwehrüberschreitung (Notwehrexzess)?",
+    "erw": "Überschreitet der Angegriffene aus Verwirrung, Furcht oder Schrecken die Grenzen der Notwehr, bleibt er straflos wegen §33 StGB.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-36",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Unterschied intensiver und extensiver Notwehrexzess?",
+    "erw": "Intensiv: zu starkes Mittel in bestehender Notwehrlage. Extensiv: Verteidigung zu früh oder zu spät (keine Notwehrlage mehr).",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-37",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine vorläufige Festnahme?",
+    "erw": "Das Festhalten eines Tatverdächtigen durch Jedermann, um Strafverfolgung zu sichern.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-38",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Darf man einen 13-jährigen festhalten?",
+    "erw": "Da Kinder in keinem Fall der Strafverfolgung zugeführt werden können, könne auch ihre Festnahme auf der Grundlage des § 127 I 1 StPO nicht zulässig sein.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-39",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Unterschied Selbsthilfe und vorläufige Festnahme?",
+    "erw": "Selbsthilfe (BGB) dient der Durchsetzung eines zivilrechtlichen Anspruchs bei Gefahr der Vereitelung. Vorläufige Festnahme (StPO) dient der Sicherung der Strafverfolgung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-40",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Tatbestandsmerkmale Hausfriedensbruch?",
+    "erw": "Tatobjekt (Wohnung/Geschäftsraum/befriedetes Besitztum), Tathandlung (Eindringen oder Verweilen), gegen den Willen des Berechtigten.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-41",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Ist Hausfriedensbruch ein Antragsdelikt?",
+    "erw": "Ja, regelmäßig ein Antragsdelikt (Strafantrag durch Berechtigten erforderlich), außer besondere Konstellationen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-42",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Diebstahl?",
+    "erw": "Wegnahme einer fremden beweglichen Sache in Zueignungsabsicht.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-43",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Zueignungsabsicht?",
+    "erw": "Absicht, die Sache oder ihren Wert sich oder einem Dritten anzueignen (Aneignungsabsicht + Enteignungsvorsatz).",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-44",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist räuberischer Diebstahl?",
+    "erw": "Nach Diebstahl auf frischer Tat angewendete Gewalt oder Drohung, um im Besitz der Beute zu bleiben.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-45",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Körperverletzung?",
+    "erw": "Körperliche Misshandlung oder Gesundheitsschädigung einer anderen Person.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-46",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist gefährliche Körperverletzung?",
+    "erw": "Körperverletzung mit qualifizierten Begehungsweisen, z.B. mittels Waffe/gefährlichem Werkzeug, Gift, hinterlistigem Überfall, gemeinschaftlich oder lebensgefährdender Behandlung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-47",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist schwere Körperverletzung?",
+    "erw": "Schwere Folge (z.B. Verlust Sehvermögen, wichtiges Glied, Dauerentstellung, Lähmung etc.) als Folge der Körperverletzung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-48",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wie ist der Versuch geregelt?",
+    "erw": "Versuch beginnt mit unmittelbarem Ansetzen. Versuch eines Verbrechens ist immer strafbar; Versuch eines Vergehens nur wenn gesetzlich bestimmt.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-49",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Garantenstellung?",
+    "erw": "Rechtliche Pflicht, einen Erfolg abzuwenden (Einstehenmüssen). Entsteht z.B. durch Gesetz, Vertrag, Ingerenz, enge Lebensbeziehung oder freiwillige Übernahme.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-50",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was passiert bei Verletzung der Garantenstellung?",
+    "erw": "Wer pflichtwidrig nicht handelt und dadurch ein tatbestandsmäßiger Erfolg eintritt, kann wegen Begehens durch Unterlassen bestraft werden, wenn er rechtlich dafür einzustehen hat.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-51",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein echtes Unterlassungsdelikt?",
+    "erw": "Ein Delikt, das schon durch Nichtstun erfüllt wird, ohne Garantenstellung (z.B. unterlassene Hilfeleistung).",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-52",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein unechtes Unterlassungsdelikt?",
+    "erw": "Strafbarkeit wegen Unterlassens nur bei Garantenstellung (Begehen durch Unterlassen).",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-53",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was sind die Elemente einer Straftat (3-Stufen-Aufbau)?",
+    "erw": "Tatbestand, Rechtswidrigkeit, Schuld.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-54",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Vorsatz?",
+    "erw": "Vorsatz heißt Wissen und Wollen der Tatbestandsverwirklichung.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-55",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Fahrlässigkeit?",
+    "erw": "Außerachtlassen der im Verkehr erforderlichen Sorgfalt, wodurch der tatbestandliche Erfolg vorhersehbar und vermeidbar verursacht wird.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-56",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Vorsatzarten gibt es?",
+    "erw": "Absicht (1. Grad), direkter Vorsatz (2. Grad/Wissentlichkeit), bedingter Vorsatz (Eventualvorsatz).",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-57",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Eventualvorsatz?",
+    "erw": "Der Täter hält den Erfolg für möglich und nimmt ihn billigend in Kauf.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-58",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Verhältnismäßigkeit (im Einsatzverhalten)?",
+    "erw": "Grundsatz: Geeignet, erforderlich (mildestes Mittel) und angemessen. Nicht mehr Gewalt als nötig und nur solange wie nötig.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-22",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was regelt das BGB?",
+    "erw": "Das BGB regelt die Rechtsbeziehungen zwischen Privatpersonen (Privatrecht), insbesondere Verträge, Eigentum, Besitz, Schadensersatz und unerlaubte Handlungen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-23",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Unterschied öffentliches und privates Recht?",
+    "erw": "Öffentliches Recht regelt Staat–Bürger-Verhältnisse (Über-/Unterordnung). Privates Recht regelt Bürger–Bürger-Verhältnisse (Gleichordnung).",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-24",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Eigentum?",
+    "erw": "Eigentum ist das umfassende Herrschaftsrecht über eine Sache. Der Eigentümer darf grundsätzlich mit der Sache nach Belieben verfahren.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-25",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Unterschied Besitz und Eigentum?",
+    "erw": "Besitz = tatsächliche Herrschaft. Eigentum = rechtliche Herrschaft. Man kann Besitzer ohne Eigentümer zu sein (z.B. Mieter).",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-26",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein Besitzdiener?",
+    "erw": "Wer die tatsächliche Gewalt über eine Sache für einen anderen ausübt und dessen Weisungen unterliegt.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-27",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Besitzstörung?",
+    "erw": "Wenn jemand den Besitz beeinträchtigt, ohne ihn vollständig zu entziehen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-28",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Besitzentziehung?",
+    "erw": "Vollständige Wegnahme der tatsächlichen Sachherrschaft gegen den Willen des Besitzers.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-29",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist allgemeine Selbsthilfe?",
+    "erw": "Durchsetzung eines Anspruchs im Wege der Selbsthilfe, wenn gerichtliche Hilfe nicht rechtzeitig zu erlangen ist und Gefahr besteht, dass die Durchsetzung vereitelt wird.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-30",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Voraussetzungen der allgemeinen Selbsthilfe?",
+    "erw": "Anspruch besteht, gerichtliche Hilfe nicht rechtzeitig erreichbar, Gefahr der Vereitelung, Verhältnismäßigkeit.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-31",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „sofort“ im §859 BGB?",
+    "erw": "Unmittelbar im Anschluss an die Besitzstörung, ohne schuldhaftes Zögern.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-32",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist defensiver Notstand?",
+    "erw": "Abwehr einer Gefahr, die von einer Sache ausgeht, durch Beschädigung dieser Sache.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-33",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist aggressiver Notstand?",
+    "erw": "Eingriff in fremdes Eigentum, obwohl die Gefahr nicht von dieser Sache ausgeht; Duldungspflicht, ggf. Schadensersatz.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-34",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine unerlaubte Handlung?",
+    "erw": "Rechtswidrige und schuldhafte Verletzung eines geschützten Rechtsgutes, die Schadensersatz auslöst.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-35",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wann ist man schadensersatzpflichtig?",
+    "erw": "Wenn man vorsätzlich oder fahrlässig ein Rechtsgut verletzt und keine Rechtfertigung greift.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-36",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist das Schikaneverbot?",
+    "erw": "Rechtsausübung ist unzulässig, wenn sie nur den Zweck hat, einem anderen Schaden zuzufügen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-37",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Verhältnismäßigkeit im Zivilrecht?",
+    "erw": "Maßnahmen müssen geeignet, erforderlich und angemessen sein.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-38",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Herausgabeanspruch?",
+    "erw": "Der Eigentümer kann vom Besitzer die Herausgabe der Sache verlangen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-39",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist ein Anspruch?",
+    "erw": "Das Recht, von einem anderen ein Tun oder Unterlassen zu verlangen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-40",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Deliktsfähigkeit?",
+    "erw": "Fähigkeit, für eigenes rechtswidriges Verhalten zivilrechtlich verantwortlich zu sein.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-41",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Ab wann ist man deliktsfähig?",
+    "erw": "Grundsätzlich ab 7 Jahren; eingeschränkt bei Minderjährigen, abhängig von Einsichtsfähigkeit.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-42",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Haften Eltern für ihre Kinder?",
+    "erw": "Nur bei Verletzung der Aufsichtspflicht.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-43",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Willenserklärung?",
+    "erw": "Äußerung eines Rechtsbindungswillens, die auf einen rechtlichen Erfolg gerichtet ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "BGB-44",
+    "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wovor schützt Notwehr im BGB?",
+    "erw": "Sie verhindert zivilrechtliche Ansprüche: Eine Notwehrhandlung ist nicht widerrechtlich, daher regelmäßig kein Schadensersatzanspruch.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-25",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Datenschutz?",
+    "erw": "Datenschutz schützt natürliche Personen bei der Verarbeitung personenbezogener Daten und regelt, wann Daten erhoben, gespeichert, genutzt, übermittelt und gelöscht werden dürfen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-26",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Für wen gilt die DSGVO?",
+    "erw": "Für die Verarbeitung personenbezogener Daten natürlicher Personen durch Verantwortliche/Auftragsverarbeiter – auch private Unternehmen, sofern sie nicht rein privat/haushaltsbezogen handeln.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-27",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „Verarbeitung“ von Daten?",
+    "erw": "Jeder Vorgang mit Daten: Erheben, Speichern, Ordnen, Verändern, Auslesen, Übermitteln, Löschen usw.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-28",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist „Erheben“?",
+    "erw": "Das Beschaffen personenbezogener Daten (z.B. Personalien aufnehmen, Ausweis ablesen, Kennzeichen notieren).",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-29",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist „berechtigtes Interesse“?",
+    "erw": "Ein legitimer Zweck des Verantwortlichen (z.B. Schutz vor Diebstahl), der nach Abwägung die Interessen/Grundrechte der Betroffenen nicht überwiegt.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-30",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet Datenminimierung (Datensparsamkeit)?",
+    "erw": "Nur so viele Daten wie nötig, so wenig wie möglich: „erforderlich“ für den Zweck.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-31",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet Speicherbegrenzung?",
+    "erw": "Daten nur so lange speichern, wie es für den Zweck erforderlich ist; danach löschen/anononymisieren.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-32",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Ausnahmen gibt es beim Löschen personenbezogener Daten?",
+    "erw": "Wenn gesetzliche Aufbewahrungspflichten bestehen, zur Rechtsverteidigung/Beweissicherung nötig ist oder andere DSGVO-Ausnahmen greifen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-33",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Berichtigung?",
+    "erw": "Unrichtige personenbezogene Daten müssen korrigiert werden; ggf. Ergänzung unvollständiger Daten.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-34",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Profiling?",
+    "erw": "Automatisierte Verarbeitung zur Bewertung persönlicher Aspekte (z.B. Verhalten/Präferenzen), um Prognosen/Entscheidungen abzuleiten.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-35",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist Videoüberwachung rechtlich (datenschutzrechtlich) grundsätzlich?",
+    "erw": "Verarbeitung personenbezogener Daten (Bilddaten). Zulässig nur mit Rechtsgrundlage, Zweck, Transparenz (Hinweise) und Interessenabwägung; keine anlasslose „Dauerüberwachung“ ohne Bedarf.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-36",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Voraussetzungen müssen für Videoüberwachung erfüllt sein?",
+    "erw": "Legitimer Zweck (z.B. Hausrecht/Diebstahlschutz), Erforderlichkeit, Interessenabwägung, Hinweisschilder/Information, Zugriffsbeschränkung, kurze Speicherdauer, Löschkonzept.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-37",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Darf ein Sicherheitsmitarbeiter Daten privat nutzen (z.B. Promi-Nummern)?",
+    "erw": "Nein. Strikte Zweckbindung: nur dienstlich und nur für den Zweck; private Nutzung ist unzulässig und kann arbeits- und strafrechtliche Folgen haben.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-38",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Daten dürfen wir als Sicherheitsmitarbeiter typischerweise aufnehmen?",
+    "erw": "Nur erforderliche Daten für den Zweck: z.B. Name, Vorname, Geburtsdatum/Adresse nur wenn notwendig (z.B. Vorfallbericht), Beschreibung, Zeit/Ort, ggf. Zeugen; keine „Neugier-Daten“.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-39",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Dürfen wir Ausweis kopieren oder fotografieren?",
+    "erw": "Grundsätzlich nur, wenn zwingend erforderlich und eine Rechtsgrundlage besteht; meist reicht „einsehen und notieren“ erforderlicher Daten.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-40",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wer ist „Verantwortlicher“ im Datenschutz?",
+    "erw": "Die Stelle, die Zwecke und Mittel der Verarbeitung festlegt – im Sicherheitsdienst meist das Unternehmen/der Auftraggeber je nach Konstellation, nicht der einzelne SMA.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-41",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was bedeutet „Vertraulichkeit“ im Datenschutz?",
+    "erw": "Personenbezogene Daten dürfen nur Befugte sehen; Zugriff ist zu beschränken, Weitergabe nur bei Rechtsgrundlage; Geheimhaltung auch nach Dienstende.",
+    "geprueft": null
+  },
+  {
+    "excelId": "Datenschutz-42",
+    "thema": "Datenschutzrecht",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was tun wir bei einem Datenschutzverstoß (z.B. Daten verloren)?",
+    "erw": "Sofort intern melden (Vorgesetzter/DSB), Schaden begrenzen, dokumentieren; ggf. Meldepflicht an Aufsicht binnen 72h durch Verantwortlichen und ggf. Betroffene informieren.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-24",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Dürfen Sicherheitsmitarbeiter in Grundrechte eingreifen?",
+    "erw": "Nur mittelbar auf Grundlage des Hausrechts, Jedermannsrechte oder Einwilligung",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-25",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Nachschau?",
+    "erw": "Behördliche Kontrolle des Betriebs ohne besonderen Anlass zur Überprüfung der Einhaltung gewerberechtlicher Vorschriften.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-26",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Wie wird Hausrecht auf Sicherheitsmitarbeiter übertragen?",
+    "erw": "Durch vertragliche Beauftragung oder Weisung des Berechtigten; der SMA handelt als Besitzdiener.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-27",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was muss auf einem Dienstausweis stehen?",
+    "erw": "Name des Mitarbeiters, Name und Anschrift des Unternehmens, Bewacherregisteridentifikationsnummer und Unterschriften SMA und Gewerbetreibenden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-28",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Muss der Dienstausweis sichtbar getragen werden?",
+    "erw": "Jede Wachperson ist verpflichtet, den Ausweis in Verbindung mit dem im Bewacherregister angegebenen Ausweis- oder Identifizierungsdokument während des Wachdienstes mitzuführen und auf Verlangen den Beauftragten der Vollzugsbehörden, insbesondere Ordnungsämter, Polizei- oder Zollbehörden, vorzuzeigen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-29",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Pflichten hat der Gewerbetreibende?",
+    "erw": "Unterweisung der Mitarbeiter, Versicherungsschutz, Einhaltung BewachV, Führung von Unterlagen, ordnungsgemäße Auswahl zuverlässiger Mitarbeiter.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-30",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Dokumente muss der Gewerbetreibende führen?",
+    "erw": "Mitarbeiterverzeichnis, Unterweisungsnachweise, Versicherungsnachweise, Einsatzdokumentationen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-31",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Warum braucht man Sachkunde für bestimmte Tätigkeiten?",
+    "erw": "Erhöhtes Gefahrenpotenzial und direkter Kontakt mit Publikum erfordern vertiefte Rechts- und Handlungskompetenz.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-32",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Welche Versicherungen braucht ein Sicherheitsunternehmen?",
+    "erw": "Betriebshaftpflichtversicherung zur Absicherung von Personen-, Sach- und Vermögensschäden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-33",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": null,
+    "quelle": "Fragen.txt",
+    "frage": "Was ist eine Objekteinweisung?",
+    "erw": "Einweisung des Mitarbeiters in besondere Gefahren, örtliche Besonderheiten und Abläufe vor Einsatzbeginn.",
+    "geprueft": null
   }
 ]

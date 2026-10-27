@@ -256,9 +256,9 @@ model ChangeRecord {
 // Stored so the exam/round logic reads weights from one authoritative place.
 model OralTheme {
   id        String   @id @default(cuid())
-  orderKey  Int      @unique // 1..8, defines the fixed question order in an exam
+  orderKey  Int      @unique // 1..9, defines the fixed theme order in an exam
   name      String   @unique // exact Excel label, e.g. "Buergerliches Gesetzbuch / Jedermannsrechte"
-  weight    Int      // Excel "Gewichtung" (10,12,14,14,8,18,8,16). All even.
+  weight    Int      // "Gewichtung" (8,12,12,12,8,16,8,16,8; sum 100). All divisible by 4.
 
   questions OralQuestion[]
 
@@ -347,7 +347,7 @@ model OralExamQuestion {
   exam        OralExam   @relation(fields: [examId], references: [id], onDelete: Cascade)
   questionId  String
   question    OralQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
-  orderKey    Int        // 1..8, theme order (fixed)
+  orderKey    Int        // 1..13 (9 base themes in order, then 4 extra slots)
   themeName   String     // snapshot of the theme name at creation time
   weight      Int        // snapshot of the theme weight at creation time
   rating      String?    // "richtig" | "teilweise richtig" | "falsch" | null

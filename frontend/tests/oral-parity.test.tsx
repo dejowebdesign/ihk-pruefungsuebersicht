@@ -1,9 +1,9 @@
 // Frontend parity test for the oral-exam grading + Luna copy behavior.
 //
-// We extract the SAME per-question points formula the detail page uses into a
-// pure helper here (mirrors backend scoring.ts verbatim) and verify it against
-// concrete Excel values. This guarantees the UI displays numbers identical to
-// the Excel matrix and that the copy button copies ONLY the overall percent.
+// The exam now has 13 questions across 9 Themenbereiche (4 themes doubled, so
+// their weight is split in half). We mirror the backend per-question formula
+// here and verify the UI math against concrete values, plus that the copy
+// button copies ONLY the overall percent.
 
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -16,7 +16,10 @@ function pointsFor(weight: number, rating: OralRating | null): number {
   return 0; // falsch or unrated
 }
 
-const WEIGHTS = [10, 12, 14, 14, 8, 18, 8, 16];
+// 9 theme weights (sum 100). Themes 0,2,4,6 are doubled → weight/2 per question.
+const THEME_WEIGHTS = [8, 12, 12, 12, 8, 16, 8, 16, 8];
+const DOUBLED = new Set([0, 2, 4, 6]);
+const PER_QUESTION: number[] = THEME_WEIGHTS.flatMap((w, i) => (DOUBLED.has(i) ? [w / 2, w / 2] : [w]));
 
 function makeItem(orderKey: number, weight: number, rating: OralRating | null): OralExamQuestion {
   return {
@@ -52,39 +55,65 @@ function makeExam(items: OralExamQuestion[], total: number, percent: number): Or
   };
 }
 
+function totalOf(ratings: OralRating[]): number {
+  return PER_QUESTION.reduce((s, w, i) => s + pointsFor(w, ratings[i]), 0);
+}
+
 describe("oral grading parity (frontend mirror)", () => {
-  it("richtig → full weight", () => {
-    WEIGHTS.forEach((w) => expect(pointsFor(w, "richtig")).toBe(w));
+  it("has 13 questions summing to 100 points", () => {
+    expect(PER_QUESTION.length).toBe(13);
+    expect(PER_QUESTION.reduce((a, b) => a + b, 0)).toBe(100);
   });
-  it("teilweise richtig → weight/2 (exact integer, weights even)", () => {
-    WEIGHTS.forEach((w) => {
+
+  it("richtig → full weight", () => {
+    PER_QUESTION.forEach((w) => expect(pointsFor(w, "richtig")).toBe(w));
+  });
+  it("teilweise richtig → weight/2 (exact integer, weights divisible by 4)", () => {
+    PER_QUESTION.forEach((w) => {
       expect(pointsFor(w, "teilweise richtig")).toBe(w / 2);
       expect(Number.isInteger(pointsFor(w, "teilweise richtig"))).toBe(true);
     });
   });
   it("falsch → 0", () => {
-    WEIGHTS.forEach((w) => expect(pointsFor(w, "falsch")).toBe(0));
+    PER_QUESTION.forEach((w) => expect(pointsFor(w, "falsch")).toBe(0));
   });
   it("unrated → 0", () => {
-    WEIGHTS.forEach((w) => expect(pointsFor(w, null)).toBe(0));
+    PER_QUESTION.forEach((w) => expect(pointsFor(w, null)).toBe(0));
   });
-  it("example A concrete total = 55 (Bestanden)", () => {
-    const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch"] as OralRating[];
-    const items = WEIGHTS.map((w, i) => makeItem(i + 1, w, ratings[i]));
-    const total = items.reduce((s, it) => s + pointsFor(it.weight, it.rating), 0);
-    expect(total).toBe(55);
+
+  it("all richtig → 100 (Bestanden)", () => {
+    const total = totalOf(PER_QUESTION.map(() => "richtig"));
+    expect(total).toBe(100);
     expect(total >= 50).toBe(true);
   });
-  it("example B concrete total = 18 (Nicht bestanden)", () => {
-    const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch"] as OralRating[];
-    const items = WEIGHTS.map((w, i) => makeItem(i + 1, w, ratings[i]));
-    const total = items.reduce((s, it) => s + pointsFor(it.weight, it.rating), 0);
-    expect(total).toBe(18);
-    expect(total >= 50).toBe(false);
+  it("all teilweise richtig → exactly 50 (Bestanden, threshold)", () => {
+    const total = totalOf(PER_QUESTION.map(() => "teilweise richtig"));
+    expect(total).toBe(50);
+    expect(total >= 50).toBe(true);
   });
-  it("percent = total exactly (max 100)", () => {
-    expect((55 * 100) / 100).toBe(55);
-    expect((18 * 100) / 100).toBe(18);
+  it("all falsch → 0 (Nicht bestanden)", () => {
+    expect(totalOf(PER_QUESTION.map(() => "falsch"))).toBe(0);
+  });
+  it("mixed example → 52 (Bestanden)", () => {
+    const ratings = PER_QUESTION.map(() => "falsch") as OralRating[];
+    ratings[0] = "richtig"; // 4
+    ratings[2] = "richtig"; // 12
+    ratings[5] = "richtig"; // 12
+    ratings[8] = "richtig"; // 16
+    ratings[11] = "teilweise richtig"; // 8
+    const total = totalOf(ratings);
+    expect(total).toBe(52);
+    expect(total >= 50).toBe(true);
+  });
+  it("one short of the threshold → 48 (Nicht bestanden)", () => {
+    const ratings = PER_QUESTION.map(() => "falsch") as OralRating[];
+    ratings[2] = "richtig"; // 12
+    ratings[5] = "richtig"; // 12
+    ratings[8] = "richtig"; // 16
+    ratings[11] = "teilweise richtig"; // 8
+    const total = totalOf(ratings);
+    expect(total).toBe(48);
+    expect(total >= 50).toBe(false);
   });
 });
 
@@ -100,10 +129,9 @@ describe("Luna overall-percent copy", () => {
       configurable: true,
     });
 
-    const items = WEIGHTS.map((w, i) => makeItem(i + 1, w, "richtig"));
+    const items = PER_QUESTION.map((w, i) => makeItem(i + 1, w, "richtig"));
     const exam = makeExam(items, 100, 100);
 
-    // Render the page via a minimal harness that exposes the copy handler.
     function Harness() {
       return (
         <div>
@@ -121,7 +149,6 @@ describe("Luna overall-percent copy", () => {
 
     expect(writeText).toHaveBeenCalledTimes(1);
     const copied = writeText.mock.calls[0][0];
-    // Must be ONLY the overall percent — no theme breakdowns.
     expect(copied).toBe("100 %");
     expect(copied).not.toContain("Recht");
     expect(copied).not.toContain("BGB");
@@ -129,16 +156,15 @@ describe("Luna overall-percent copy", () => {
   });
 
   it("the overall-percent display matches the cached exam percent", () => {
-    const items = WEIGHTS.map((w, i) => makeItem(i + 1, w, "richtig"));
+    const items = PER_QUESTION.map((w, i) => makeItem(i + 1, w, "richtig"));
     const exam = makeExam(items, 100, 100);
     expect(`${Math.round(exam.percent)} %`).toBe("100 %");
 
-    const exam55 = makeExam(WEIGHTS.map((w, i) => makeItem(i + 1, w, i === 0 || i === 2 || i === 5 ? "richtig" : i === 1 || i === 3 ? "teilweise richtig" : "falsch")), 55, 55);
-    expect(`${Math.round(exam55.percent)} %`).toBe("55 %");
+    const exam52 = makeExam(items, 52, 52);
+    expect(`${Math.round(exam52.percent)} %`).toBe("52 %");
   });
 });
 
 // keep render/screen used
 void render;
 void screen;
-
