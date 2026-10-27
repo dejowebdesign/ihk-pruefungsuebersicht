@@ -293,3 +293,33 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
 - Existing pool typos preserved (not touched): "Panikbegrice" (UmM-35),
   "Schusswa2en/Schusswa6en" (UmW), "Recht der oeffentlichen" naming, and
   Sicherheitstechnik-02 carrying an embedded continuation line.
+
+## Question-pool quality audit (branch `fix/oral-question-quality`, PR #7)
+
+- **`ensureOralPoolSeeded` content guard.** It used to short-circuit on
+  `existing >= seedRows.length`, so an edited question text in
+  `oral-questions.json` never reached a populated DB. It now compares stored
+  content field-by-field against the seed file (`poolMatchesSeed`) and runs the
+  upsert pass on missing rows *or* outdated text. Still idempotent: upsert by
+  unique `excelId` preserves row `id`, and `OralExam`/`OralExamQuestion`/
+  `OralCandidate` are never touched. **Any future seed-text edit therefore
+  propagates on restart — no manual command needed.**
+- **Exams read question text live** via the pool join (`api/routes/oral.ts`),
+  while rating/points/weight/note are snapshotted on `OralExamQuestion`. So
+  text corrections never alter historical scores; only display text changes.
+- **Pool count is now 342** (was 341). `RdOesO-14` held a second question inside
+  its answer field; it became `RdOesO-15`. Two tests hardcode the count:
+  `oral-service.test.ts` (`SEED_QUESTION_COUNT`) and `oral-pdf-delete.test.ts`
+  (`.toBe(342)`).
+- **`seedFingerprint()`** (exported from `src/oral/seed.ts`) hashes the pool
+  text. `tests/oral-question-quality.test.ts` asserts the exact value, so any
+  pool edit must update that hash deliberately.
+- **OCR pattern to know:** `ff` was mis-read as `2`, `6`, `K`, `O`, `X`, `c`
+  (e.g. `Schusswa6en`, `zugri2sbereit`, `Öcentliche`). `§` also appears as a
+  bullet character. Both are covered by the new regression test's word list.
+- **Audit report:** `docs/oral-question-quality-audit.md`, generated from the
+  real `git diff main` — 80 changed records with category/severity/status.
+- **Legal sources were unreachable** from the sandbox
+  (`gesetze-im-internet.de` blocked, Tavily quota exhausted). No check against
+  official statute text was performed and none is claimed; two records are
+  explicitly left open (`Sicherheitstechnik-31`, `Datenschutz-22`).
