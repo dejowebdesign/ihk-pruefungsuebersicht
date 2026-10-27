@@ -1,16 +1,16 @@
-// Admin endpoints (protected by adminAuth): manual import trigger, scheduler
+// Admin endpoints (protected by adminGuard: admin session or legacy ADMIN_TOKEN): manual import trigger, scheduler
 // status, and a combined admin status. All return JSON, never raw exceptions.
 
 import { Hono } from "hono";
 import { prisma } from "../../db/prisma";
-import { adminAuth } from "../admin-auth";
+import { adminGuard } from "../identity";
 import { triggerImport, schedulerStatus } from "../../scheduler/scheduler";
 import { apiError } from "../helpers";
 
 export const admin = new Hono();
 
 // All admin routes require the shared secret.
-admin.use("*", adminAuth);
+admin.use("*", adminGuard);
 
 // GET /api/admin/status — import status + scheduler in one call.
 admin.get("/status", async (c) => {

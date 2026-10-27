@@ -72,14 +72,77 @@ describe("api client", () => {
     expect(d.sourceSheet.originalName).toBe("n");
   });
 
-  it("adminImport sends POST with bearer auth", async () => {
+  it("triggerImport sends POST without any client-supplied credential", async () => {
     const body = { message: "ok", runId: "r1" };
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockFetch({ body }));
-    const res = await api.adminImport("secret-token");
+    const res = await api.triggerImport();
     expect(res.message).toBe("ok");
     const init = spy.mock.calls[0][1] as RequestInit;
     expect(init.method).toBe("POST");
-    expect((init.headers as Record<string, string>).Authorization).toBe("Bearer secret-token");
+    // The session rides in an httpOnly cookie — the client never sets a token.
+    const headers = (init.headers ?? {}) as Record<string, string>;
+    expect(headers.Authorization).toBeUndefined();
+    expect(init.credentials).toBe("same-origin");
+  });
+
+  it("login posts the credentials and relies on the session cookie", async () => {
+    const body = { user: { id: "u1", username: "admin", role: "admin", active: true } };
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockFetch({ body }));
+    const res = await api.login("admin", "geheim-123");
+    expect(res.user.role).toBe("admin");
+    const [url, init] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/auth/login");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({
+      username: "admin",
+      password: "geheim-123",
+    });
+    expect(init.credentials).toBe("same-origin");
+  });
+
+  it("logout posts to /api/auth/logout", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockFetch({ body: { ok: true } }));
+    await api.logout();
+    const [url, init] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/auth/logout");
+    expect(init.method).toBe("POST");
+  });
+
+  it("every request is sent with same-origin credentials", async () => {
+    const body = { data: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0 } };
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockFetch({ body }));
+    await api.ihkList();
+    expect((spy.mock.calls[0][1] as RequestInit).credentials).toBe("same-origin");
+  });
+
+  it("oralExamPdfUrl points at the exam PDF endpoint", () => {
+    expect(api.oralExamPdfUrl("abc")).toBe("/api/oral/exams/abc/pdf");
+    expect(api.oralExamPdfUrl("abc", true)).toBe("/api/oral/exams/abc/pdf?disposition=attachment");
+    // Ids are escaped, so a crafted id cannot break out of the path.
+    expect(api.oralExamPdfUrl("a/b")).toBe("/api/oral/exams/a%2Fb/pdf");
+  });
+
+  it("oralDeleteExam sends DELETE with the explicit confirmation flag", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockFetch({ body: { ok: true, deletedItems: 13, deletedCandidates: [] } }),
+    );
+    await api.oralDeleteExam("exam-1");
+    const [url, init] = spy.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/oral/exams/exam-1?confirm=true");
+    expect(init.method).toBe("DELETE");
+  });
+
+  it("user management calls the admin endpoints", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockFetch({ body: { data: [] } }));
+    await api.users();
+    expect(spy.mock.calls[0][0]).toBe("/api/users");
+
+    spy.mockResolvedValue(mockFetch({ body: { user: { id: "u", username: "a", role: "participant", active: true } } }));
+    await api.updateUser("u1", { active: false });
+    const [url, init] = spy.mock.calls[1] as [string, RequestInit];
+    expect(url).toBe("/api/users/u1");
+    expect(init.method).toBe("PATCH");
+    expect(JSON.parse(init.body as string)).toEqual({ active: false });
   });
 
   it("throws ApiClientError with backend message on non-2xx", async () => {

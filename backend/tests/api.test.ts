@@ -10,12 +10,14 @@ import { execSync } from "node:child_process";
 import { setPrismaClient, disconnectPrisma } from "../src/db/prisma";
 import { runInitialImport } from "../src/importer/initial-import";
 import { createApp } from "../src/api/app";
+import { makeRequester } from "./helpers/request";
 
 const TEST_TOKEN = "test-admin-token-do-not-use-in-prod-0123456789abcdef";
 
 let dbPath: string;
 let client: PrismaClient;
 let app: ReturnType<typeof createApp>;
+let req: (path: string, init?: RequestInit) => Promise<Response>;
 let ihkAachenId: string;
 let sheetId: string;
 let questionId: string;
@@ -54,6 +56,7 @@ beforeAll(async () => {
   caseExampleId = ce!.id;
 
   app = createApp();
+  req = makeRequester(app, TEST_TOKEN);
 }, 180_000);
 
 afterAll(async () => {
@@ -64,7 +67,7 @@ afterAll(async () => {
 
 describe("health", () => {
   it("GET /api/health returns ok + db + version", async () => {
-    const res = await app.request("/api/health");
+    const res = await req("/api/health");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe("ok");
@@ -76,7 +79,7 @@ describe("health", () => {
 
 describe("IHK list", () => {
   it("returns paginated IHK locations", async () => {
-    const res = await app.request("/api/ihk?page=1&limit=10");
+    const res = await req("/api/ihk?page=1&limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data).toHaveLength(10);
@@ -85,14 +88,14 @@ describe("IHK list", () => {
   });
 
   it("respects limit cap (no unbounded responses)", async () => {
-    const res = await app.request("/api/ihk?limit=10000");
+    const res = await req("/api/ihk?limit=10000");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeLessThanOrEqual(200);
   });
 
   it("filters by bundesland", async () => {
-    const res = await app.request("/api/ihk?bundesland=Nordrhein-Westfalen&limit=200");
+    const res = await req("/api/ihk?bundesland=Nordrhein-Westfalen&limit=200");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeGreaterThan(0);
@@ -102,14 +105,14 @@ describe("IHK list", () => {
   });
 
   it("filters by skp", async () => {
-    const res = await app.request("/api/ihk?skp=✅&limit=200");
+    const res = await req("/api/ihk?skp=✅&limit=200");
     expect(res.status).toBe(200);
     const body = await res.json();
     for (const loc of body.data) expect(loc.skp).toBe("✅");
   });
 
   it("filters by writtenForm", async () => {
-    const res = await app.request("/api/ihk?writtenForm=Laptop/PC&limit=200");
+    const res = await req("/api/ihk?writtenForm=Laptop/PC&limit=200");
     expect(res.status).toBe(200);
     const body = await res.json();
     for (const loc of body.data) expect(loc.writtenForm).toBe("Laptop/PC");
@@ -117,14 +120,14 @@ describe("IHK list", () => {
 
   it("returns 503 when no successful run (simulated)", async () => {
     // Not easily simulable here since we seeded success; verify normal path.
-    const res = await app.request("/api/ihk");
+    const res = await req("/api/ihk");
     expect(res.status).toBe(200);
   });
 });
 
 describe("IHK detail", () => {
   it("returns the IHK with provenance", async () => {
-    const res = await app.request(`/api/ihk/${ihkAachenId}`);
+    const res = await req(`/api/ihk/${ihkAachenId}`);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ihkShortName).toBe("Aachen");
@@ -135,7 +138,7 @@ describe("IHK detail", () => {
   });
 
   it("404 for unknown id", async () => {
-    const res = await app.request("/api/ihk/nonexistent-id");
+    const res = await req("/api/ihk/nonexistent-id");
     expect(res.status).toBe(404);
     const body = await res.json();
     expect(body.error).toBeTruthy();
@@ -145,7 +148,7 @@ describe("IHK detail", () => {
 
 describe("search", () => {
   it("finds IHKs by short name substring", async () => {
-    const res = await app.request("/api/ihk/search?q=aach");
+    const res = await req("/api/ihk/search?q=aach");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeGreaterThan(0);
@@ -154,26 +157,26 @@ describe("search", () => {
   });
 
   it("search is case-insensitive", async () => {
-    const res = await app.request("/api/ihk/search?q=AACH");
+    const res = await req("/api/ihk/search?q=AACH");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeGreaterThan(0);
   });
 
   it("rejects too-short query", async () => {
-    const res = await app.request("/api/ihk/search?q=a");
+    const res = await req("/api/ihk/search?q=a");
     expect(res.status).toBe(400);
   });
 
   it("requires q param", async () => {
-    const res = await app.request("/api/ihk/search");
+    const res = await req("/api/ihk/search");
     expect(res.status).toBe(400);
   });
 });
 
 describe("sheets", () => {
   it("lists sheets paginated", async () => {
-    const res = await app.request("/api/sheets?page=1&limit=20");
+    const res = await req("/api/sheets?page=1&limit=20");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBe(20);
@@ -181,14 +184,14 @@ describe("sheets", () => {
   });
 
   it("filters by sheetType", async () => {
-    const res = await app.request("/api/sheets?sheetType=IHK&limit=200");
+    const res = await req("/api/sheets?sheetType=IHK&limit=200");
     expect(res.status).toBe(200);
     const body = await res.json();
     for (const s of body.data) expect(s.sheetType).toBe("IHK");
   });
 
   it("returns sheet metadata without raw rows", async () => {
-    const res = await app.request(`/api/sheets/${sheetId}`);
+    const res = await req(`/api/sheets/${sheetId}`);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.id).toBe(sheetId);
@@ -199,14 +202,14 @@ describe("sheets", () => {
   });
 
   it("404 for unknown sheet", async () => {
-    const res = await app.request("/api/sheets/nonexistent");
+    const res = await req("/api/sheets/nonexistent");
     expect(res.status).toBe(404);
   });
 });
 
 describe("questions", () => {
   it("lists questions paginated", async () => {
-    const res = await app.request("/api/questions?page=1&limit=10");
+    const res = await req("/api/questions?page=1&limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBe(10);
@@ -214,28 +217,28 @@ describe("questions", () => {
   });
 
   it("searches question text", async () => {
-    const res = await app.request("/api/questions?q=Recht&limit=200");
+    const res = await req("/api/questions?q=Recht&limit=200");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeGreaterThan(0);
   });
 
   it("returns single question", async () => {
-    const res = await app.request(`/api/questions/${questionId}`);
+    const res = await req(`/api/questions/${questionId}`);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.id).toBe(questionId);
   });
 
   it("404 for unknown question", async () => {
-    const res = await app.request("/api/questions/nonexistent");
+    const res = await req("/api/questions/nonexistent");
     expect(res.status).toBe(404);
   });
 });
 
 describe("case examples", () => {
   it("lists case examples paginated", async () => {
-    const res = await app.request("/api/case-examples?page=1&limit=10");
+    const res = await req("/api/case-examples?page=1&limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBe(10);
@@ -243,7 +246,7 @@ describe("case examples", () => {
   });
 
   it("returns single case example", async () => {
-    const res = await app.request(`/api/case-examples/${caseExampleId}`);
+    const res = await req(`/api/case-examples/${caseExampleId}`);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.id).toBe(caseExampleId);
@@ -252,7 +255,7 @@ describe("case examples", () => {
 
 describe("import status + history", () => {
   it("GET /api/import/status returns last success + attempt", async () => {
-    const res = await app.request("/api/import/status");
+    const res = await req("/api/import/status");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.lastSuccess).toBeTruthy();
@@ -262,7 +265,7 @@ describe("import status + history", () => {
   });
 
   it("GET /api/import/runs returns paginated history", async () => {
-    const res = await app.request("/api/import/runs?page=1&limit=10");
+    const res = await req("/api/import/runs?page=1&limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBeGreaterThanOrEqual(1);
@@ -326,7 +329,7 @@ describe("admin disabled when no token", () => {
     process.env.ADMIN_TOKEN = TEST_TOKEN;
   });
 
-  it("returns 503 when ADMIN_TOKEN unset (fails closed)", async () => {
+  it("returns 503 when ADMIN_TOKEN unset and no admin account exists (fails closed)", async () => {
     delete process.env.ADMIN_TOKEN;
     const res = await app.request("/api/admin/status", {
       headers: { Authorization: "Bearer anything" },
@@ -339,19 +342,19 @@ describe("admin disabled when no token", () => {
 
 describe("invalid requests", () => {
   it("unknown route returns 404", async () => {
-    const res = await app.request("/api/nonexistent");
+    const res = await req("/api/nonexistent");
     expect(res.status).toBe(404);
   });
 
   it("invalid pagination defaults gracefully", async () => {
-    const res = await app.request("/api/ihk?page=abc&limit=xyz");
+    const res = await req("/api/ihk?page=abc&limit=xyz");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.pagination.page).toBe(1);
   });
 
   it("api root lists endpoints", async () => {
-    const res = await app.request("/api");
+    const res = await req("/api");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.endpoints).toContain("GET /api/health");
@@ -360,8 +363,8 @@ describe("invalid requests", () => {
 
 describe("pagination", () => {
   it("page 2 returns different items than page 1", async () => {
-    const r1 = await app.request("/api/ihk?page=1&limit=5");
-    const r2 = await app.request("/api/ihk?page=2&limit=5");
+    const r1 = await req("/api/ihk?page=1&limit=5");
+    const r2 = await req("/api/ihk?page=2&limit=5");
     const b1 = await r1.json();
     const b2 = await r2.json();
     expect(b1.data[0].id).not.toBe(b2.data[0].id);

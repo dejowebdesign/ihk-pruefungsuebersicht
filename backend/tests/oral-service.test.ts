@@ -13,6 +13,7 @@ import { createExam, rateQuestion, completeExam } from "../src/oral/service";
 import { mulberry32 } from "../src/oral/randomize";
 import { ORAL_THEMES, ORAL_QUESTIONS_PER_EXAM, ORAL_UVV_THEME, ORAL_TOTAL_WEIGHT } from "../src/oral/themes";
 import { createApp } from "../src/api/app";
+import { makeRequester } from "./helpers/request";
 
 const TEST_TOKEN = "oral-test-token-do-not-use-in-prod-0123456789abcdef";
 const SEED_QUESTION_COUNT = 341; // 218 original + 123 from Fragen.txt
@@ -20,6 +21,7 @@ const SEED_QUESTION_COUNT = 341; // 218 original + 123 from Fragen.txt
 let dbPath: string;
 let client: PrismaClient;
 let app: ReturnType<typeof createApp>;
+let req: (path: string, init?: RequestInit) => Promise<Response>;
 
 beforeAll(async () => {
   dbPath = path.join(os.tmpdir(), `ihk-oral-test-${Date.now()}.db`);
@@ -37,6 +39,7 @@ beforeAll(async () => {
   await seedOralPool(client);
 
   app = createApp();
+  req = makeRequester(app, TEST_TOKEN);
 });
 
 afterAll(async () => {
@@ -192,16 +195,18 @@ describe("oral service — persistence & scoring", () => {
 describe("oral API routes", () => {
   let examId: string;
 
-  it("GET /api/oral/themes is public and returns 9 themes", async () => {
-    const res = await app.request("/api/oral/themes");
+  it("GET /api/oral/themes requires auth and returns 9 themes", async () => {
+    expect((await app.request("/api/oral/themes")).status).toBe(401);
+    const res = await req("/api/oral/themes");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.length).toBe(9);
     expect(body.data.map((t: { name: string }) => t.name)).toEqual(ORAL_THEMES.map((t) => t.name));
   });
 
-  it(`GET /api/oral/pool is public and returns ${SEED_QUESTION_COUNT} questions`, async () => {
-    const res = await app.request("/api/oral/pool?limit=400");
+  it(`GET /api/oral/pool requires auth and returns ${SEED_QUESTION_COUNT} questions`, async () => {
+    expect((await app.request("/api/oral/pool?limit=400")).status).toBe(401);
+    const res = await req("/api/oral/pool?limit=400");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.pagination.total).toBe(SEED_QUESTION_COUNT);
@@ -217,7 +222,7 @@ describe("oral API routes", () => {
   });
 
   it("POST /api/oral/exams with auth creates an exam", async () => {
-    const res = await app.request("/api/oral/exams", {
+    const res = await req("/api/oral/exams", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ candidateName: "API Prüfling", examiner: "Prüfer API" }),
@@ -229,14 +234,14 @@ describe("oral API routes", () => {
   });
 
   it("GET /api/oral/exams lists the created exam", async () => {
-    const res = await app.request("/api/oral/exams?limit=50");
+    const res = await req("/api/oral/exams?limit=50");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.some((e: { id: string }) => e.id === examId)).toBe(true);
   });
 
   it("GET /api/oral/exams/:id returns the exam with 13 questions", async () => {
-    const res = await app.request(`/api/oral/exams/${examId}`);
+    const res = await req(`/api/oral/exams/${examId}`);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.items.length).toBe(13);
@@ -254,14 +259,14 @@ describe("oral API routes", () => {
 
   it("PATCH all 13 questions richtig → 100 points, Bestanden", async () => {
     for (let order = 1; order <= ORAL_QUESTIONS_PER_EXAM; order++) {
-      const res = await app.request(`/api/oral/exams/${examId}/questions/${order}`, {
+      const res = await req(`/api/oral/exams/${examId}/questions/${order}`, {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({ rating: "richtig" }),
       });
       expect(res.status).toBe(200);
     }
-    const score = await app.request(`/api/oral/exams/${examId}/score`);
+    const score = await req(`/api/oral/exams/${examId}/score`);
     const body = await score.json();
     expect(body.totalPoints).toBe(100);
     expect(body.percent).toBe(100);
@@ -269,7 +274,7 @@ describe("oral API routes", () => {
   });
 
   it("PATCH question order 14 → 400 (only 13 questions exist)", async () => {
-    const res = await app.request(`/api/oral/exams/${examId}/questions/14`, {
+    const res = await req(`/api/oral/exams/${examId}/questions/14`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({ rating: "richtig" }),
@@ -278,7 +283,7 @@ describe("oral API routes", () => {
   });
 
   it("invalid rating → 400", async () => {
-    const res = await app.request(`/api/oral/exams/${examId}/questions/1`, {
+    const res = await req(`/api/oral/exams/${examId}/questions/1`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({ rating: "super" }),
@@ -287,12 +292,12 @@ describe("oral API routes", () => {
   });
 
   it("POST complete finalizes the exam", async () => {
-    const res = await app.request(`/api/oral/exams/${examId}/complete`, {
+    const res = await req(`/api/oral/exams/${examId}/complete`, {
       method: "POST",
       headers: authHeaders(),
     });
     expect(res.status).toBe(200);
-    const exam = await app.request(`/api/oral/exams/${examId}`);
+    const exam = await req(`/api/oral/exams/${examId}`);
     const body = await exam.json();
     expect(body.status).toBe("completed");
     expect(body.percent).toBe(100);

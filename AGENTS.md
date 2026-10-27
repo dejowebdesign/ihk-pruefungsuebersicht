@@ -6,11 +6,91 @@ NOT modify Quiz0r.
 ## Architecture
 
 - **backend/** — Hono REST API (read-only) on Prisma + SQLite. Tests via Vitest
-  (`npm -w backend test`, 97 tests). Start: `npm -w backend run serve` with
+  (`npm -w backend test`, 265 tests). Start: `npm -w backend run serve` with
   `DATABASE_URL`, `ADMIN_TOKEN`, `PORT` env. The `serve` script defaults to
   PORT=3000, so set `PORT=3001` to match docker-compose/`BACKEND_URL`.
 - **frontend/** — Next.js 14 (App Router) Web-GUI consuming the backend API.
 - **Dockerfile** (root) — backend image. **frontend/Dockerfile** — Next.js image.
+
+## Phase 9 — Auth, user management, exam admin & PDF (DONE)
+
+### Authentication & roles
+- **DB-backed session cookie auth** (`ihk_session`), replacing the old
+  `frontend/src/lib/oral-auth.ts` localStorage admin-token flow (deleted) and
+  `backend/src/api/admin-auth.ts` (deleted). Roles: `admin` | `participant`.
+- Password hashing: **scrypt via `node:crypto`** (`backend/src/auth/passwords.ts`),
+  format `scrypt$N$r$p$<saltHex>$<hashHex>` (self-describing, params readable at
+  verify time). **No new dependencies** — deliberately hand-rolled.
+- Sessions: raw token lives only in the httpOnly cookie; DB stores only its
+  SHA-256 (`backend/src/auth/service.ts`). `active` is re-checked on *every*
+  request, so deactivation is immediate; sessions are revocable.
+- **Legacy `ADMIN_TOKEN` is preserved**: a Bearer token still authenticates as
+  `admin` (`backend/src/api/identity.ts`), so existing tooling keeps working.
+  `bootstrapAdmin()` (run in `scripts/serve.ts`) creates the `admin` account once
+  from `ADMIN_PASSWORD` (else `ADMIN_TOKEN`) and is a no-op once any admin
+  exists — restarting never overwrites a password changed in the UI.
+- **Last active admin is protected** in the service layer (not the UI):
+  `setActive`/`setRole`/`removeUser` refuse to deactivate/demote the final admin.
+
+### Authorization model (two layers, both server-side)
+1. **Central gate** — `backend/src/api/access-policy.ts` `requiredAccess(method, path)`
+   returns `public` | `authenticated` | `admin` for every API path; wired as
+   `app.use("/api/*", …)` in `app.ts`. A participant cannot reach an admin-only
+   endpoint even when the UI is bypassed. Unknown paths resolve to `public` so
+   they 404 normally instead of a misleading 401.
+   - Public: `/api`, `/api/health`, `/api/auth/*`, legacy `/api/admin/*`, and
+     `/api/ihk` + `/api/ihk/search` (they back the participant start page `/`).
+   - Admin-only: `/api/ihk/:id` (detail), `/questions`, `/case-examples`,
+     `/sheets`, `/import`, `/users`, and every non-GET `/api/oral/*`.
+   - `/api/oral/*` GETs: `authenticated`.
+2. **Route guards** — `requireAdmin` / `requireAuth` / `adminGuard`
+   (`backend/src/api/identity.ts`). Roles are **never** read from request data:
+   exam ownership is taken from the session (`identity.userId`), and a `userId`
+   in a request body is ignored.
+
+### Participant scoping
+- Participants may only read exams whose `userId` equals their own; the filter is
+  applied **in the SQL `where`** (`examScope()` in `routes/oral.ts`), not by
+  post-filtering. A foreign exam returns **404, not 403**, so its existence is
+  not confirmed. Exams with `userId = null` (legacy/admin-token-created) are
+  never participant-readable.
+- `frontend/src/middleware.ts` gates pages server-side (participant: `/` and
+  `/muendliche-pruefung*` only; everything else redirects to `/`). `/login` is
+  public and bounces signed-in users onward.
+
+### PDF report (`backend/src/oral/pdf.ts` + `pdf-writer.ts`)
+- Hand-rolled PDF writer, **no dependencies**. Text ops are `BT /F1|F2 <size> Tf
+  … Tm (…) Tj ET`; streams are **uncompressed** (do not assume Flate). Umlauts
+  (ä/ö/ü/ß/§) render via Helvetica WinAnsiEncoding, so no font file is embedded.
+- The report is a **pure renderer of persisted values** (`maxPoints`,
+  `totalPoints`, `percent`, `result`, plus stored per-item `rating`/`points`/
+  `weight` snapshots). It never re-runs scoring, so it cannot disagree with the
+  app — including historical exams whose weights were snapshotted under an older
+  theme layout. Percent uses the same `Math.round` as the UI.
+- `GET /api/oral/exams/:id/pdf` → 404 unknown, **409 not-completed**, 200 with
+  `Content-Disposition: inline|attachment` (`?disposition=attachment`) and
+  `Cache-Control: private, no-store`.
+
+### Exam deletion
+- `DELETE /api/oral/exams/:id` is admin-only and requires explicit confirmation
+  (`?confirm=true` or `x-confirm-delete: true`), else **400**. `deleteExam()`
+  (`oral/service.ts`) runs in one transaction: deletes the exam's
+  `OralExamQuestion` rows, then the exam, then the candidate **only if orphaned**.
+  The question pool (`OralQuestion`/`OralTheme`) is never touched, and a candidate
+  shared with another exam is kept. Unknown id → 404 with no write.
+
+### Gotchas
+- **`content-length` must not be forwarded by the API proxy.** Re-reading the body
+  while passing the original framing headers makes undici throw
+  `RequestContentLengthMismatchError` → 502 on every DELETE. `middleware.ts`
+  deletes `content-length`/`transfer-encoding` before forwarding.
+  Covered by `frontend/tests/middleware.test.ts`.
+- `next start` warns under `output: "standalone"`; the warning is expected.
+- Frontend identity cache (`src/lib/auth.ts`) is **observable** (subscribe/notify):
+  without it a client-side login leaves the already-mounted `Header` stale.
+- Migrations are **additive**: `20260827000000_users_sessions` adds `User`/
+  `Session`, adds nullable `OralExam.userId` (ON DELETE SET NULL), and preserves
+  every existing row/result.
 
 ## Phase 5 (Next.js Web-GUI) key learnings
 
@@ -39,7 +119,7 @@ NOT modify Quiz0r.
   `import React` (component source files have no explicit React import).
 - **userEvent + fake timers hang** (userEvent waits internally). Use real timers
   for interactive tests; for debounce use a small `debounceMs` + `setTimeout`.
-- Run: `npx vitest run` (30 tests across 4 suites, all passing).
+- Run: `npx vitest run` (172 tests across 15 suites, all passing).
 
 ## Commands
 

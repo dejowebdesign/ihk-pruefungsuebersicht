@@ -24,6 +24,8 @@ export interface CreateExamInput {
   examDate?: string | null; // ISO date
   examiner?: string | null;
   status?: ExamStatus;
+  /** Owning participant account; null for the legacy admin-token flow. */
+  userId?: string | null;
 }
 
 export interface RateInput {
@@ -91,6 +93,7 @@ export async function createExam(
     const exam = await tx.oralExam.create({
       data: {
         candidateId: candidate.id,
+        userId: input.userId ?? null,
         examDate: input.examDate ? new Date(input.examDate) : null,
         examiner: input.examiner ?? null,
         status: input.status ?? "draft",
@@ -214,3 +217,58 @@ async function recomputeScoreTx(
     },
   });
 }
+
+export interface DeleteExamResult {
+  deletedExamId: string;
+  deletedItems: number;
+  /** Candidate rows removed because no other exam referenced them any more. */
+  deletedCandidates: string[];
+}
+
+/**
+ * Delete one exam and its dependent exam entries, atomically.
+ *
+ * Guarantees:
+ *   - runs in a single transaction, so an exam is never left half-deleted;
+ *   - removes ONLY OralExamQuestion rows belonging to this exam (the question
+ *     pool in OralQuestion/OralTheme is never touched, and historical exams of
+ *     other candidates keep their exact question set and ratings);
+ *   - a candidate is deleted only when it has no remaining exams — candidates
+ *     shared with other exams are kept;
+ *   - returns 404 semantics to the caller by throwing on an unknown id, which
+ *     the route maps to a 404 without having performed any write.
+ */
+export async function deleteExam(db: PrismaClient, examId: string): Promise<DeleteExamResult> {
+  return db.$transaction(async (tx) => {
+    const exam = await tx.oralExam.findUnique({
+      where: { id: examId },
+      select: { id: true, candidateId: true },
+    });
+    if (!exam) throw new ExamNotFoundError(examId);
+
+    // Dependent rows first, then the exam itself. OralExamQuestion.exam has
+    // onDelete: Cascade, but deleting explicitly keeps the count reportable
+    // and works identically on SQLite and PostgreSQL.
+    const items = await tx.oralExamQuestion.deleteMany({ where: { examId } });
+    await tx.oralExam.delete({ where: { id: examId } });
+
+    // Candidate cleanup: only when orphaned by this deletion.
+    const deletedCandidates: string[] = [];
+    const remaining = await tx.oralExam.count({ where: { candidateId: exam.candidateId } });
+    if (remaining === 0) {
+      await tx.oralCandidate.delete({ where: { id: exam.candidateId } });
+      deletedCandidates.push(exam.candidateId);
+    }
+
+    return { deletedExamId: examId, deletedItems: items.count, deletedCandidates };
+  });
+}
+
+/** Thrown by deleteExam for an unknown exam id (mapped to HTTP 404). */
+export class ExamNotFoundError extends Error {
+  constructor(examId: string) {
+    super(`exam not found: ${examId}`);
+    this.name = "ExamNotFoundError";
+  }
+}
+

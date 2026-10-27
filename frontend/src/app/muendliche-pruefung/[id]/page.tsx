@@ -2,8 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { api, ApiClientError, type OralExam, type OralExamQuestion, type OralRating } from "@/lib/api";
-import { getStoredToken } from "@/lib/oral-auth";
 import { ErrorState } from "@/components/States";
+import { useIdentity } from "@/lib/use-identity";
 
 const RATINGS: OralRating[] = ["richtig", "teilweise richtig", "falsch"];
 const RATING_LABEL: Record<OralRating, string> = {
@@ -20,13 +20,17 @@ function pointsFor(weight: number, rating: OralRating | null): number {
 
 export default function OralExamPage({ params }: { params: { id: string } }) {
   const { id } = params;
+  const { user } = useIdentity();
+  // Rating and completing are admin-only. Participants get a read-only view of
+  // their own completed exams (the server enforces this too — this only avoids
+  // offering buttons that would be rejected).
+  const isAdmin = user?.role === "admin";
   const [exam, setExam] = useState<OralExam | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState(0); // index into items (0..7)
   const [noteDraft, setNoteDraft] = useState("");
   const [saving, setSaving] = useState(false);
-  const [needToken, setNeedToken] = useState(false);
   const [copied, setCopied] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -57,57 +61,44 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   }, [current, exam]);
 
   async function rate(rating: OralRating | null) {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     const item = exam?.items?.[current];
     if (!item) return;
     setSaving(true);
+    setError(null);
     try {
-      await api.oralRateQuestion(token, id, item.orderKey, { rating });
+      await api.oralRateQuestion(id, item.orderKey, { rating });
       await load();
     } catch (e: unknown) {
-      if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
-      else setError(e instanceof ApiClientError ? e.message : "Bewertung konnte nicht gespeichert werden.");
+      setError(
+        e instanceof ApiClientError ? e.message : "Bewertung konnte nicht gespeichert werden.",
+      );
     } finally {
       setSaving(false);
     }
   }
 
   async function saveNote() {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     const item = exam?.items?.[current];
     if (!item) return;
     setSaving(true);
     try {
-      await api.oralRateQuestion(token, id, item.orderKey, { note: noteDraft });
+      await api.oralRateQuestion(id, item.orderKey, { note: noteDraft });
       await load();
     } catch (e: unknown) {
-      if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
+      setError(e instanceof ApiClientError ? e.message : "Notiz konnte nicht gespeichert werden.");
     } finally {
       setSaving(false);
     }
   }
 
   async function completeExam() {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     setCompleting(true);
+    setError(null);
     try {
-      await api.oralCompleteExam(token, id);
+      await api.oralCompleteExam(id);
       await load();
     } catch (e: unknown) {
-      if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
-      else setError(e instanceof ApiClientError ? e.message : "Abschluss fehlgeschlagen.");
+      setError(e instanceof ApiClientError ? e.message : "Abschluss fehlgeschlagen.");
     } finally {
       setCompleting(false);
     }
@@ -171,15 +162,14 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
         <Link className="btn btn--ghost btn--sm" href="/muendliche-pruefung">← Zurück zur Übersicht</Link>
       </p>
 
-      {needToken && (
-        <p className="state" role="alert" style={{ padding: 12 }}>
-          Schreibzugriff benötigt einen Administrator-Token. Hinterlege ihn unter <Link href="/admin">Admin</Link>.
-        </p>
-      )}
       {error && <p className="state" role="alert" style={{ padding: 12 }}>{error}</p>}
 
       {isCompleted ? (
         <ResultView exam={exam} onCopy={copyOverall} copied={copied} items={items} />
+      ) : !isAdmin ? (
+        <div className="oral-card">
+          Diese Prüfung ist noch nicht abgeschlossen. Die Bewertung erfolgt durch die Prüfungsleitung.
+        </div>
       ) : item ? (
         <ExamTaker
           item={item}
@@ -201,7 +191,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
         <div className="oral-card">Diese Prüfung hat keine Fragen.</div>
       )}
 
-      {!isCompleted && (
+      {!isCompleted && isAdmin && (
         <details className="oral-card" style={{ marginTop: 16 }}>
           <summary style={{ cursor: "pointer", fontWeight: 600 }}>Fragenübersicht ({items.length})</summary>
           <table className="oral-table" style={{ marginTop: 12 }}>
@@ -333,9 +323,22 @@ function ResultView(props: {
         {exam.totalPoints} / {exam.maxPoints} Punkte —{" "}
         <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>{exam.result}</span>
       </p>
-      <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
-        {copied ? "Kopiert ✓" : "Gesamtwert kopieren"}
-      </button>
+      <div className="oral-result__actions">
+        <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
+          {copied ? "Kopiert ✓" : "Gesamtwert kopieren"}
+        </button>
+        <a
+          className="btn btn--ghost"
+          href={api.oralExamPdfUrl(exam.id)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          PDF öffnen
+        </a>
+        <a className="btn btn--ghost" href={api.oralExamPdfUrl(exam.id, true)}>
+          PDF-Auswertung herunterladen
+        </a>
+      </div>
 
       <details style={{ marginTop: 24, textAlign: "left" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Detaillierte Auswertung</summary>
