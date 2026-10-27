@@ -24,7 +24,7 @@ export interface CreateExamInput {
   examDate?: string | null; // ISO date
   examiner?: string | null;
   status?: ExamStatus;
-  /** Owning participant account; null for the legacy admin-token flow. */
+  /** Creating account (audit only — every staff member may run every exam). */
   userId?: string | null;
 }
 

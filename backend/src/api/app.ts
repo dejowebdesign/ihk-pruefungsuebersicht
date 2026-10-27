@@ -23,7 +23,7 @@ export function createApp() {
   app.use("*", attachIdentity);
 
   // Central server-side gate. Every route declares a minimum access level in
-  // access-policy.ts; a participant cannot reach an admin-only endpoint even by
+  // access-policy.ts; an examiner cannot reach an admin-only endpoint even by
   // calling it directly, and the role is never taken from request data.
   app.use("/api/*", async (c, next) => {
     const need = requiredAccess(c.req.method, new URL(c.req.url).pathname);
@@ -57,9 +57,9 @@ export function createApp() {
         "POST /api/auth/logout",
         "GET /api/auth/me",
         "GET /api/health",
-        "GET /api/ihk (public — backs the participant start page)",
+        "GET /api/ihk (auth — backs the start page)",
         "GET /api/ihk/search?q=... (public)",
-        "GET /api/ihk/:id (admin)",
+        "GET /api/ihk/:id (auth — IHK detail page)",
         "GET /api/sheets (admin)",
         "GET /api/sheets/:id (admin)",
         "GET /api/questions (admin)",
@@ -78,15 +78,15 @@ export function createApp() {
         "DELETE /api/users/:id (admin)",
         "GET /api/oral/pool (auth)",
         "GET /api/oral/themes (auth)",
-        "GET /api/oral/exams (auth, scoped to own exams for participants)",
-        "GET /api/oral/exams/:id (auth, scoped)",
-        "GET /api/oral/exams/:id/score (auth, scoped)",
-        "GET /api/oral/exams/:id/pdf (auth, scoped, completed only)",
-        "POST /api/oral/exams (admin)",
-        "PATCH /api/oral/exams/:id/questions/:order (admin)",
-        "POST /api/oral/exams/:id/complete (admin)",
-        "PATCH /api/oral/exams/:id (admin)",
-        "DELETE /api/oral/exams/:id?confirm=true (admin)",
+        "GET /api/oral/exams (auth, all exams)",
+        "GET /api/oral/exams/:id (auth)",
+        "GET /api/oral/exams/:id/score (auth)",
+        "GET /api/oral/exams/:id/pdf (auth, completed only)",
+        "POST /api/oral/exams (staff)",
+        "PATCH /api/oral/exams/:id/questions/:order (staff)",
+        "POST /api/oral/exams/:id/complete (staff)",
+        "PATCH /api/oral/exams/:id (staff)",
+        "DELETE /api/oral/exams/:id?confirm=true (staff)",
       ],
     }),
   );

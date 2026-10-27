@@ -185,7 +185,7 @@ export interface OralExam {
 
 // ── auth / users ───────────────────────────────────────────────────────────
 
-export type UserRole = "admin" | "participant";
+export type UserRole = "admin" | "examiner";
 
 export interface AuthUser {
   id: string | null;

@@ -6,7 +6,6 @@ import {
   resolveTheme,
   saveThemeMode,
 } from "@/lib/theme";
-import { COMPARE_STORAGE_KEY, loadCompareIds } from "@/lib/compare";
 
 beforeEach(() => {
   localStorage.clear();
@@ -72,30 +71,32 @@ describe("applyResolvedTheme", () => {
   });
 });
 
-describe("theme vs. compare independence", () => {
-  it("uses a different localStorage key than compare", () => {
-    expect(THEME_STORAGE_KEY).not.toBe(COMPARE_STORAGE_KEY);
+describe("theme storage isolation", () => {
+  // A foreign key stands in for any other feature that writes to localStorage:
+  // saving a theme must not disturb unrelated entries, and vice versa.
+  const OTHER_KEY = "ihk-other-feature";
+
+  it("uses its own localStorage key", () => {
     expect(THEME_STORAGE_KEY).toBe("ihk-theme");
-    expect(COMPARE_STORAGE_KEY).toBe("ihk-compare-ids");
   });
 
-  it("saving a theme never touches the compare selection", () => {
-    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["a", "b"]));
+  it("saving a theme never touches another feature's entry", () => {
+    localStorage.setItem(OTHER_KEY, JSON.stringify(["a", "b"]));
     saveThemeMode("dark");
-    expect(loadCompareIds()).toEqual(["a", "b"]);
+    expect(JSON.parse(localStorage.getItem(OTHER_KEY) as string)).toEqual(["a", "b"]);
   });
 
-  it("saving a compare selection never touches the theme", () => {
+  it("another feature writing storage never touches the theme", () => {
     saveThemeMode("dark");
-    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["x"]));
+    localStorage.setItem(OTHER_KEY, JSON.stringify(["x"]));
     expect(loadThemeMode()).toBe("dark");
   });
 
-  it("clearing theme storage leaves compare untouched", () => {
+  it("clearing theme storage leaves other entries untouched", () => {
     saveThemeMode("dark");
-    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["a"]));
+    localStorage.setItem(OTHER_KEY, JSON.stringify(["a"]));
     localStorage.removeItem(THEME_STORAGE_KEY);
     expect(loadThemeMode()).toBe("system");
-    expect(loadCompareIds()).toEqual(["a"]);
+    expect(JSON.parse(localStorage.getItem(OTHER_KEY) as string)).toEqual(["a"]);
   });
 });

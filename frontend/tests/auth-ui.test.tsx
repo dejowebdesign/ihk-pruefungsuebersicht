@@ -172,7 +172,7 @@ describe("identity cache storage", () => {
 
   it("keeps only non-sensitive identity fields", async () => {
     const { writeCachedIdentity, readCachedIdentity } = await import("@/lib/auth");
-    writeCachedIdentity({ id: "u1", username: "anna", role: "participant", active: true });
+    writeCachedIdentity({ id: "u1", username: "anna", role: "examiner", active: true });
     const stored = JSON.parse(localStorage.getItem(IDENTITY_CACHE_KEY)!);
     expect(Object.keys(stored).sort()).toEqual(["active", "id", "role", "username"]);
     expect(readCachedIdentity()?.username).toBe("anna");
@@ -193,7 +193,7 @@ describe("identity cache storage", () => {
 
     // Unsubscribing stops further notifications.
     unsubscribe();
-    writeCachedIdentity({ id: "b", username: "bea", role: "participant", active: true });
+    writeCachedIdentity({ id: "b", username: "bea", role: "examiner", active: true });
     expect(seen).toEqual(["admin", null]);
   });
 });
@@ -219,30 +219,30 @@ describe("Header session area", () => {
     await waitFor(() => expect(screen.getByRole("link", { name: "Anmelden" })).toBeInTheDocument());
   });
 
-  it("shows the participant's name, role and a sign-out button", async () => {
+  it("shows the examiner's name, role and a sign-out button", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       status: 200,
       text: async () =>
         JSON.stringify({
-          user: { id: "u1", username: "anna", role: "participant", active: true },
+          user: { id: "u1", username: "anna", role: "examiner", active: true },
         }),
     } as unknown as Response);
 
     const { Header } = await import("@/components/Header");
     render(<Header />);
     await waitFor(() => expect(screen.getByText("anna")).toBeInTheDocument());
-    expect(screen.getByText("Teilnehmer")).toBeInTheDocument();
+    expect(screen.getByText("Prüfer")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Abmelden" })).toBeInTheDocument();
   });
 
-  it("hides admin-only navigation from a participant", async () => {
+  it("hides admin-only navigation from an examiner", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       status: 200,
       text: async () =>
         JSON.stringify({
-          user: { id: "u1", username: "anna", role: "participant", active: true },
+          user: { id: "u1", username: "anna", role: "examiner", active: true },
         }),
     } as unknown as Response);
 
@@ -250,12 +250,13 @@ describe("Header session area", () => {
     render(<Header />);
     await waitFor(() => expect(screen.getByText("anna")).toBeInTheDocument());
 
-    // The areas participants may not use are not offered at all.
+    // The areas examiners may not use are not offered at all.
     expect(screen.queryByRole("link", { name: "Verwaltung" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Fragen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Fallbeispiele" })).not.toBeInTheDocument();
+    // The compare page is gone entirely, so it is offered to nobody.
     expect(screen.queryByRole("link", { name: "Vergleich" })).not.toBeInTheDocument();
-    // The two permitted areas are present.
+    // The permitted areas are present.
     expect(screen.getByRole("link", { name: "IHKs" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Mündliche Prüfung" })).toBeInTheDocument();
   });

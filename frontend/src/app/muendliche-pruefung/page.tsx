@@ -6,6 +6,7 @@ import { api, ApiClientError, type Paginated, type OralExam } from "@/lib/api";
 import { ErrorState } from "@/components/States";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useIdentity } from "@/lib/use-identity";
+import { canManageExams } from "@/lib/auth";
 
 function statusLabel(s: string): string {
   if (s === "completed") return "Abgeschlossen";
@@ -16,7 +17,9 @@ function statusLabel(s: string): string {
 export default function OralExamsPage() {
   const router = useRouter();
   const { user } = useIdentity();
-  const isAdmin = user?.role === "admin";
+  // Both roles run exams; `canManageExams` is the shared presentation mirror of
+  // the server-side `requireStaff` guard.
+  const canManage = canManageExams(user?.role);
 
   const [data, setData] = useState<Paginated<OralExam> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -103,13 +106,12 @@ export default function OralExamsPage() {
       <div className="oral-hero">
         <h1>Mündliche Prüfung</h1>
         <p>
-          {isAdmin
-            ? "Digitale Durchführung, Bewertung und Auswertung einer mündlichen §34a-Sachkundeprüfung."
-            : "Ihre durchgeführten mündlichen §34a-Sachkundeprüfungen und deren Auswertung."}
+          Digitale Durchführung, Bewertung und Auswertung einer mündlichen
+          §34a-Sachkundeprüfung.
         </p>
       </div>
 
-      {isAdmin && (
+      {canManage && (
         <form className="oral-card oral-toolbar" onSubmit={createExam} aria-label="Neue Prüfung erstellen">
           <div className="oral-field">
             <label htmlFor="oral-name">Prüfling (Name) *</label>
@@ -145,9 +147,7 @@ export default function OralExamsPage() {
         </p>
       )}
 
-      <h2 style={{ marginTop: 28, marginBottom: 12 }}>
-        {isAdmin ? "Letzte Prüfungen" : "Meine Prüfungen"}
-      </h2>
+      <h2 style={{ marginTop: 28, marginBottom: 12 }}>Letzte Prüfungen</h2>
 
       {loading ? (
         <div className="oral-card">Lade Prüfungen …</div>
@@ -155,9 +155,7 @@ export default function OralExamsPage() {
         <ErrorState message={error} onRetry={load} />
       ) : !data || data.data.length === 0 ? (
         <div className="oral-card">
-          {isAdmin
-            ? "Noch keine Prüfungen vorhanden. Erstelle die erste Prüfung oben."
-            : "Es sind noch keine Prüfungen für Sie freigegeben."}
+          Noch keine Prüfungen vorhanden. Erstelle die erste Prüfung oben.
         </div>
       ) : (
         <div className="oral-card" style={{ padding: 0 }}>
@@ -194,7 +192,7 @@ export default function OralExamsPage() {
                   <td>
                     <div className="oral-row-actions">
                       <Link className="btn btn--ghost btn--sm" href={`/muendliche-pruefung/${exam.id}`}>
-                        {exam.status === "completed" ? "Ansehen" : isAdmin ? "Fortsetzen" : "Ansehen"}
+                        {exam.status === "completed" ? "Ansehen" : "Fortsetzen"}
                       </Link>
                       {exam.status === "completed" && (
                         <>
@@ -211,7 +209,7 @@ export default function OralExamsPage() {
                           </a>
                         </>
                       )}
-                      {isAdmin && (
+                      {canManage && (
                         <button
                           type="button"
                           className="btn btn--danger-ghost btn--sm"

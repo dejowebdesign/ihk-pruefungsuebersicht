@@ -129,6 +129,23 @@ export const requireAdmin: MiddlewareHandler<{ Variables: AuthVariables }> = asy
 };
 
 /**
+ * Middleware: require a signed-in staff member — admin OR examiner (401 when
+ * anonymous).
+ *
+ * This is the guard for the oral exam simulation, which is the one working area
+ * both roles share: an examiner runs and administers exams exactly like an
+ * admin does. Administrative surfaces outside the simulation (user management,
+ * question pool, imports) keep using requireAdmin, so "staff" must never be
+ * used as a blanket replacement for requireAdmin.
+ */
+export const requireStaff: MiddlewareHandler<{ Variables: AuthVariables }> = async (c, next) => {
+  const identity = c.get("identity") ?? (await resolveIdentity(c));
+  c.set("identity", identity);
+  if (!identity) return c.json({ error: "unauthorized" }, 401);
+  await next();
+};
+
+/**
  * Middleware for the legacy /api/admin surface.
  *
  * Keeps the historical fails-closed contract — 503 while NEITHER the shared
@@ -156,9 +173,3 @@ export const adminGuard: MiddlewareHandler<{ Variables: AuthVariables }> = async
   }
   return c.json({ error: "unauthorized" }, 401);
 };
-
-/** True when the caller may read an exam owned by `ownerUserId`. */
-export function canReadExam(identity: Identity, ownerUserId: string | null): boolean {
-  if (identity.role === "admin") return true;
-  return ownerUserId !== null && ownerUserId === identity.userId;
-}

@@ -17,6 +17,7 @@ import {
   setRole,
   removeUser,
   isRole,
+  DEFAULT_ROLE,
 } from "../../auth/service";
 
 export const users = new Hono<{ Variables: AuthVariables }>();
@@ -35,8 +36,9 @@ users.post("/", async (c) => {
     return apiError(c, 400, "invalid JSON body");
   }
   // The role is taken from the admin-supplied body but validated against the
-  // fixed role list — never trusted as a free-form string.
-  const role = isRole(body.role) ? body.role : "participant";
+  // fixed role list — never trusted as a free-form string. Anything unknown
+  // (including the retired "participant") falls back to the examiner default.
+  const role = isRole(body.role) ? body.role : DEFAULT_ROLE;
   try {
     const user = await createUser(prisma(), {
       username: String(body.username ?? ""),

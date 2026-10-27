@@ -17,7 +17,8 @@ NOT modify Quiz0r.
 ### Authentication & roles
 - **DB-backed session cookie auth** (`ihk_session`), replacing the old
   `frontend/src/lib/oral-auth.ts` localStorage admin-token flow (deleted) and
-  `backend/src/api/admin-auth.ts` (deleted). Roles: `admin` | `participant`.
+  `backend/src/api/admin-auth.ts` (deleted). Roles: `admin` | `examiner` (the
+  retired `participant` role was fully replaced — see "Role cleanup" below).
 - Password hashing: **scrypt via `node:crypto`** (`backend/src/auth/passwords.ts`),
   format `scrypt$N$r$p$<saltHex>$<hashHex>` (self-describing, params readable at
   verify time). **No new dependencies** — deliberately hand-rolled.
@@ -35,28 +36,53 @@ NOT modify Quiz0r.
 ### Authorization model (two layers, both server-side)
 1. **Central gate** — `backend/src/api/access-policy.ts` `requiredAccess(method, path)`
    returns `public` | `authenticated` | `admin` for every API path; wired as
-   `app.use("/api/*", …)` in `app.ts`. A participant cannot reach an admin-only
+   `app.use("/api/*", …)` in `app.ts`. An examiner cannot reach an admin-only
    endpoint even when the UI is bypassed. Unknown paths resolve to `public` so
    they 404 normally instead of a misleading 401.
-   - Public: `/api`, `/api/health`, `/api/auth/*`, legacy `/api/admin/*`, and
-     `/api/ihk` + `/api/ihk/search` (they back the participant start page `/`).
-   - Admin-only: `/api/ihk/:id` (detail), `/questions`, `/case-examples`,
-     `/sheets`, `/import`, `/users`, and every non-GET `/api/oral/*`.
-   - `/api/oral/*` GETs: `authenticated`.
-2. **Route guards** — `requireAdmin` / `requireAuth` / `adminGuard`
-   (`backend/src/api/identity.ts`). Roles are **never** read from request data:
-   exam ownership is taken from the session (`identity.userId`), and a `userId`
+   - Public: `/api`, `/api/health`, `/api/auth/*`, legacy `/api/admin/*`.
+   - Authenticated (both roles): `/api/ihk` + `/api/ihk/search` + `/api/ihk/:id`
+     (they back the start page `/` and the detail pages `/ihk/:id`), and
+     `/api/oral/*` except `/oral/seed`.
+   - Admin-only: `/questions`, `/case-examples`, `/sheets`, `/import`, `/users`,
+     and `POST /api/oral/seed` (seeding rewrites the shared pool).
+2. **Route guards** — `requireAdmin` / `requireStaff` / `requireAuth` /
+   `adminGuard` (`backend/src/api/identity.ts`). `requireStaff` = admin **or**
+   examiner; it guards the whole oral simulation (create, rate, complete, PDF,
+   delete), because both roles run exams with identical rights. `requireAdmin`
+   stays on everything outside it. Roles are **never** read from request data:
+   the exam creator is taken from the session (`identity.userId`), and a `userId`
    in a request body is ignored.
 
-### Participant scoping
-- Participants may only read exams whose `userId` equals their own; the filter is
-  applied **in the SQL `where`** (`examScope()` in `routes/oral.ts`), not by
-  post-filtering. A foreign exam returns **404, not 403**, so its existence is
-  not confirmed. Exams with `userId = null` (legacy/admin-token-created) are
-  never participant-readable.
-- `frontend/src/middleware.ts` gates pages server-side (participant: `/` and
-  `/muendliche-pruefung*` only; everything else redirects to `/`). `/login` is
+### Staff-wide exams (no per-user scoping)
+- The oral simulation is a **shared staff area**: every examiner and admin sees
+  and edits the same exams. `OralExam.userId` is an **audit-only** record of who
+  created the exam; it is never used as an access filter. (Earlier per-owner
+  `examScope()` scoping was removed with the role cleanup — `examScope` and
+  `canReadExam` no longer exist.)
+- An unknown exam id is **404** for everyone.
+- `frontend/src/middleware.ts` gates pages server-side (examiner: `/`, `/ihk*`
+  and `/muendliche-pruefung*`; everything else redirects to `/`). `/login` is
   public and bounces signed-in users onward.
+
+### Role cleanup (`admin` | `examiner`) — migration `20261027000000_examiner_role`
+- The `participant` role is **retired**. Migration
+  `backend/prisma/migrations/20261027000000_examiner_role/migration.sql` converts
+  every existing `role = 'participant'` row to `'examiner'` (SQLite table-rebuild,
+  since the column default also changes) and sets the new default to `'examiner'`.
+  It is **data-preserving**: usernames, password hashes, `active`/`disabledAt`,
+  sessions, exams, ratings and the question pool are all kept. The migration is
+  executed verbatim in `backend/tests/auth.test.ts` (via `node:sqlite`
+  `DatabaseSync.exec`) against a DB seeded with participants + exam history, and
+  the test asserts conversion *and* preservation.
+- `isRole()` only accepts `admin`/`examiner`; a `participant` value in a create
+  body falls back to the `examiner` default, and a `PATCH { role: "participant" }`
+  is rejected with **400 "invalid role"**. The client-side
+  `canAccessPath()` also refuses unknown role strings instead of falling through
+  to the examiner branch.
+- The IHK-Vergleich was removed with this cleanup: `/vergleich` page,
+  `ComparisonTable.tsx`, `lib/compare.ts` and their tests are deleted, and the
+  IHK cards are now a **single `<a>`** (no `+`/compare toggle) — one link per
+  card, reachable by mouse, keyboard and touch.
 
 ### PDF report (`backend/src/oral/pdf.ts` + `pdf-writer.ts`)
 - Hand-rolled PDF writer, **no dependencies**. Text ops are `BT /F1|F2 <size> Tf
@@ -72,7 +98,7 @@ NOT modify Quiz0r.
   `Cache-Control: private, no-store`.
 
 ### Exam deletion
-- `DELETE /api/oral/exams/:id` is admin-only and requires explicit confirmation
+- `DELETE /api/oral/exams/:id` requires `requireStaff` and explicit confirmation
   (`?confirm=true` or `x-confirm-delete: true`), else **400**. `deleteExam()`
   (`oral/service.ts`) runs in one transaction: deletes the exam's
   `OralExamQuestion` rows, then the exam, then the candidate **only if orphaned**.
@@ -88,9 +114,12 @@ NOT modify Quiz0r.
 - `next start` warns under `output: "standalone"`; the warning is expected.
 - Frontend identity cache (`src/lib/auth.ts`) is **observable** (subscribe/notify):
   without it a client-side login leaves the already-mounted `Header` stale.
-- Migrations are **additive**: `20260827000000_users_sessions` adds `User`/
-  `Session`, adds nullable `OralExam.userId` (ON DELETE SET NULL), and preserves
-  every existing row/result.
+- Migrations are **additive / data-preserving**: `20260827000000_users_sessions`
+  adds `User`/`Session` and nullable `OralExam.userId` (ON DELETE SET NULL);
+  `20261027000000_examiner_role` rebuilds `User` only to change the role default
+  and convert `participant` → `examiner`. Both preserve every existing row.
+- Changing `User.role`'s default requires `npx prisma generate` before the tests
+  see it — the checked-in client is stale otherwise.
 
 ## Phase 5 (Next.js Web-GUI) key learnings
 
@@ -119,7 +148,7 @@ NOT modify Quiz0r.
   `import React` (component source files have no explicit React import).
 - **userEvent + fake timers hang** (userEvent waits internally). Use real timers
   for interactive tests; for debounce use a small `debounceMs` + `setTimeout`.
-- Run: `npx vitest run` (172 tests across 15 suites, all passing).
+- Run: `npx vitest run` (152 tests across 12 suites, all passing).
 
 ## Commands
 

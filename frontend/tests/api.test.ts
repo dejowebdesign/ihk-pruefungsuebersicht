@@ -137,7 +137,7 @@ describe("api client", () => {
     await api.users();
     expect(spy.mock.calls[0][0]).toBe("/api/users");
 
-    spy.mockResolvedValue(mockFetch({ body: { user: { id: "u", username: "a", role: "participant", active: true } } }));
+    spy.mockResolvedValue(mockFetch({ body: { user: { id: "u", username: "a", role: "examiner", active: true } } }));
     await api.updateUser("u1", { active: false });
     const [url, init] = spy.mock.calls[1] as [string, RequestInit];
     expect(url).toBe("/api/users/u1");

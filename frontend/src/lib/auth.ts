@@ -13,8 +13,8 @@ import type { AuthUser, UserRole } from "./api";
 
 export const IDENTITY_CACHE_KEY = "ihk-identity";
 
-/** Areas a participant is allowed to use. Everything else is admin-only. */
-export const PARTICIPANT_ROUTES = ["/", "/muendliche-pruefung"];
+/** Areas an examiner is allowed to use. Everything else is admin-only. */
+export const EXAMINER_ROUTES = ["/", "/ihk", "/muendliche-pruefung"];
 /** Routes reachable without signing in. */
 export const PUBLIC_ROUTES = ["/login"];
 
@@ -38,7 +38,7 @@ export function readCachedIdentity(): AuthUser | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthUser;
     if (!parsed || typeof parsed.username !== "string") return null;
-    if (parsed.role !== "admin" && parsed.role !== "participant") return null;
+    if (parsed.role !== "admin" && parsed.role !== "examiner") return null;
     return parsed;
   } catch {
     return null;
@@ -65,10 +65,22 @@ export function isWithin(pathname: string, prefixes: readonly string[]): boolean
   });
 }
 
+/**
+ * Both roles run the oral exam simulation with identical rights: creating,
+ * rating, completing, exporting and deleting exams. Only the surrounding admin
+ * areas differ. Server-side this is the `requireStaff` guard.
+ */
+export function canManageExams(role: UserRole | null | undefined): boolean {
+  return role === "admin" || role === "examiner";
+}
+
 /** May a user with `role` open `pathname`? Mirrors the server-side page policy. */
 export function canAccessPath(role: UserRole, pathname: string): boolean {
+  // Only known roles pass. A retired/unknown role string must not fall through
+  // to the examiner branch and inherit access.
+  if (role !== "admin" && role !== "examiner") return false;
   if (role === "admin") return true;
-  return isWithin(pathname, PARTICIPANT_ROUTES);
+  return isWithin(pathname, EXAMINER_ROUTES);
 }
 
 export function isPublicPath(pathname: string): boolean {
@@ -76,5 +88,5 @@ export function isPublicPath(pathname: string): boolean {
 }
 
 export function roleLabel(role: UserRole): string {
-  return role === "admin" ? "Administrator" : "Teilnehmer";
+  return role === "admin" ? "Administrator" : "Prüfer";
 }

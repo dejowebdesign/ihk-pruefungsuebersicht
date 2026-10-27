@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api, ApiClientError } from "@/lib/api";
-import { writeCachedIdentity } from "@/lib/auth";
+import { canAccessPath, writeCachedIdentity } from "@/lib/auth";
 
 // useSearchParams() requires a Suspense boundary when the page is statically
 // rendered, so the form lives in its own component.
@@ -48,9 +48,9 @@ function LoginForm() {
       const { user } = await api.login(username.trim(), password);
       writeCachedIdentity(user);
       // `next` is only honoured for a target the role may actually open, so a
-      // crafted link cannot bounce a participant into an admin page.
+      // crafted link cannot bounce an examiner into an admin page.
       const target =
-        next && (user.role === "admin" || next === "/" || next.startsWith("/muendliche-pruefung"))
+        next && (user.role === "admin" || canAccessPath(user.role, next))
           ? next
           : user.role === "admin"
             ? "/admin"
@@ -114,7 +114,8 @@ function LoginForm() {
           {submitting ? "Anmelden …" : "Anmelden"}
         </button>
         <p className="login-card__hint">
-          Teilnehmer sehen die IHK-Übersicht und ihre eigenen mündlichen Prüfungen.{" "}
+          Prüfer sehen die IHK-Übersicht, die IHK-Details und die mündliche
+          Prüfung.{" "}
           <Link href="/">Zur Übersicht</Link>
         </p>
       </form>

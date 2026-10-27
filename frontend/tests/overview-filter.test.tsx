@@ -2,10 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import HomePage from "@/app/page";
-import {
-  COMPARE_STORAGE_KEY,
-  loadCompareIds,
-} from "@/lib/compare";
 
 // IHK rows across multiple Bundesländer to exercise the filter + pagination.
 function ihk(id: string, name: string, bundesland: string) {
@@ -101,18 +97,27 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+/**
+ * The IHK cards are single anchors now, so they are counted as links with the
+ * card's accessible name ("<IHK> – Details anzeigen"). This also pins the
+ * accessible name itself.
+ */
+function cards() {
+  return screen.getAllByRole("link", { name: /– Details anzeigen$/ });
+}
+
 async function renderOverview() {
   const user = userEvent.setup();
   const utils = render(<HomePage />);
   // Default page (no filter): all 18 IHKs, page size 12 → first page = 12 cards.
-  await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(12));
+  await waitFor(() => expect(cards()).toHaveLength(12));
   return { user, ...utils };
 }
 
 describe("overview Bundesland filter", () => {
   it("TEST 1: 'Alle Bundesländer' shows all IHKs (paginated)", async () => {
     await renderOverview();
-    expect(screen.getAllByRole("article")).toHaveLength(12);
+    expect(cards()).toHaveLength(12);
     expect(screen.getByText(/18 IHK-Standorte/)).toBeInTheDocument();
   });
 
@@ -121,7 +126,7 @@ describe("overview Bundesland filter", () => {
     const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
     await user.selectOptions(select, "Nordrhein-Westfalen");
     // NRW has 15 IHKs → page size 12 → first page = 12.
-    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(12));
+    await waitFor(() => expect(cards()).toHaveLength(12));
     expect(screen.getByText(/15 IHK-Standorte/)).toBeInTheDocument();
     expect(screen.getByText("Köln")).toBeInTheDocument();
     expect(screen.queryByText("München")).not.toBeInTheDocument();
@@ -131,7 +136,7 @@ describe("overview Bundesland filter", () => {
     const { user } = await renderOverview();
     const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
     await user.selectOptions(select, "Bayern");
-    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(2));
+    await waitFor(() => expect(cards()).toHaveLength(2));
     expect(screen.getByText("München")).toBeInTheDocument();
     expect(screen.queryByText("Köln")).not.toBeInTheDocument();
   });
@@ -143,7 +148,7 @@ describe("overview Bundesland filter", () => {
     await waitFor(() => expect(screen.getByText(/15 IHK-Standorte/)).toBeInTheDocument());
     await user.selectOptions(select, "");
     await waitFor(() => expect(screen.getByText(/18 IHK-Standorte/)).toBeInTheDocument());
-    expect(screen.getAllByRole("article")).toHaveLength(12);
+    expect(cards()).toHaveLength(12);
   });
 
   it("TEST 5: no removed filters are rendered", async () => {
@@ -172,32 +177,40 @@ describe("overview Bundesland filter", () => {
     expect(labels).not.toContain("Thüringen");
   });
 
-  it("TEST 9: compare selection still works alongside the filter", async () => {
-    const { user } = await renderOverview();
-    const add = screen.getAllByRole("button", { name: "Zum Vergleich hinzufügen" })[0];
-    await user.click(add);
-    expect(loadCompareIds()).toHaveLength(1);
+  it("TEST 9: IHK cards have no plus symbol and link to the detail page", async () => {
+    await renderOverview();
+    // No compare/plus control anywhere on the overview.
+    expect(screen.queryByRole("button", { name: /Vergleich/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("+")).not.toBeInTheDocument();
+    expect(screen.queryByText("✓")).not.toBeInTheDocument();
+    // Each card is one link to its own detail page.
+    for (const card of cards()) {
+      expect(card).toHaveAttribute("href", expect.stringMatching(/^\/ihk\//));
+    }
   });
 
-  it("TEST 10: filter does not damage stored compare selection", async () => {
-    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["nrw-1", "by-1"]));
+  it("TEST 10: the whole card is clickable and keeps working with a filter", async () => {
     const { user } = await renderOverview();
-    // Selecting a filter must not wipe the stored selection.
     const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
+    // Hessen has exactly one IHK in the fixture.
     await user.selectOptions(select, "Hessen");
-    await waitFor(() => expect(loadCompareIds()).toEqual(["nrw-1", "by-1"]));
-    // And switching back to "Alle Bundesländer" still preserves it.
-    await user.selectOptions(select, "");
-    await waitFor(() => expect(loadCompareIds()).toEqual(["nrw-1", "by-1"]));
+    await waitFor(() => expect(cards()).toHaveLength(1));
+    for (const card of cards()) {
+      expect(card).toHaveAttribute("href", expect.stringMatching(/^\/ihk\//));
+    }
+    // Cards remain reachable for keyboard users (focusable anchors).
+    const [first] = cards();
+    first.focus();
+    expect(first).toHaveFocus();
   });
 
   it("TEST P1: pagination works WITHOUT filter (all 18 → 2 pages)", async () => {
     const { user } = await renderOverview();
     // Page 1 shows 12 of 18; page 2 button exists.
-    expect(screen.getAllByRole("article")).toHaveLength(12);
+    expect(cards()).toHaveLength(12);
     const page2 = screen.getByRole("button", { name: "Seite 2" });
     await user.click(page2);
-    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(6));
+    await waitFor(() => expect(cards()).toHaveLength(6));
   });
 
   it("TEST P2: pagination works WITH the NRW filter (15 → 2 pages)", async () => {
@@ -205,14 +218,14 @@ describe("overview Bundesland filter", () => {
     const select = screen.getByLabelText("Bundesland filtern") as HTMLSelectElement;
     await user.selectOptions(select, "Nordrhein-Westfalen");
     await waitFor(() => expect(screen.getByText(/15 IHK-Standorte/)).toBeInTheDocument());
-    expect(screen.getAllByRole("article")).toHaveLength(12);
+    expect(cards()).toHaveLength(12);
     const page2 = screen.getByRole("button", { name: "Seite 2" });
     await user.click(page2);
-    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(3));
+    await waitFor(() => expect(cards()).toHaveLength(3));
     // Going back to page 1 restores the first 12.
     const page1 = screen.getByRole("button", { name: "Seite 1" });
     await user.click(page1);
-    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(12));
+    await waitFor(() => expect(cards()).toHaveLength(12));
   });
 
   it("IHK card data remains complete (bundesland + attrs shown)", async () => {

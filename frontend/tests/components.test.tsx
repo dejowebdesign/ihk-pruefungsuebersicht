@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { Badge, SkpBadge } from "@/components/Badge";
 import { Pagination } from "@/components/Pagination";
 import { EmptyState, ErrorState } from "@/components/States";
-import { ComparisonTable } from "@/components/ComparisonTable";
 import type { IhkLocation } from "@/lib/api";
 
 describe("Badge", () => {
@@ -78,47 +77,5 @@ describe("States", () => {
   it("ErrorState renders message", () => {
     render(<ErrorState message="Kaputt" />);
     expect(screen.getByText("Kaputt")).toBeInTheDocument();
-  });
-});
-
-describe("ComparisonTable", () => {
-  const ihks: IhkLocation[] = [
-    {
-      id: "a", nr: 1, ihkShortName: "A", officialName: "x", sourceSheetId: "s",
-      skp: "✅", bundesland: "Bayern", writtenForm: "Tablet",
-      writtenResultImmediate: "ja", sameDay: "ja", intervalWrittenOral: "0",
-      examinerCount: "2", groupFormat: "3er Gruppe", fallbeispiel: null,
-      koFallbeispiel: null, punktesystem: null, vorbereitung: null, notizen: null,
-      dataState: null, lastUpdatedRaw: null, bezirk: null, adresse: null,
-      telefon: null, website: null, ansprechpartner: null, durchwahl: null,
-      email: null, routeUrl: null,
-    },
-    {
-      id: "b", nr: 2, ihkShortName: "B", officialName: "y", sourceSheetId: "s",
-      skp: "nein", bundesland: "Hessen", writtenForm: "Papier",
-      writtenResultImmediate: "nein", sameDay: "nein", intervalWrittenOral: "14",
-      examinerCount: "3", groupFormat: "4er Gruppe", fallbeispiel: null,
-      koFallbeispiel: null, punktesystem: null, vorbereitung: null, notizen: null,
-      dataState: null, lastUpdatedRaw: null, bezirk: null, adresse: null,
-      telefon: null, website: null, ansprechpartner: null, durchwahl: null,
-      email: null, routeUrl: null,
-    },
-  ];
-
-  it("renders feature rows and IHK columns", () => {
-    render(<ComparisonTable ihks={ihks} />);
-    expect(screen.getByText("Merkmal")).toBeInTheDocument();
-    expect(screen.getByText("SKP")).toBeInTheDocument();
-    // Both IHK names as headers.
-    expect(screen.getAllByText("A").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("B").length).toBeGreaterThan(0);
-    // Values present.
-    expect(screen.getAllByText("Tablet").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Papier").length).toBeGreaterThan(0);
-  });
-
-  it("renders empty state when no ihks", () => {
-    render(<ComparisonTable ihks={[]} />);
-    expect(screen.getByText(/Wähle IHKs/)).toBeInTheDocument();
   });
 });
