@@ -186,62 +186,64 @@ export default function UsersPage() {
         <ErrorState message={error} onRetry={load} />
       ) : (
         <section className="admin-card" style={{ marginTop: 20, padding: 0 }}>
-          <table className="oral-table">
-            <thead>
-              <tr>
-                <th>Benutzername</th>
-                <th>Rolle</th>
-                <th>Status</th>
-                <th>Angelegt</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>
-                    {u.username}
-                    {me?.username === u.username && <span className="badge-soft">Sie</span>}
-                  </td>
-                  <td>{roleLabel(u.role)}</td>
-                  <td>
-                    <span className={`oral-status oral-status--${u.active ? "completed" : "draft"}`}>
-                      {u.active ? "Aktiv" : "Deaktiviert"}
-                    </span>
-                  </td>
-                  <td>{new Date(u.createdAt).toLocaleDateString("de-DE")}</td>
-                  <td>
-                    <div className="oral-row-actions">
-                      <button
-                        type="button"
-                        className="btn btn--ghost btn--sm"
-                        onClick={() => {
-                          setResetError(null);
-                          setNewPassword("");
-                          setResetting(u);
-                        }}
-                      >
-                        Passwort setzen
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn btn--sm ${u.active ? "btn--danger-ghost" : "btn--ghost"}`}
-                        disabled={busy || isLastAdmin(u)}
-                        title={
-                          isLastAdmin(u)
-                            ? "Das letzte aktive Administratorkonto kann nicht deaktiviert werden."
-                            : undefined
-                        }
-                        onClick={() => (u.active ? setPendingDisable(u) : toggleActive(u))}
-                      >
-                        {u.active ? "Deaktivieren" : "Aktivieren"}
-                      </button>
-                    </div>
-                  </td>
+          <div className="table-scroll">
+            <table className="oral-table">
+              <thead>
+                <tr>
+                  <th>Benutzername</th>
+                  <th>Rolle</th>
+                  <th>Status</th>
+                  <th>Angelegt</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td>
+                      {u.username}
+                      {me?.username === u.username && <span className="badge-soft">Sie</span>}
+                    </td>
+                    <td>{roleLabel(u.role)}</td>
+                    <td>
+                      <span className={`oral-status oral-status--${u.active ? "completed" : "draft"}`}>
+                        {u.active ? "Aktiv" : "Deaktiviert"}
+                      </span>
+                    </td>
+                    <td>{new Date(u.createdAt).toLocaleDateString("de-DE")}</td>
+                    <td>
+                      <div className="oral-row-actions">
+                        <button
+                          type="button"
+                          className="btn btn--ghost btn--sm"
+                          onClick={() => {
+                            setResetError(null);
+                            setNewPassword("");
+                            setResetting(u);
+                          }}
+                        >
+                          Passwort setzen
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn btn--sm ${u.active ? "btn--danger-ghost" : "btn--ghost"}`}
+                          disabled={busy || isLastAdmin(u)}
+                          title={
+                            isLastAdmin(u)
+                              ? "Das letzte aktive Administratorkonto kann nicht deaktiviert werden."
+                              : undefined
+                          }
+                          onClick={() => (u.active ? setPendingDisable(u) : toggleActive(u))}
+                        >
+                          {u.active ? "Deaktivieren" : "Aktivieren"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
