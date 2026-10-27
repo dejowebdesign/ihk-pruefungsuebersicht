@@ -51,14 +51,9 @@ export default function OralExamsPage() {
       setFormError("Bitte einen Prüflingsnamen eingeben.");
       return;
     }
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     setCreating(true);
     try {
-      const res = await api.oralCreateExam(token, {
+      const res = await api.oralCreateExam(getStoredToken() ?? undefined, {
         candidateName: trimmed,
         examDate: date || null,
         examiner: examiner.trim() || null,
@@ -101,8 +96,8 @@ export default function OralExamsPage() {
 
       {needToken && (
         <p className="state" role="alert" style={{ padding: 12 }}>
-          Für die Durchführung ist ein Administrator-Token nötig. Hinterlege es unter{" "}
-          <Link href="/admin">Admin</Link>.
+          Für die Durchführung ist eine Anmeldung nötig. Bitte unter{" "}
+          <Link href="/admin/login">Admin-Anmeldung</Link> anmelden.
         </p>
       )}
       {formError && <p className="state" role="alert" style={{ padding: 12 }}>{formError}</p>}

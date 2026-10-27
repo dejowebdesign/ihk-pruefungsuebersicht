@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/fragen", label: "Fragen" },
   { href: "/fallbeispiele", label: "Fallbeispiele" },
   { href: "/muendliche-pruefung", label: "Mündliche Prüfung" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export function Header() {

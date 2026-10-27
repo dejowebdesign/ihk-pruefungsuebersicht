@@ -210,6 +210,13 @@ export interface OralRateInput {
   note?: string | null;
 }
 
+// ── Admin login (session-based) ─────────────────────────────────────────────
+
+export interface AuthMe {
+  authenticated: boolean;
+  username: string | null;
+}
+
 export interface AdminStatus {
   lastSuccess: ImportRun | null;
   lastAttempt: ImportRun | null;
@@ -218,6 +225,8 @@ export interface AdminStatus {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
+    // Send/receive the admin session cookie for same-origin API calls.
+    credentials: "include",
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
@@ -262,6 +271,11 @@ export interface IhkListParams {
   sort?: string;
 }
 
+/** Build an Authorization header only when a legacy token is supplied. */
+function authHeader(token?: string): Record<string, string> {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function buildQuery(params: Record<string, string | number | undefined>): string {
   const usp = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
@@ -274,6 +288,17 @@ function buildQuery(params: Record<string, string | number | undefined>): string
 export const api = {
   health: () =>
     request<{ status: string; database: string; timestamp: string; version: string }>("/api/health"),
+
+  // ── Admin login (session-based, server-verified) ──────────────────────────
+  authLogin: (username: string, password: string) =>
+    request<{ ok: true; username: string }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }),
+  authLogout: () =>
+    request<{ ok: true }>("/api/auth/logout", { method: "POST" }),
+  authMe: () => request<AuthMe>("/api/auth/me"),
+
   importStatus: () => request<ImportStatus>("/api/import/status"),
   importRuns: (page = 1, limit = 20) =>
     request<Paginated<ImportRun>>(`/api/import/runs${buildQuery({ page, limit })}`),
@@ -303,14 +328,14 @@ export const api = {
   caseExamples: (page = 1, limit = 50, q?: string, category?: string, cluster?: string) =>
     request<Paginated<CaseExample>>(`/api/case-examples${buildQuery({ page, limit, q, category, cluster })}`),
 
-  adminStatus: (token: string) =>
-    request<AdminStatus>("/api/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
-  adminScheduler: (token: string) =>
-    request<SchedulerStatus>("/api/admin/scheduler", { headers: { Authorization: `Bearer ${token}` } }),
-  adminImport: (token: string) =>
+  adminStatus: (token?: string) =>
+    request<AdminStatus>("/api/admin/status", { headers: authHeader(token) }),
+  adminScheduler: (token?: string) =>
+    request<SchedulerStatus>("/api/admin/scheduler", { headers: authHeader(token) }),
+  adminImport: (token?: string) =>
     request<{ message: string; runId?: string }>("/api/admin/import", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
     }),
 
   // ── Oral exam (Phase 8) ──────────────────────────────────────────────────
@@ -322,32 +347,34 @@ export const api = {
   oralExam: (id: string) => request<OralExam>(`/api/oral/exams/${id}`),
   oralExamScore: (id: string) => request<OralExamScore>(`/api/oral/exams/${id}/score`),
 
-  oralCreateExam: (token: string, input: OralCreateInput) =>
+  // Write methods accept an optional legacy bearer token; when omitted they
+  // rely on the server-verified admin session cookie (sent automatically).
+  oralCreateExam: (token: string | undefined, input: OralCreateInput) =>
     request<{ examId: string }>("/api/oral/exams", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
       body: JSON.stringify(input),
     }),
-  oralRateQuestion: (token: string, examId: string, order: number, input: OralRateInput) =>
+  oralRateQuestion: (token: string | undefined, examId: string, order: number, input: OralRateInput) =>
     request<{ ok: true }>(`/api/oral/exams/${examId}/questions/${order}`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
       body: JSON.stringify(input),
     }),
-  oralCompleteExam: (token: string, examId: string) =>
+  oralCompleteExam: (token: string | undefined, examId: string) =>
     request<{ ok: true }>(`/api/oral/exams/${examId}/complete`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
     }),
-  oralUpdateExam: (token: string, examId: string, input: OralUpdateInput) =>
+  oralUpdateExam: (token: string | undefined, examId: string, input: OralUpdateInput) =>
     request<{ ok: true }>(`/api/oral/exams/${examId}`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
       body: JSON.stringify(input),
     }),
-  oralSeedPool: (token: string) =>
+  oralSeedPool: (token: string | undefined) =>
     request<{ message: string; themes: number; questions: number }>("/api/oral/seed", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeader(token),
     }),
 };

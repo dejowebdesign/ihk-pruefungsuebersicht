@@ -11,6 +11,7 @@ import { caseExamples } from "./routes/case-examples";
 import { imp } from "./routes/import";
 import { admin } from "./routes/admin";
 import { oral } from "./routes/oral";
+import { auth } from "./routes/auth";
 
 export function createApp() {
   const app = new Hono();
@@ -22,6 +23,7 @@ export function createApp() {
   app.route("/api/questions", questions);
   app.route("/api/case-examples", caseExamples);
   app.route("/api/import", imp);
+  app.route("/api/auth", auth);
   app.route("/api/admin", admin);
   app.route("/api/oral", oral);
 
@@ -54,6 +56,9 @@ export function createApp() {
         "PATCH /api/oral/exams/:id/questions/:order (auth)",
         "POST /api/oral/exams/:id/complete (auth)",
         "PATCH /api/oral/exams/:id (auth)",
+        "POST /api/auth/login",
+        "POST /api/auth/logout",
+        "GET /api/auth/me",
       ],
     }),
   );

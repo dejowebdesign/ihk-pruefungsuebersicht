@@ -57,16 +57,13 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   }, [current, exam]);
 
   async function rate(rating: OralRating | null) {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     const item = exam?.items?.[current];
     if (!item) return;
     setSaving(true);
     try {
-      await api.oralRateQuestion(token, id, item.orderKey, { rating });
+      // Session cookie authenticates the request; a stored legacy token is an
+      // optional fallback for clients that still use one.
+      await api.oralRateQuestion(getStoredToken() ?? undefined, id, item.orderKey, { rating });
       await load();
     } catch (e: unknown) {
       if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
@@ -77,16 +74,11 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   }
 
   async function saveNote() {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     const item = exam?.items?.[current];
     if (!item) return;
     setSaving(true);
     try {
-      await api.oralRateQuestion(token, id, item.orderKey, { note: noteDraft });
+      await api.oralRateQuestion(getStoredToken() ?? undefined, id, item.orderKey, { note: noteDraft });
       await load();
     } catch (e: unknown) {
       if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
@@ -96,14 +88,9 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   }
 
   async function completeExam() {
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     setCompleting(true);
     try {
-      await api.oralCompleteExam(token, id);
+      await api.oralCompleteExam(getStoredToken() ?? undefined, id);
       await load();
     } catch (e: unknown) {
       if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
@@ -173,7 +160,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
 
       {needToken && (
         <p className="state" role="alert" style={{ padding: 12 }}>
-          Schreibzugriff benötigt einen Administrator-Token. Hinterlege ihn unter <Link href="/admin">Admin</Link>.
+          Schreibzugriff erfordert eine Anmeldung. Bitte unter <Link href="/admin/login">Admin-Anmeldung</Link> anmelden.
         </p>
       )}
       {error && <p className="state" role="alert" style={{ padding: 12 }}>{error}</p>}

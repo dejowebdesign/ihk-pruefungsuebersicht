@@ -9,6 +9,16 @@ services:
     environment:
       # Admin token MUST be provided via Portainer/env (never committed).
       ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN must be set in the environment}
+      # Admin login (server-side verified). Provide a scrypt hash (preferred)
+      # or a plaintext password for local use. Username defaults to "admin".
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_SESSION_TTL_HOURS: ${ADMIN_SESSION_TTL_HOURS:-8}
+      ADMIN_LOGIN_MAX_ATTEMPTS: ${ADMIN_LOGIN_MAX_ATTEMPTS:-5}
+      ADMIN_LOGIN_WINDOW_MINUTES: ${ADMIN_LOGIN_WINDOW_MINUTES:-15}
+      # Comma-separated public origin(s) for CSRF checks (e.g. https://ihk.example.com).
+      APP_ORIGIN: ${APP_ORIGIN:-}
       GOOGLE_SHEET_ID: ${GOOGLE_SHEET_ID:-1jDFsBoQyzReOv-AxFAgrhAZkdimwp-oj7UT56pqf0Wk}
       IMPORT_INTERVAL_HOURS: ${IMPORT_INTERVAL_HOURS:-6}
       IMPORT_REQUEST_DELAY_MS: ${IMPORT_REQUEST_DELAY_MS:-400}

@@ -12,7 +12,13 @@ export async function middleware(request: NextRequest) {
   const backendUrl = new URL(url);
 
   const headers = new Headers(request.headers);
-  // Strip host so fetch uses the backend host header.
+  // The backend must be able to check the browser's real origin for CSRF, but
+  // fetch rewrites Host to the backend host. Forward the original host/proto
+  // explicitly, then strip host so fetch targets the backend correctly.
+  const originalHost = request.headers.get("host");
+  if (originalHost) headers.set("x-forwarded-host", originalHost);
+  const proto = request.nextUrl.protocol.replace(":", "");
+  if (proto) headers.set("x-forwarded-proto", proto);
   headers.delete("host");
 
   const init: RequestInit = {
@@ -28,9 +34,18 @@ export async function middleware(request: NextRequest) {
     const res = await fetch(backendUrl, init);
     const respHeaders = new Headers();
     res.headers.forEach((v, k) => {
-      // Drop transfer-encoding; NextResponse sets its own.
-      if (k.toLowerCase() !== "transfer-encoding") respHeaders.set(k, v);
+      const lower = k.toLowerCase();
+      // Drop transfer-encoding; NextResponse sets its own. Drop set-cookie here
+      // (handled separately below) because Headers.forEach collapses multiple
+      // Set-Cookie values into one comma-joined string, which corrupts cookies.
+      if (lower === "transfer-encoding" || lower === "set-cookie") return;
+      respHeaders.set(k, v);
     });
+    // Forward Set-Cookie verbatim (may be multiple; keep each header separate).
+    const setCookies = res.headers.getSetCookie?.() ?? [];
+    for (const sc of setCookies) {
+      respHeaders.append("set-cookie", sc);
+    }
     const body = res.status === 204 ? null : await res.arrayBuffer();
     return new NextResponse(body, { status: res.status, headers: respHeaders });
   } catch {

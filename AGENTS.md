@@ -6,8 +6,9 @@ NOT modify Quiz0r.
 ## Architecture
 
 - **backend/** — Hono REST API (read-only) on Prisma + SQLite. Tests via Vitest
-  (`npm -w backend test`, 97 tests). Start: `npm -w backend run serve` with
-  `DATABASE_URL`, `ADMIN_TOKEN`, `PORT` env. The `serve` script defaults to
+  (`npm -w backend test`). Start: `npm -w backend run serve` with
+  `DATABASE_URL`, `ADMIN_TOKEN` (and/or `ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH`
+  for the login), `PORT` env. The `serve` script defaults to
   PORT=3000, so set `PORT=3001` to match docker-compose/`BACKEND_URL`.
 - **frontend/** — Next.js 14 (App Router) Web-GUI consuming the backend API.
 - **Dockerfile** (root) — backend image. **frontend/Dockerfile** — Next.js image.
@@ -151,3 +152,63 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
 - **E2E verified** in-browser: create exam → rate 8 questions → live %
   updates → complete → result screen (100 %, Bestanden) → copy button →
   appears in list. Dark mode renders correctly.
+
+## Task 10 — Admin login (username + password)
+
+Secure browser login for the admin area, replacing the manual token entry as
+the primary path. The legacy shared secret still works — this is additive.
+
+### Backend
+- **`backend/src/api/passwords.ts`** — `scrypt` hashing/verification (Node
+  built-in, no dependency). Stored format `scrypt$N$r$p$salt$hash`.
+- **`backend/src/api/session.ts`** — in-process session store (opaque
+  256-bit token → username + expiry, TTL `ADMIN_SESSION_TTL_HOURS`, default 8 h).
+  Not persisted: a restart invalidates sessions (fails closed).
+- **`backend/src/api/rate-limit.ts`** — fixed-window login limiter keyed by
+  IP+username (`ADMIN_LOGIN_MAX_ATTEMPTS` / `ADMIN_LOGIN_WINDOW_MINUTES`).
+- **`backend/src/api/admin-credentials.ts`** — resolves `ADMIN_USERNAME`
+  (default `admin`) + `ADMIN_PASSWORD_HASH` (preferred) or `ADMIN_PASSWORD`.
+  Credentials come from env only — never from code or the database.
+- **`backend/src/api/csrf.ts`** — Origin/Referer check for cookie-authenticated
+  state-changing requests. Allowed origins = `APP_ORIGIN` + `X-Forwarded-Host`
+  /`Host` + the request URL's own origin.
+- **`backend/src/api/admin-auth.ts`** — the SINGLE gate. Accepts a valid
+  session cookie (CSRF-checked) OR a legacy `Bearer ADMIN_TOKEN` (CSRF-exempt).
+  `ADMIN_SESSION_COOKIE = ihk_admin_session`. Fails closed (503) when nothing
+  is configured.
+- **`backend/src/api/routes/auth.ts`** — `POST /api/auth/login`,
+  `POST /api/auth/logout`, `GET /api/auth/me`. Mounted at `/api/auth` in
+  `app.ts`. Cookie: HttpOnly, SameSite=Lax, Path=/, Secure in production (or
+  `ADMIN_COOKIE_SECURE=1`).
+- **`backend/src/scripts/hash-admin-password.ts`** — prints an
+  `ADMIN_PASSWORD_HASH` value: `npx tsx src/scripts/hash-admin-password.ts 'pw'`.
+
+### Frontend
+- **`/admin/login`** — username/password form (password show/hide toggle,
+  loading state, friendly errors incl. 429 lockout). Redirects to `/admin`
+  when already authenticated.
+- **`/admin`** — session-first: shows the logged-in user + Abmelden; falls back
+  to the token form ("Token verwenden") and the login page when unauthenticated.
+- **`frontend/src/lib/api.ts`** — `credentials: "include"` on every request;
+  `authLogin/authLogout/authMe`; `authHeader()` makes the legacy token optional
+  on admin/oral write calls (cookie used when absent).
+- **`frontend/src/middleware.ts`** — forwards `Set-Cookie` verbatim (multiple
+  headers) and passes `X-Forwarded-Host`/`-Proto` so backend CSRF sees the real
+  public origin. `Header.tsx` has an "Admin" nav link.
+
+### Config (`.env.example` documents all; real values never committed)
+`ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_PASSWORD`, `ADMIN_SESSION_TTL_HOURS`,
+`ADMIN_LOGIN_MAX_ATTEMPTS`, `ADMIN_LOGIN_WINDOW_MINUTES`, `APP_ORIGIN`,
+`ADMIN_COOKIE_SECURE`, plus the pre-existing `ADMIN_TOKEN`. docker-compose
+passes them through with defaults.
+
+### Tests
+`backend/tests/auth.test.ts` (25: login, invalid creds, unauth writes, access
+after login, logout, expiry, CSRF incl. proxy host, rate limit, legacy token,
+fail-closed) and `frontend/tests/admin-login.test.tsx` (6: fields, toggle,
+login+redirect, error, 429, already-authed). Green: backend 186, frontend 102.
+E2E smoke-tested against a live server (login → cookie → CSRF reject → write
+→ logout → 401; legacy bearer still 200; rate limit 429).
+
+**Initial local credentials:** username `admin`, password `dbasicherheit26`
+(only in the gitignored `.env`; the repo stores no plaintext password).
