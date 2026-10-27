@@ -241,6 +241,51 @@ model ChangeRecord {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Authentication & authorization
+//
+// Roles: "admin" | "participant". Passwords are stored ONLY as scrypt hashes
+// (see backend/src/auth/passwords.ts) — never in plaintext, never returned by
+// any API response. Deactivation is soft (`active = false`) so history and
+// audit trail survive; every request re-checks `active`, so a deactivated
+// account loses access immediately.
+//
+// Sessions are DB-backed (not stateless JWTs) precisely so they are
+// revocable: deleting the Session row (or flipping User.active) invalidates
+// the cookie on the very next request. The raw session token is never stored —
+// only its SHA-256 hash.
+// ─────────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String // scrypt hash; never exposed via the API
+  role         String    @default("participant") // "admin" | "participant"
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  disabledAt   DateTime?
+
+  sessions     Session[]
+  exams        OralExam[]
+
+  @@index([role])
+  @@index([active])
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique // sha256(raw token); the raw token lives only in the cookie
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Phase 8 — Mündliche Prüfung (oral exam)
 //
 // Completely separate from the public IHK `Question`/`CaseExample` models
@@ -311,6 +356,11 @@ model OralExam {
   id           String    @id @default(cuid())
   candidateId  String
   candidate    OralCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  // Owning participant account (null for exams created by the legacy admin
+  // token or by a shared/examiner flow). Participants may only ever read
+  // exams whose userId equals their own; the API enforces this server-side.
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   examDate     DateTime?
   examiner     String?
   status       String    @default("draft") // draft | in_progress | completed
@@ -329,6 +379,7 @@ model OralExam {
   @@index([candidateId])
   @@index([status])
   @@index([createdAt])
+  @@index([userId])
 }
 
 // One question slot within a concrete exam. The `orderKey` matches the theme's

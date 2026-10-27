@@ -183,6 +183,27 @@ export interface OralExam {
   items?: OralExamQuestion[];
 }
 
+// ── auth / users ───────────────────────────────────────────────────────────
+
+export type UserRole = "admin" | "participant";
+
+export interface AuthUser {
+  id: string | null;
+  username: string;
+  role: UserRole;
+  active: boolean;
+}
+
+export interface ManagedUser {
+  id: string;
+  username: string;
+  role: UserRole;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  disabledAt: string | null;
+}
+
 export interface OralExamScore {
   id: string;
   maxPoints: number;
@@ -219,6 +240,8 @@ export interface AdminStatus {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...init,
+    // Same-origin cookie session must ride along with every API call.
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
   });
   const text = await res.text();
@@ -274,6 +297,34 @@ function buildQuery(params: Record<string, string | number | undefined>): string
 export const api = {
   health: () =>
     request<{ status: string; database: string; timestamp: string; version: string }>("/api/health"),
+
+  // ── auth ────────────────────────────────────────────────────────────────
+  login: (username: string, password: string) =>
+    request<{ user: AuthUser }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }),
+  logout: () => request<{ ok: true }>("/api/auth/logout", { method: "POST" }),
+  me: () => request<{ user: AuthUser }>("/api/auth/me"),
+
+  // ── user management (admin) ─────────────────────────────────────────────
+  users: () => request<{ data: ManagedUser[] }>("/api/users"),
+  createUser: (input: { username: string; password: string; role: UserRole }) =>
+    request<{ user: ManagedUser }>("/api/users", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  updateUser: (
+    id: string,
+    input: { password?: string; active?: boolean; role?: UserRole },
+  ) =>
+    request<{ user: ManagedUser }>(`/api/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }),
+  deleteUser: (id: string) =>
+    request<{ user: ManagedUser }>(`/api/users/${id}`, { method: "DELETE" }),
+
   importStatus: () => request<ImportStatus>("/api/import/status"),
   importRuns: (page = 1, limit = 20) =>
     request<Paginated<ImportRun>>(`/api/import/runs${buildQuery({ page, limit })}`),
@@ -303,15 +354,11 @@ export const api = {
   caseExamples: (page = 1, limit = 50, q?: string, category?: string, cluster?: string) =>
     request<Paginated<CaseExample>>(`/api/case-examples${buildQuery({ page, limit, q, category, cluster })}`),
 
-  adminStatus: (token: string) =>
-    request<AdminStatus>("/api/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
-  adminScheduler: (token: string) =>
-    request<SchedulerStatus>("/api/admin/scheduler", { headers: { Authorization: `Bearer ${token}` } }),
-  adminImport: (token: string) =>
-    request<{ message: string; runId?: string }>("/api/admin/import", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    }),
+  // ── admin (session-authenticated) ───────────────────────────────────────
+  adminStatus: () => request<AdminStatus>("/api/admin/status"),
+  adminScheduler: () => request<SchedulerStatus>("/api/admin/scheduler"),
+  triggerImport: () =>
+    request<{ message: string; runId?: string }>("/api/admin/import", { method: "POST" }),
 
   // ── Oral exam (Phase 8) ──────────────────────────────────────────────────
   oralThemes: () => request<{ data: OralTheme[] }>("/api/oral/themes"),
@@ -322,32 +369,35 @@ export const api = {
   oralExam: (id: string) => request<OralExam>(`/api/oral/exams/${id}`),
   oralExamScore: (id: string) => request<OralExamScore>(`/api/oral/exams/${id}/score`),
 
-  oralCreateExam: (token: string, input: OralCreateInput) =>
+  /** PDF URL of a completed exam. `download` selects attachment disposition. */
+  oralExamPdfUrl: (id: string, download = false) =>
+    `/api/oral/exams/${encodeURIComponent(id)}/pdf${download ? "?disposition=attachment" : ""}`,
+
+  oralCreateExam: (input: OralCreateInput) =>
     request<{ examId: string }>("/api/oral/exams", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(input),
     }),
-  oralRateQuestion: (token: string, examId: string, order: number, input: OralRateInput) =>
+  oralRateQuestion: (examId: string, order: number, input: OralRateInput) =>
     request<{ ok: true }>(`/api/oral/exams/${examId}/questions/${order}`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(input),
     }),
-  oralCompleteExam: (token: string, examId: string) =>
-    request<{ ok: true }>(`/api/oral/exams/${examId}/complete`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-  oralUpdateExam: (token: string, examId: string, input: OralUpdateInput) =>
+  oralCompleteExam: (examId: string) =>
+    request<{ ok: true }>(`/api/oral/exams/${examId}/complete`, { method: "POST" }),
+  oralUpdateExam: (examId: string, input: OralUpdateInput) =>
     request<{ ok: true }>(`/api/oral/exams/${examId}`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(input),
     }),
-  oralSeedPool: (token: string) =>
+  /** Delete an exam. `confirm` is required by the API as an explicit intent flag. */
+  oralDeleteExam: (examId: string) =>
+    request<{ ok: true; deletedItems: number; deletedCandidates: string[] }>(
+      `/api/oral/exams/${examId}?confirm=true`,
+      { method: "DELETE" },
+    ),
+  oralSeedPool: () =>
     request<{ message: string; themes: number; questions: number }>("/api/oral/seed", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
     }),
 };

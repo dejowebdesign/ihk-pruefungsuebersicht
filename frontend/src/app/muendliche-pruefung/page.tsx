@@ -3,8 +3,9 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, ApiClientError, type Paginated, type OralExam } from "@/lib/api";
-import { getStoredToken } from "@/lib/oral-auth";
 import { ErrorState } from "@/components/States";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useIdentity } from "@/lib/use-identity";
 
 function statusLabel(s: string): string {
   if (s === "completed") return "Abgeschlossen";
@@ -14,6 +15,9 @@ function statusLabel(s: string): string {
 
 export default function OralExamsPage() {
   const router = useRouter();
+  const { user } = useIdentity();
+  const isAdmin = user?.role === "admin";
+
   const [data, setData] = useState<Paginated<OralExam> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +27,12 @@ export default function OralExamsPage() {
   const [examiner, setExaminer] = useState("");
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [needToken, setNeedToken] = useState(false);
+
+  // Pending deletion, held until the user confirms in the dialog.
+  const [pendingDelete, setPendingDelete] = useState<OralExam | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -31,7 +40,7 @@ export default function OralExamsPage() {
     try {
       setData(await api.oralExams(1, 50));
     } catch (e: unknown) {
-      setError(e instanceof ApiClientError ? e.message : null);
+      setError(e instanceof ApiClientError ? e.message : "Prüfungen konnten nicht geladen werden.");
       setData(null);
     } finally {
       setLoading(false);
@@ -39,26 +48,20 @@ export default function OralExamsPage() {
   }, []);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
   async function createExam(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
-    setNeedToken(false);
     const trimmed = name.trim();
     if (!trimmed) {
       setFormError("Bitte einen Prüflingsnamen eingeben.");
       return;
     }
-    const token = getStoredToken();
-    if (!token) {
-      setNeedToken(true);
-      return;
-    }
     setCreating(true);
     try {
-      const res = await api.oralCreateExam(token, {
+      const res = await api.oralCreateExam({
         candidateName: trimmed,
         examDate: date || null,
         examiner: examiner.trim() || null,
@@ -66,11 +69,32 @@ export default function OralExamsPage() {
       });
       router.push(`/muendliche-pruefung/${res.examId}`);
     } catch (e: unknown) {
-      const msg = e instanceof ApiClientError ? e.message : "Prüfung konnte nicht erstellt werden.";
-      setFormError(msg);
-      if (e instanceof ApiClientError && e.status === 401) setNeedToken(true);
+      setFormError(
+        e instanceof ApiClientError ? e.message : "Prüfung konnte nicht erstellt werden.",
+      );
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await api.oralDeleteExam(pendingDelete.id);
+      setPendingDelete(null);
+      setNotice(
+        `Prüfung von ${pendingDelete.candidate.name} wurde gelöscht (${res.deletedItems} Einträge).`,
+      );
+      // Refresh the overview so the removed row disappears.
+      await load();
+    } catch (e: unknown) {
+      setDeleteError(
+        e instanceof ApiClientError ? e.message : "Die Prüfung konnte nicht gelöscht werden.",
+      );
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -78,43 +102,63 @@ export default function OralExamsPage() {
     <div className="oral-page">
       <div className="oral-hero">
         <h1>Mündliche Prüfung</h1>
-        <p>Digitale Durchführung, Bewertung und Auswertung einer mündlichen §34a-Sachkundeprüfung.</p>
+        <p>
+          {isAdmin
+            ? "Digitale Durchführung, Bewertung und Auswertung einer mündlichen §34a-Sachkundeprüfung."
+            : "Ihre durchgeführten mündlichen §34a-Sachkundeprüfungen und deren Auswertung."}
+        </p>
       </div>
 
-      <form className="oral-card oral-toolbar" onSubmit={createExam} aria-label="Neue Prüfung erstellen">
-        <div className="oral-field">
-          <label htmlFor="oral-name">Prüfling (Name) *</label>
-          <input id="oral-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Max Mustermann" required />
-        </div>
-        <div className="oral-field">
-          <label htmlFor="oral-date">Prüfungsdatum</label>
-          <input id="oral-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </div>
-        <div className="oral-field">
-          <label htmlFor="oral-examiner">Prüfer/in</label>
-          <input id="oral-examiner" value={examiner} onChange={(e) => setExaminer(e.target.value)} placeholder="optional" />
-        </div>
-        <button className="btn btn--primary" type="submit" disabled={creating}>
-          {creating ? "Erstelle …" : "+ Neue Prüfung"}
-        </button>
-      </form>
+      {isAdmin && (
+        <form className="oral-card oral-toolbar" onSubmit={createExam} aria-label="Neue Prüfung erstellen">
+          <div className="oral-field">
+            <label htmlFor="oral-name">Prüfling (Name) *</label>
+            <input id="oral-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Max Mustermann" required />
+          </div>
+          <div className="oral-field">
+            <label htmlFor="oral-date">Prüfungsdatum</label>
+            <input id="oral-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="oral-field">
+            <label htmlFor="oral-examiner">Prüfer/in</label>
+            <input id="oral-examiner" value={examiner} onChange={(e) => setExaminer(e.target.value)} placeholder="optional" />
+          </div>
+          <button className="btn btn--primary" type="submit" disabled={creating}>
+            {creating ? "Erstelle …" : "+ Neue Prüfung"}
+          </button>
+        </form>
+      )}
 
-      {needToken && (
+      {formError && (
         <p className="state" role="alert" style={{ padding: 12 }}>
-          Für die Durchführung ist ein Administrator-Token nötig. Hinterlege es unter{" "}
-          <Link href="/admin">Admin</Link>.
+          {formError}
         </p>
       )}
-      {formError && <p className="state" role="alert" style={{ padding: 12 }}>{formError}</p>}
+      {notice && (
+        <p className="inline-notice" role="status">
+          {notice}
+        </p>
+      )}
+      {deleteError && (
+        <p className="state" role="alert" style={{ padding: 12 }}>
+          {deleteError}
+        </p>
+      )}
 
-      <h2 style={{ marginTop: 28, marginBottom: 12 }}>Letzte Prüfungen</h2>
+      <h2 style={{ marginTop: 28, marginBottom: 12 }}>
+        {isAdmin ? "Letzte Prüfungen" : "Meine Prüfungen"}
+      </h2>
 
       {loading ? (
         <div className="oral-card">Lade Prüfungen …</div>
       ) : error ? (
         <ErrorState message={error} onRetry={load} />
       ) : !data || data.data.length === 0 ? (
-        <div className="oral-card">Noch keine Prüfungen vorhanden. Erstelle die erste Prüfung oben.</div>
+        <div className="oral-card">
+          {isAdmin
+            ? "Noch keine Prüfungen vorhanden. Erstelle die erste Prüfung oben."
+            : "Es sind noch keine Prüfungen für Sie freigegeben."}
+        </div>
       ) : (
         <div className="oral-card" style={{ padding: 0 }}>
           <table className="oral-table">
@@ -148,9 +192,39 @@ export default function OralExamsPage() {
                     <span className={`oral-status oral-status--${exam.status}`}>{statusLabel(exam.status)}</span>
                   </td>
                   <td>
-                    <Link className="btn btn--ghost btn--sm" href={`/muendliche-pruefung/${exam.id}`}>
-                      {exam.status === "completed" ? "Ansehen" : "Fortsetzen"}
-                    </Link>
+                    <div className="oral-row-actions">
+                      <Link className="btn btn--ghost btn--sm" href={`/muendliche-pruefung/${exam.id}`}>
+                        {exam.status === "completed" ? "Ansehen" : isAdmin ? "Fortsetzen" : "Ansehen"}
+                      </Link>
+                      {exam.status === "completed" && (
+                        <>
+                          <a
+                            className="btn btn--ghost btn--sm"
+                            href={api.oralExamPdfUrl(exam.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            PDF öffnen
+                          </a>
+                          <a className="btn btn--ghost btn--sm" href={api.oralExamPdfUrl(exam.id, true)}>
+                            PDF herunterladen
+                          </a>
+                        </>
+                      )}
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          className="btn btn--danger-ghost btn--sm"
+                          onClick={() => {
+                            setDeleteError(null);
+                            setNotice(null);
+                            setPendingDelete(exam);
+                          }}
+                        >
+                          Löschen
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -158,6 +232,28 @@ export default function OralExamsPage() {
           </table>
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        danger
+        busy={deleting}
+        title="Prüfung löschen?"
+        confirmLabel="Löschen"
+        cancelLabel="Abbrechen"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+        message={
+          <>
+            <p>
+              Die Prüfung von <strong>{pendingDelete?.candidate.name}</strong> und alle zugehörigen
+              Bewertungen werden endgültig entfernt.
+            </p>
+            <p className="modal__hint">
+              Der Fragenpool bleibt unverändert. Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+          </>
+        }
+      />
     </div>
   );
 }

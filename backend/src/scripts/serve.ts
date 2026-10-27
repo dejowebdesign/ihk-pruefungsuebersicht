@@ -6,6 +6,7 @@ import { serve } from "@hono/node-server";
 import { createApp } from "../api/app";
 import { maybeInitialImport, startScheduler, stopScheduler } from "../scheduler/scheduler";
 import { ensureOralPoolSeeded } from "../oral/seed";
+import { bootstrapAdmin } from "../auth/service";
 import { prisma, disconnectPrisma } from "../db/prisma";
 
 async function main() {
@@ -39,6 +40,19 @@ async function main() {
     // matching the maybeInitialImport philosophy. OralExam creation will
     // surface a clear error until the pool is available.
     console.error("Oral pool self-seed failed:", e);
+  }
+
+  // Guarantee the deployment can never be locked out of administration.
+  // Creates the "admin" account once (from ADMIN_PASSWORD, else ADMIN_TOKEN),
+  // and is a no-op as soon as any admin exists — so a password the operator
+  // later changed in the UI is never overwritten on restart.
+  try {
+    const r = await bootstrapAdmin(prisma());
+    if (r.created) {
+      console.log(`Bootstrap admin account created: ${r.username}`);
+    }
+  } catch (e) {
+    console.error("Admin bootstrap failed:", e);
   }
 
   const app = createApp();

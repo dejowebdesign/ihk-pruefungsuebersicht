@@ -1,20 +1,37 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useIdentity } from "@/lib/use-identity";
+import { roleLabel } from "@/lib/auth";
 
-const LINKS = [
-  { href: "/", label: "IHKs" },
-  { href: "/vergleich", label: "Vergleich" },
-  { href: "/fragen", label: "Fragen" },
-  { href: "/fallbeispiele", label: "Fallbeispiele" },
-  { href: "/muendliche-pruefung", label: "Mündliche Prüfung" },
+// Navigation is role-aware: participants only see the areas the server lets
+// them open (`/` and `/muendliche-pruefung`). This is presentation only — the
+// actual restriction is enforced by middleware and the API gate.
+const ALL_LINKS = [
+  { href: "/", label: "IHKs", roles: ["admin", "participant"] },
+  { href: "/vergleich", label: "Vergleich", roles: ["admin"] },
+  { href: "/fragen", label: "Fragen", roles: ["admin"] },
+  { href: "/fallbeispiele", label: "Fallbeispiele", roles: ["admin"] },
+  { href: "/muendliche-pruefung", label: "Mündliche Prüfung", roles: ["admin", "participant"] },
+  { href: "/admin", label: "Verwaltung", roles: ["admin"] },
 ];
 
 export function Header() {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { user, loaded, logout } = useIdentity();
+
+  const links = ALL_LINKS.filter((l) => !user || l.roles.includes(user.role));
+  const onLoginPage = path === "/login";
+
+  async function signOut() {
+    await logout();
+    setOpen(false);
+    router.replace("/login");
+  }
 
   return (
     <header className="site-header">
@@ -26,21 +43,23 @@ export function Header() {
           <span>Prüfungsübersicht</span>
         </Link>
 
-        <nav className={`nav${open ? " nav--open" : ""}`} aria-label="Hauptnavigation">
-          {LINKS.map((l) => {
-            const active = l.href === "/" ? path === "/" : path?.startsWith(l.href);
-            return (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={active ? "active" : ""}
-                onClick={() => setOpen(false)}
-              >
-                {l.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {!onLoginPage && (
+          <nav className={`nav${open ? " nav--open" : ""}`} aria-label="Hauptnavigation">
+            {links.map((l) => {
+              const active = l.href === "/" ? path === "/" : path?.startsWith(l.href);
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={active ? "active" : ""}
+                  onClick={() => setOpen(false)}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         <button
           className="nav__toggle"
@@ -52,6 +71,28 @@ export function Header() {
             <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
           </svg>
         </button>
+
+        {!onLoginPage && loaded && (
+          <div className="session">
+            {user ? (
+              <>
+                <span className="session__user" title={roleLabel(user.role)}>
+                  <span className="session__name">{user.username}</span>
+                  <span className={`session__role session__role--${user.role}`}>
+                    {roleLabel(user.role)}
+                  </span>
+                </span>
+                <button className="btn btn--ghost btn--sm" onClick={signOut}>
+                  Abmelden
+                </button>
+              </>
+            ) : (
+              <Link className="btn btn--primary btn--sm" href="/login">
+                Anmelden
+              </Link>
+            )}
+          </div>
+        )}
 
         <ThemeToggle />
       </div>
