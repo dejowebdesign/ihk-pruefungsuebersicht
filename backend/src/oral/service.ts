@@ -9,6 +9,7 @@
 import { PrismaClient } from "@prisma/client";
 import { drawExam, groupByTheme, type Rng } from "./randomize";
 import { scoreExam, isRating, type Rating } from "./scoring";
+import { ORAL_TOTAL_WEIGHT } from "./themes";
 
 export type ExamStatus = "draft" | "in_progress" | "completed";
 
@@ -36,7 +37,10 @@ async function recomputeScore(db: PrismaClient, examId: string): Promise<void> {
     where: { examId },
     select: { weight: true, rating: true },
   });
-  const scored = scoreExam(items.map((i) => ({ weight: i.weight, rating: (i.rating as Rating | null) ?? null })));
+  const scored = scoreExam(
+    items.map((i) => ({ weight: i.weight, rating: (i.rating as Rating | null) ?? null })),
+    ORAL_TOTAL_WEIGHT,
+  );
   await db.oralExam.update({
     where: { id: examId },
     data: {
@@ -90,7 +94,7 @@ export async function createExam(
         examDate: input.examDate ? new Date(input.examDate) : null,
         examiner: input.examiner ?? null,
         status: input.status ?? "draft",
-        maxPoints: 100,
+        maxPoints: ORAL_TOTAL_WEIGHT,
       },
     });
 
@@ -196,7 +200,10 @@ async function recomputeScoreTx(
     where: { examId },
     select: { weight: true, rating: true },
   });
-  const scored = scoreExam(items.map((i) => ({ weight: i.weight, rating: (i.rating as Rating | null) ?? null })));
+  const scored = scoreExam(
+    items.map((i) => ({ weight: i.weight, rating: (i.rating as Rating | null) ?? null })),
+    ORAL_TOTAL_WEIGHT,
+  );
   await tx.oralExam.update({
     where: { id: examId },
     data: {

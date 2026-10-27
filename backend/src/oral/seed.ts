@@ -25,7 +25,7 @@ export async function seedOralPool(
   db: PrismaClient,
   rows: SeedRow[] = seedRows,
 ): Promise<{ themes: number; questions: number }> {
-  // 1) Themes (8), keyed by name + orderKey.
+  // 1) Themes, keyed by name + orderKey.
   for (const t of ORAL_THEMES) {
     await db.oralTheme.upsert({
       where: { name: t.name },

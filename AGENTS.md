@@ -68,36 +68,51 @@ Anleitung). The workbook is a **template only** — not read at runtime. Its dat
 is seeded into the app DB via a seed script; the public `/fragen` questions
 (Master_Fragen_Muendlich) are a DIFFERENT pool and must stay separate.
 
-### Exam structure (1:1 from Excel)
-- **8 questions per exam, exactly one per Themenbereich** (Pruefung rows 8–15,
-  "Automatische Fragen" = 30 Prüflinge × 8 questions, INDEX offset `(nr-1)*8+k`).
-- 8 Themenbereiche with fixed weights (sum = 100 = Maximalpunkte):
+### Exam structure (Excel base + X2/W1 extension — 2026)
+- **13 questions per exam.** Base = **exactly one question per each of the
+  9 Themenbereiche** (order preserved, orderKey 1..9). Plus **4 additional
+  questions over 4 DISTINCT of the remaining 8 themes** (orderKey 10..13).
+  **UVV/DGUV never receives a 2nd question** (exactly one UVV question per exam).
+  **No Themenbereich has more than 2 questions.**
+- The first 8 Themenbereiche + order come from the Excel workbook (Pruefung rows
+  8–15); the 9th (UVV/DGUV) was added as an independent Bereich.
+- 9 Themenbereiche with weights (sum = 100 = Maximalpunkte), decision "W1":
 
 | # | Themenbereich | weight |
 |---|---------------|--------|
-| 1 | Recht der oeffentlichen Sicherheit und Ordnung | 10 |
+| 1 | Recht der oeffentlichen Sicherheit und Ordnung | 8 |
 | 2 | Gewerberecht / Bewachungsverordnung | 12 |
-| 3 | Buergerliches Gesetzbuch / Jedermannsrechte | 14 |
-| 4 | Straf- und Verfahrensrecht | 14 |
+| 3 | Buergerliches Gesetzbuch / Jedermannsrechte | 12 |
+| 4 | Straf- und Verfahrensrecht | 12 |
 | 5 | Umgang mit Waffen | 8 |
-| 6 | Umgang mit Menschen / Deeskalation | 18 |
+| 6 | Umgang mit Menschen / Deeskalation | 16 |
 | 7 | Datenschutzrecht | 8 |
 | 8 | Grundlagen der Sicherheitstechnik | 16 |
+| 9 | Unfallverhuetungsvorschriften (UVV/DGUV) | 8 |
 
-### Fragenpool (Fragenpool sheet)
-- 224 rows → **218 unique Frage-IDs**. 6 duplicate rows are content-continuation
-  fragments (BGB-02, Sicherheitstechnik-02, StGB-01, UmW-01×3, UmW-02) merged
-  into the parent question's text/answer during seeding.
-- Unique IDs per theme (≥20 each): UmM 40, Sicherheitstechnik 38, UmW 27,
-  StGB 26, Datenschutz 24, RdOesO 22, BGB 21, Gewerberecht 20.
+  Every weight is **divisible by 4**, so both `weight/2` (a theme with 2
+  questions) and `weight/4` ("teilweise richtig" on a doubled theme) are exact
+  integers → no rounding, Excel parity preserved.
+
+### Fragenpool
+- Excel "Fragenpool" sheet: 224 rows → 218 unique Frage-IDs. 6 duplicate rows are
+  content-continuation fragments (BGB-02, Sicherheitstechnik-02, StGB-01,
+  UmW-01×3, UmW-02) merged into the parent question during seeding.
+- **2026 extension from `Fragen.txt`** (uploaded questions, 8 Themengebiete,
+  146 questions): **123 new questions added** (341 total), **23 exact/content
+  duplicates skipped** (existing questions never deleted or changed). New
+  questions are numbered by appending to each theme's existing excelId prefix
+  (e.g. `UmM-41`..`UmM-50`, new prefix `UVV-01`..`UVV-11`).
+- Pool per theme (after extension): StGB 58, Sicherheitstechnik 53, UmM 50,
+  BGB 44, Datenschutz 42, RdOesO 32, UmW 31, Gewerberecht 20, UVV 11.
 
 ### Grading logic (1:1 — DO NOT change)
 - **3 Bewertungsstufen:** `richtig` / `teilweise richtig` / `falsch`.
 - Per-question points (Pruefung!G8:G15):
   `=IF(F="","",IF(F="richtig",B,IF(F="teilweise richtig",B/2,0)))`
   → richtig = full weight; teilweise richtig = weight/2; falsch = 0.
-- **All weights are even**, so weight/2 is always an exact integer — no
-  per-question rounding ambiguity.
+- **All weights are divisible by 4**, so weight/2 (and weight/4 for a doubled
+  theme) is always an exact integer — no per-question rounding ambiguity.
 - **Maximalpunkte** (G17) = 100. **Summe** (G18) = `SUM(G8:G15)`.
 - **Prozentwert** (G19) = `G18/G17` = points/100. Format `0.0%` → display
   with one decimal (e.g. "78.0 %"). Underlying value is exact (integer/100).
@@ -109,28 +124,32 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
 
 ### Randomization (the ONLY deliberate change vs. Excel)
 - Excel fixes a specific question per Prüfling; the app draws a **fresh random
-  question per theme** for each NEW exam (1 from each of the 8 themes, theme
-  order preserved, no duplicate question-ids within an exam).
-- The concrete selection (ids + order) is **persisted** on exam creation and
-  never regenerated (reload/reopen/continue keep the same questions).
+  question per theme** for each NEW exam (1 from each of the 9 themes in order,
+  plus 4 extra questions over 4 distinct non-UVV themes; ≤2 per theme; no
+  duplicate question-ids within an exam).
+- The concrete selection (ids + order + per-question weights) is **persisted**
+  on exam creation and never regenerated (reload/reopen/continue keep the same
+  questions). Existing exams keep their stored `themeName`/`weight` snapshots —
+  they are NOT recomputed when the pool or weights change.
 
 ### Luna transfer
 - Only the **single overall percent** is needed — not per-theme breakdowns.
   Copy button copies exactly `NN %` (the overall percent), nothing else.
 
-### Implementation (Phase 8 — DONE)
-- **Backend** (`backend/src/oral/`): `themes.ts` (8 themes + weights),
+### Implementation (Phase 8 — DONE; 13-question/9-theme extension — DONE)
+- **Backend** (`backend/src/oral/`): `themes.ts` (9 themes + weights, `ORAL_QUESTIONS_PER_EXAM = 13`, `ORAL_EXTRA_QUESTIONS = 4`, `ORAL_UVV_THEME`),
   `scoring.ts` (Excel G8–G20 parity: `questionPoints`, `totalPoints`,
   `percentValue` via `total*100/max` to avoid IEEE-754 artefacts, `passResult`,
-  `scoreExam`), `randomize.ts` (`mulberry32` seeded RNG, `drawExam` → 8 slots
-  one-per-theme in order, `groupByTheme`, avoid-set for consecutive exams),
-  `seed.ts` (idempotent upsert of 8 themes + 218 questions from JSON),
-  `service.ts` (`createExam`/`rateQuestion`/`completeExam`/`getExam` — atomic
-  persistence, immutable question set, auto-recompute on every rating).
+  `scoreExam`), `randomize.ts` (`mulberry32` seeded RNG, `drawExam` → 13 slots:
+  9 base in theme order + 4 extras over distinct non-UVV themes, `groupByTheme`,
+  avoid-set for consecutive exams), `seed.ts` (idempotent upsert of 9 themes +
+  341 questions from JSON), `service.ts` (`createExam`/`rateQuestion`/`completeExam`/`getExam` — atomic
+  persistence, immutable question set, auto-recompute on every rating; `maxPoints`
+  derived from `ORAL_TOTAL_WEIGHT` = 100).
 - **API** (`backend/src/api/routes/oral.ts`): public `GET /themes`, `GET /pool`,
   `GET /exams`, `GET /exams/:id`, `GET /exams/:id/score`; auth-gated
-  `POST /exams`, `PATCH /exams/:id/questions/:order`, `POST /exams/:id/complete`,
-  `PATCH /exams/:id`, `POST /seed`. Registered in `app.ts`.
+  `POST /exams`, `PATCH /exams/:id/questions/:order` (order validated 1..13),
+  `POST /exams/:id/complete`, `PATCH /exams/:id`, `POST /seed`. Registered in `app.ts`.
 - **Schema** (`backend/prisma/schema.prisma`): `OralTheme`, `OralQuestion`,
   `OralCandidate` (name `@unique` for upsert), `OralExam`, `OralExamQuestion`.
   Migration `20260819000000_oral_exam` (also reconciles a pre-existing
@@ -145,9 +164,23 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
   from `/admin` via `frontend/src/lib/oral-auth.ts`. Styles in `globals.css`
   (`.oral-*`) use theme tokens → light/dark automatic.
 - **Tests**: `backend/tests/oral-scoring.test.ts` (30 Excel-parity cases),
-  `oral-randomize.test.ts` (11), `oral-service.test.ts` (18 incl. API+auth),
-  `frontend/tests/oral-parity.test.tsx` (9 incl. Luna copy). All green:
-  backend 159 (incl. 59 oral), frontend 84 (incl. 9 oral).
-- **E2E verified** in-browser: create exam → rate 8 questions → live %
-  updates → complete → result screen (100 %, Bestanden) → copy button →
-  appears in list. Dark mode renders correctly.
+  `oral-randomize.test.ts` (16: 13 questions, 9 themes, exactly 1 UVV, ≤2/theme,
+  100 pts), `oral-service.test.ts` (24 incl. API+auth, 13-question persistence,
+  50/100 threshold, historical exams unchanged), `frontend/tests/oral-parity.test.tsx`
+  (12 incl. Luna copy). All green: backend 229, frontend 137, build ✓.
+- **E2E verified** in-browser (pre-extension): create exam → rate questions →
+  live % updates → complete → result screen → copy button → appears in list.
+  Dark mode renders correctly.
+- **Test-data note**: `Fragen.txt` (the 2026 question file) is NOT committed to
+  the repo; only its parsed result is in the seed JSON. The uploaded file had
+  line-continuation artefacts which were reassembled verbatim before import.
+
+### Flagged original-text issues (kept verbatim — for later review)
+Per the "no silent correction" rule, these were imported unchanged and flagged:
+- `StGB-…` "Darf man einen 13-jährigen festhalten?" — answer grammar
+  ("könne auch ihre Festnahme … nicht zulässig sein") left as-is.
+- `StGB-…` "Was passiert bei Verletzung der Garantenstellung?" — awkward
+  phrasing ("kann wegen Begehens durch Unterlassen bestraft werden") left as-is.
+- Existing pool typos preserved (not touched): "Panikbegrice" (UmM-35),
+  "Schusswa2en/Schusswa6en" (UmW), "Recht der oeffentlichen" naming, and
+  Sicherheitstechnik-02 carrying an embedded continuation line.

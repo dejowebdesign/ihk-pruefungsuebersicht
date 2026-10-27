@@ -5,8 +5,8 @@
 // for concrete evaluation combinations. They are the single source of truth
 // for "Bewertungslogik 1:1".
 //
-// Excel reference (Pruefung sheet):
-//   weights B8:B15 = 10,12,14,14,8,18,8,16  (sum 100)
+// Reference (Pruefung sheet + W1 decision):
+//   theme weights = 8,12,12,12,8,16,8,16,8  (sum 100)
 //   G = richtig→B, teilweise richtig→B/2, falsch→0
 //   G18 = SUM(G8:G15), G19 = G18/100, G20 = G18>=50 ? "Bestanden" : "Nicht bestanden"
 
@@ -23,7 +23,7 @@ import {
 } from "../src/oral/scoring";
 import { ORAL_THEMES } from "../src/oral/themes";
 
-const WEIGHTS = ORAL_THEMES.map((t) => t.weight); // [10,12,14,14,8,18,8,16]
+const WEIGHTS = ORAL_THEMES.map((t) => t.weight); // [8,12,12,12,8,16,8,16,8]
 
 describe("oral scoring — Excel parity", () => {
   describe("Bewertungsstufen 1:1", () => {
@@ -38,7 +38,7 @@ describe("oral scoring — Excel parity", () => {
     });
 
     it("teilweise richtig → half weight (Excel: B/2), exact integer because all weights even", () => {
-      const expected = [5, 6, 7, 7, 4, 9, 4, 8];
+      const expected = [4, 6, 6, 6, 4, 8, 4, 8, 4];
       WEIGHTS.forEach((w, i) => {
         expect(questionPoints(w, "teilweise richtig")).toBe(w / 2);
         expect(questionPoints(w, "teilweise richtig")).toBe(expected[i]);
@@ -77,17 +77,17 @@ describe("oral scoring — Excel parity", () => {
       expect(totalPoints(items)).toBe(50);
     });
 
-    it("mixed concrete example A: richtig on themes 1,3,6; teilweise on 2,4; falsch on rest", () => {
-      // richtig: 10+14+18 = 42 ; teilweise: 6+7 = 13 ; falsch: 0+0+0 = 0  → 55
-      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch"] as const;
+    it("mixed concrete example A: richtig on 1,3,6; teilweise on 2,4; falsch on rest", () => {
+      // richtig: 8+12+16 = 36 ; teilweise: 6+6 = 12 ; falsch: 0  → 48
+      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
       const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(totalPoints(items)).toBe(55);
+      expect(totalPoints(items)).toBe(48);
     });
 
-    it("mixed concrete example B: richtig on 6 only, rest falsch → 18", () => {
-      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch"] as const;
+    it("mixed concrete example B: richtig on 6 only, rest falsch → 16", () => {
+      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
       const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(totalPoints(items)).toBe(18);
+      expect(totalPoints(items)).toBe(16);
     });
   });
 
@@ -115,7 +115,7 @@ describe("oral scoring — Excel parity", () => {
 
   describe("Rundungslogik 1:1", () => {
     it("never produces a fractional total — all weights even ⇒ integer sum", () => {
-      // Exhaustive-ish: for every combination of the 3 ratings across 8 themes,
+      // Exhaustive-ish: for every combination of the 3 ratings across 9 themes,
       // the total is an integer. We sample randomly to keep it cheap.
       for (let i = 0; i < 1000; i++) {
         const items = WEIGHTS.map((w) => ({
@@ -157,14 +157,14 @@ describe("oral scoring — Excel parity", () => {
   });
 
   describe("scoreExam — full Excel G18/G19/G20 snapshot", () => {
-    it("example A (55 pts) → 55 %, Bestanden", () => {
-      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch"] as const;
+    it("example A (48 pts) → 48 %, Nicht bestanden", () => {
+      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
       const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
       expect(scoreExam(items)).toEqual({
         maxPoints: 100,
-        totalPoints: 55,
-        percent: 55,
-        result: "Bestanden",
+        totalPoints: 48,
+        percent: 48,
+        result: "Nicht bestanden",
       });
     });
 
@@ -198,13 +198,13 @@ describe("oral scoring — Excel parity", () => {
       });
     });
 
-    it("example B (18 pts) → 18 %, Nicht bestanden", () => {
-      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch"] as const;
+    it("example B (16 pts) → 16 %, Nicht bestanden", () => {
+      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
       const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
       expect(scoreExam(items)).toEqual({
         maxPoints: 100,
-        totalPoints: 18,
-        percent: 18,
+        totalPoints: 16,
+        percent: 16,
         result: "Nicht bestanden",
       });
     });
@@ -220,8 +220,8 @@ describe("oral scoring — Excel parity", () => {
     it("weights sum to 100", () => {
       expect(WEIGHTS.reduce((a, b) => a + b, 0)).toBe(100);
     });
-    it("all weights are even (guarantees weight/2 integer)", () => {
-      for (const w of WEIGHTS) expect(w % 2).toBe(0);
+    it("all weights are divisible by 4 (guarantees weight/2 and weight/4 integers)", () => {
+      for (const w of WEIGHTS) expect(w % 4).toBe(0);
     });
   });
 });
