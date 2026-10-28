@@ -172,47 +172,68 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
   gap(10);
 
   // ── result box ───────────────────────────────────────────────────────────
+  // Every text is placed from the box TOP with an explicit baseline offset.
+  // A baseline is the text's BOTTOM edge, so the visible glyphs extend roughly
+  // 0.72 * size ABOVE it: a label placed at the box top would be drawn outside
+  // the box, and two labels sharing one baseline would overprint each other.
+  // The box interior is [boxTop - boxHeight, boxTop], so each baseline must
+  // stay below -0.72 * size and above -(boxHeight - 0.24 * size).
   const percent = Math.round(data.exam.percent);
   const passed = data.exam.result === "Bestanden";
   const boxHeight = 64;
+  const boxTop = y;
+  const LABEL_Y = boxTop - 15; // "Gesamtergebnis", top-left (ascent ends at -7.8)
+  const POINTS_Y = boxTop - 31; // "<total> von <max> Punkten", below the label
+  const PERCENT_Y = boxTop - 34; // large percent, right side
+  const RESULT_Y = boxTop - 52; // "Bestanden" / "Nicht bestanden", right, below
   ops.push({
     kind: "rect",
     x: MARGIN,
-    y: y - boxHeight,
+    y: boxTop - boxHeight,
     width: CONTENT_WIDTH,
     height: boxHeight,
     fill: passed ? 0xf0fdf4 : 0xfef2f2,
     stroke: true,
   });
-  text("Gesamtergebnis", MARGIN + 16, 10, "bold", COLOR_MUTED);
+  ops.push({
+    kind: "text",
+    x: MARGIN + 16,
+    y: LABEL_Y,
+    text: "Gesamtergebnis",
+    size: 10,
+    font: "bold",
+    color: COLOR_MUTED,
+  });
+  ops.push({
+    kind: "text",
+    x: MARGIN + 16,
+    y: POINTS_Y,
+    text: `${data.exam.totalPoints} von ${data.exam.maxPoints} Punkten`,
+    size: 11,
+    font: "regular",
+    color: COLOR_TEXT,
+  });
   ops.push({
     kind: "text",
     x: PAGE_WIDTH - MARGIN - 16,
-    y: y - 34,
+    y: PERCENT_Y,
     text: `${percent} %`,
     size: 26,
     font: "bold",
     color: passed ? COLOR_PASS : COLOR_FAIL,
     align: "right",
   });
-  text(
-    `${data.exam.totalPoints} von ${data.exam.maxPoints} Punkten`,
-    MARGIN + 16,
-    11,
-    "regular",
-    COLOR_TEXT,
-  );
   ops.push({
     kind: "text",
     x: PAGE_WIDTH - MARGIN - 16,
-    y: y - 52,
+    y: RESULT_Y,
     text: data.exam.result ?? "-",
     size: 12,
     font: "bold",
     color: passed ? COLOR_PASS : COLOR_FAIL,
     align: "right",
   });
-  y -= boxHeight + 24;
+  y = boxTop - boxHeight - 24;
 
   // ── per-question table ───────────────────────────────────────────────────
   // Column layout: #, Themenbereich, Frage-ID, Bewertung, Gewicht, Punkte.

@@ -323,3 +323,34 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
   (`gesetze-im-internet.de` blocked, Tavily quota exhausted). No check against
   official statute text was performed and none is claimed; two records are
   explicitly left open (`Sicherheitstechnik-31`, `Datenschutz-22`).
+
+## PDF layout pitfalls (`backend/src/oral/pdf.ts`)
+
+- **A PDF baseline is the text's BOTTOM edge, not the top.** `text(value, x, size)`
+  uses the current `y` cursor as the baseline, so glyphs are drawn *above* it
+  (~0.72 × size ascent). Two calls without an intervening `gap()` share one
+  baseline and overprint; a call at a box's top edge draws outside the box.
+  This caused the result-box overlap fixed in PR #8.
+- **The result box now uses fixed offsets from an explicit `boxTop`**, with each
+  text pushed as its own op rather than via the shared `y` cursor:
+  label `boxTop-15`, points `boxTop-31`, percent `boxTop-34`, status `boxTop-52`
+  (box interior is `[boxTop-64, boxTop]`). Keep those offsets inside
+  `-0.72*size … -(64 - 0.24*size)`.
+- **Presence-only assertions cannot catch layout bugs.** `extractPdfText()` in
+  `tests/oral-pdf-delete.test.ts` only proves a string exists. For geometry use
+  `extractPositionedText()` / `extractFilledRects()`, which parse the real
+  `Tm` coordinates and `re f` rects out of the content stream. Reverting the two
+  offsets makes the `PDF result box layout` suite fail, so it is a true
+  regression test.
+- **Verifying visually:** no poppler/gs in the sandbox; use
+  `pip install pymupdf` (render + `get_text("rawdict")` per-glyph bboxes) and
+  `pillow` for side-by-side images. Note PyMuPDF's span `bbox` uses full font
+  metrics and is much taller than the ink, so span-level overlap flags are
+  mostly false positives — compare *ink bands* from a rendered pixmap, or
+  per-glyph bboxes, to judge a real collision.
+- **`npm -w backend` needs `DATABASE_URL`** for any script touching Prisma; use
+  `DATABASE_URL="file:/tmp/x.db" npx prisma db push --skip-generate --force-reset --accept-data-loss`
+  to get an isolated throwaway DB instead of touching `backend/prisma/dev.db`.
+- **Pushing:** if `git push` hangs on a password prompt the cached token has
+  expired — re-run `git remote set-url origin "https://${GITHUB_TOKEN}@github.com/…"`
+  and push with `GIT_TERMINAL_PROMPT=0` so it fails fast instead of hanging.
