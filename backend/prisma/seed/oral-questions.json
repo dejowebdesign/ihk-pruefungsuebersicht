@@ -4,7 +4,7 @@
     "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
     "nr": 1,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
-    "frage": "Unter welchen Vorraussetzungen dürfen SMA in die Rechte anderer eingreifen?",
+    "frage": "Unter welchen Voraussetzungen dürfen SMA in die Rechte anderer eingreifen?",
     "erw": "Auf Grundlage der Jedermannsrechte / Rechtfertigungsgründe und der übertragenen Selbsthilferechte",
     "geprueft": null
   },
@@ -13,7 +13,7 @@
     "thema": "Buergerliches Gesetzbuch / Jedermannsrechte",
     "nr": 2,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
-    "frage": "Welche Rechtfertigungsgründe / Entschuldigungsgründe / Jedermannsrechte müssen private Sicherheitskräfte kennen?\nbrechen • Auch noch nach Tagen möglich",
+    "frage": "Welche Rechtfertigungsgründe / Entschuldigungsgründe / Jedermannsrechte müssen private Sicherheitskräfte kennen?",
     "erw": "BGB: §227 Notwehr, §229 Allgemeine Selbsthilfe, §859 Selbsthilfe des Besitzers, §860 Selbsthilfe des Besitzdieners, §228 Defensivnotstand, §904 Aggressivnotstand • StGB/StPO: §32 Notwehr, §34 rechtfertigender Notstand, §127 StPO vorläufige Festnahme, §35 entschuldigende Notstand, • (§33 Überschreiten der Notwehr) und (Putativnotwehr)",
     "geprueft": null
   },
@@ -59,7 +59,7 @@
     "nr": 7,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
     "frage": "Wann wird man Besitzdiener?",
-    "erw": "Wenn sie (vertraglich) übertragen werden (übertragene Selbsthilferechte) • Den Besitzdiener kennzeichnet: Soziale Abhängigkeit, Weisungsgebunden • Hat die gleichen Rechte wie der Besitzer BGB mündliche Prüfungsfragen 09.2025",
+    "erw": "Wenn sie (vertraglich) übertragen werden (übertragene Selbsthilferechte) • Den Besitzdiener kennzeichnet: Soziale Abhängigkeit, Weisungsgebunden • Hat die gleichen Rechte wie der Besitzer",
     "geprueft": null
   },
   {
@@ -95,7 +95,7 @@
     "nr": 11,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
     "frage": "Was darf man mit der Allgemeinen Selbsthilfe?",
-    "erw": "Anwender muss einen gerichtlich durchsetzbaren zivilrechtlichen Anspruch haben (oder sein \"Chef\"/\"Auftraggeber\") • Obrigkeit (Polizei) nicht rechtzeitig vor Ort • Durchsetzung des Anspruchs ist wesentlich erschwert. Dann darf ich: • 1.Sache beschädigen, zerstören oder wegnehmen • 2.Person festnehmen bei Fluchtverdacht (z.B: unbekannt, ofW, Ausland) • Widerstand der Person gegen meine Handlung nach",
+    "erw": "Anwender muss einen gerichtlich durchsetzbaren zivilrechtlichen Anspruch haben (oder sein \"Chef\"/\"Auftraggeber\") • Obrigkeit (Polizei) nicht rechtzeitig vor Ort • Durchsetzung des Anspruchs ist wesentlich erschwert. Dann darf ich: • 1. Sache beschädigen, zerstören oder wegnehmen • 2. Person festnehmen bei Fluchtverdacht (z. B. unbekannt, oFw = ohne festen Wohnsitz, Ausland)",
     "geprueft": null
   },
   {
@@ -113,7 +113,7 @@
     "nr": 13,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
     "frage": "Was regelt die Notwehr im BGB?",
-    "erw": "Notwehr ist die Verteidigung, die erforderlich ist, um einen gegenwärtigen, rechtswidrigen Angriff, von sich oder einem Anderen (Nothilfe) abzuwenden. • Gebotenheit (Rechtsgüterabwägung / kein krasses Missverhältnis) • Gegenwärtig: Angriff steht unmittelbar bevor, findet statt, noch nicht beendet. • rechtswidrig: kein Rechtfertigungsgrund vorhanden • Angriff: EingriX in ein Rechtsgut durch einen Menschen. • Erforderlich: Mildestes Mittel BGB mündliche Prüfungsfragen 09.2025",
+    "erw": "Notwehr ist die Verteidigung, die erforderlich ist, um einen gegenwärtigen, rechtswidrigen Angriff, von sich oder einem Anderen (Nothilfe) abzuwenden. • Gebotenheit (Rechtsgüterabwägung / kein krasses Missverhältnis) • Gegenwärtig: Angriff steht unmittelbar bevor, findet statt, noch nicht beendet. • rechtswidrig: kein Rechtfertigungsgrund vorhanden • Angriff: Eingriff in ein Rechtsgut durch einen Menschen. • Erforderlich: Mildestes Mittel",
     "geprueft": null
   },
   {
@@ -176,7 +176,7 @@
     "nr": 20,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Haftungsarten unterscheidet das BGB?",
-    "erw": "Verschuldungshaftung (823 BGB) • Gefährdungshaftung (z.B. 833 BGB Tierhalterhaftung) BGB mündliche Prüfungsfragen 09.2025",
+    "erw": "Verschuldungshaftung (823 BGB) • Gefährdungshaftung (z.B. 833 BGB Tierhalterhaftung)",
     "geprueft": null
   },
   {
@@ -185,7 +185,7 @@
     "nr": 21,
     "quelle": "BGB_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Pflichten gibt es bei Fundsachen?",
-    "erw": "Ab Wert von 10€: • Anzeigepflicht §965 BGB • Verwahrungspflicht §966 BGB • Ablieferungspflicht §967 BGB Finderlohn: • 5% bis 500 Euro, darüber 3% • Eigentumserwerb nach 6 Monaten möglich §978 BGB Fund in Behörde oder Verkehrsanstalt: • (z.B. in Bus oder Bahn) • Finderlohn erst ab 50 Euro • Bedienstete haben keinen Anspruch auf Finderlohn • Kein Eigentumserwerb nach 6 Monaten",
+    "erw": "Ab einem Wert von 10 €: • Anzeigepflicht §965 BGB • Verwahrungspflicht §966 BGB • Ablieferungspflicht §967 BGB Finderlohn: • 5% bis 500 Euro, darüber 3% • Eigentumserwerb nach 6 Monaten möglich §978 BGB Fund in Behörde oder Verkehrsanstalt: • (z.B. in Bus oder Bahn) • Finderlohn erst ab 50 Euro • Bedienstete haben keinen Anspruch auf Finderlohn • Kein Eigentumserwerb nach 6 Monaten",
     "geprueft": null
   },
   {
@@ -248,7 +248,7 @@
     "nr": 7,
     "quelle": "Datenschutz_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist bei der Videoüberwachung zusätzlich zu beachten?",
-    "erw": "Speicherung nur so lange, wie es erforderlich ist • Es braucht sichtbares ein Hinweisschild, dass ein Raum Videoüberwacht wird • Versteckte Kameras sind verboten • Keine Videoüberwachung in intimen Bereichen (Toilette, Umkleidekabine, Pausenraum…) Mündliche Prüfungsfragen Datenschutz 10/2025",
+    "erw": "Speicherung nur so lange, wie es erforderlich ist • Es braucht sichtbares ein Hinweisschild, dass ein Raum Videoüberwacht wird • Versteckte Kameras sind verboten • Keine Videoüberwachung in intimen Bereichen (Toilette, Umkleidekabine, Pausenraum…)",
     "geprueft": null
   },
   {
@@ -311,7 +311,7 @@
     "nr": 14,
     "quelle": "Datenschutz_mündliche_Prüfungsfragen.pdf",
     "frage": "Was sind die Folgen von Datenschutzverletzungen?",
-    "erw": "Ordnungswidrigkeiten (Geldbuße) • Straftaten (Geldstrafe oder Freiheitsstrafe) Mündliche Prüfungsfragen Datenschutz 10/2025",
+    "erw": "Ordnungswidrigkeiten (Geldbuße) • Straftaten (Geldstrafe oder Freiheitsstrafe)",
     "geprueft": null
   },
   {
@@ -374,7 +374,7 @@
     "nr": 21,
     "quelle": "Datenschutz_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Datenschutz Gesetze gibt es?",
-    "erw": "DSGVO (Europäische Datenschutzgrundverordnung) • BDSG (Bundesdatenschutzgesetz) • LDSG (Landesdatenschutzgesetze) Mündliche Prüfungsfragen Datenschutz 10/2025",
+    "erw": "DSGVO (Europäische Datenschutzgrundverordnung) • BDSG (Bundesdatenschutzgesetz) • LDSG (Landesdatenschutzgesetze)",
     "geprueft": null
   },
   {
@@ -383,7 +383,7 @@
     "nr": 22,
     "quelle": "Datenschutz_mündliche_Prüfungsfragen.pdf",
     "frage": "Was sind die Grundsätze der Datenverarbeitung?",
-    "erw": "Rechtmäßigkeit, Transparenz, Verarbeitung nach Treu und Glauben: o Die Datenverarbeitung muss auf einer Rechtsgrundlage basieren und für die betroffene Person nachvollziehbar sein. • Zweckbindung: o Daten dürfen nur für den vorher genannten Zweck ihrer Erhebung verarbeitet werden • Datenminimierung: o Es dürfen nur die Daten erhoben werden, die zur Erfüllung des Zwecks wirklich nötig sind • Richtigkeit: o Daten müssen sachlich richtig und aktuell sein, unrichtige oder veraltete Daten müssen unverzüglich berichtigt...",
+    "erw": "Rechtmäßigkeit, Transparenz, Verarbeitung nach Treu und Glauben: o Die Datenverarbeitung muss auf einer Rechtsgrundlage basieren und für die betroffene Person nachvollziehbar sein. • Zweckbindung: o Daten dürfen nur für den vorher genannten Zweck ihrer Erhebung verarbeitet werden • Datenminimierung: o Es dürfen nur die Daten erhoben werden, die zur Erfüllung des Zwecks wirklich nötig sind • Richtigkeit: o Daten müssen sachlich richtig und aktuell sein, unrichtige oder veraltete Daten müssen unverzüglich berichtigt.",
     "geprueft": null
   },
   {
@@ -409,7 +409,7 @@
     "thema": "Gewerberecht / Bewachungsverordnung",
     "nr": 1,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
-    "frage": "Welche Anzeigepflichten hat ein Bewachungsunternehmer gemäß §14 GewO?",
+    "frage": "Welche Anzeigepflichten hat ein Bewachungsunternehmer gemäß § 14 GewO?",
     "erw": "Eröffnung des Gewerbes • Verlegung des Betriebs • Eröffnung einer Zweigstelle • Zweckänderung / Erweiterung • Aufgabe des Betriebes",
     "geprueft": null
   },
@@ -418,7 +418,7 @@
     "thema": "Gewerberecht / Bewachungsverordnung",
     "nr": 2,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
-    "frage": "Unter welchen Voraussetzungen darf man ein Bewachungsunternehmen gemäß §34a GewO eröffnen?",
+    "frage": "Unter welchen Voraussetzungen darf man ein Bewachungsunternehmen gemäß § 34a GewO eröffnen?",
     "erw": "Zuverlässigkeit • Geordnete Vermögensverhältnisse • Haftpflichtversicherung • Sachkundeprüfung",
     "geprueft": null
   },
@@ -446,7 +446,7 @@
     "nr": 5,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
     "frage": "Welcher Personenkreis muss gemäß § 8 BewachV nicht am Unterrichtungsverfahren gemäß § 34a GewO teilnehmen?",
-    "erw": "Höhere Ausbildung: (Werkschutzfachkraft, Fachkraft für Schutz und Sicherheit, Servicekraft für Schutz und Sicherheit, Geprüfte Schutz und Sicherheitskraft, Werkschutzmeister oder Meister für Schutz und Sicherheit) • Polizei, Justiz, Zoll, Feldjäger der Bundeswehr Gewerberecht mündliche Prüfungsfragen 09.2025",
+    "erw": "Höhere Ausbildung: (Werkschutzfachkraft, Fachkraft für Schutz und Sicherheit, Servicekraft für Schutz und Sicherheit, Geprüfte Schutz und Sicherheitskraft, Werkschutzmeister oder Meister für Schutz und Sicherheit) • Polizei, Justiz, Zoll, Feldjäger der Bundeswehr",
     "geprueft": null
   },
   {
@@ -508,7 +508,7 @@
     "thema": "Gewerberecht / Bewachungsverordnung",
     "nr": 12,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
-    "frage": "Welche Voraussetzungen muss ein SMA nach §34a GewO erfüllen?",
+    "frage": "Welche Voraussetzungen muss ein SMA nach § 34a GewO erfüllen?",
     "erw": "Zuverlässigkeit • Mindestens 18 Jahre alt oder Ausbildung • Befähigungsnachweis (z.B Sachkundeprüfung) • Persönliche Eignung",
     "geprueft": null
   },
@@ -518,7 +518,7 @@
     "nr": 13,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist gemäß § 12 BewachV hinsichtlich der Dienstkleidung zu beachten?",
-    "erw": "Die Dienstkleidung darf nicht mit Uniformen der Angehörigen von Streitkräften oder behördlichen Vollzugsorganen zu verwechseln sein. • Das gilt auch für Abzeichen. • Innerhalb befriedeten Besitztums muss Dienstkleidung getragen werden. Gewerberecht mündliche Prüfungsfragen 09.2025",
+    "erw": "Die Dienstkleidung darf nicht mit Uniformen der Angehörigen von Streitkräften oder behördlichen Vollzugsorganen zu verwechseln sein. • Das gilt auch für Abzeichen. • Innerhalb befriedeten Besitztums muss Dienstkleidung getragen werden.",
     "geprueft": null
   },
   {
@@ -527,7 +527,7 @@
     "nr": 14,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
     "frage": "Wann liegt die Zuverlässigkeit in der Regel nicht vor?",
-    "erw": "Letzte 10 Jahre Mitglied in einem verbotenen Verein oder einer verbotenen Partei • Letzte 5 Jahren: Geldstrafe von mindestens 90 Tagessätzen oder mindestens zweimal zu einer geringeren Geldstrafe rechtskräftig verurteilt worden ist bei den Straftaten: o Verbrechen o Straftat gegen die sexuelle Selbstbestimmung, des Menschenhandels oder der Förderung des Menschenhandels, der vorsätzlichen Körperverletzung, Freiheitsberaubung, des Diebstahls, der Unterschlagung, Erpressung, des Betrugs, der Untreue, Hehlerei,...",
+    "erw": "Letzte 10 Jahre Mitglied in einem verbotenen Verein oder einer verbotenen Partei • Letzte 5 Jahre: Geldstrafe von mindestens 90 Tagessätzen oder mindestens zweimal zu einer geringeren Geldstrafe rechtskräftig verurteilt worden ist bei den Straftaten: o Verbrechen o Straftat gegen die sexuelle Selbstbestimmung, des Menschenhandels oder der Förderung des Menschenhandels, der vorsätzlichen Körperverletzung, Freiheitsberaubung, des Diebstahls, der Unterschlagung, Erpressung, des Betrugs, der Untreue, Hehlerei.",
     "geprueft": null
   },
   {
@@ -536,7 +536,7 @@
     "nr": 15,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Pflichten hat ein Unternehmer in Bezug auf die Dienstanweisung für seine Angestellten?",
-    "erw": "ich muss jedem neuen Mitarbeiter eine allgemeine Dienstanweisung zur Verfügung stellen und gegen Empfangsbescheinigung aushändigen!!!!! • Wachpersonen NICHT die Eigenschaft und Befugnisse eines Polizeibeamten haben (keine hoheitlichen Rechte) • Schusswaffen, Hieb- und Stoßwaffen sowie Reizstoffsprühgeräte nur mit Zustimmung des Gewerbetreibenden • Jeder Gebrauch einer Waffe ist unverzüglich der Polizei wie auch dem Gewerbetreibenden anzuzeigen",
+    "erw": "Ich muss jedem neuen Mitarbeiter eine allgemeine Dienstanweisung zur Verfügung stellen und gegen Empfangsbescheinigung aushändigen. • Wachpersonen haben NICHT die Eigenschaft und Befugnisse eines Polizeibeamten (keine hoheitlichen Rechte) • Schusswaffen, Hieb- und Stoßwaffen sowie Reizstoffsprühgeräte nur mit Zustimmung des Gewerbetreibenden • Jeder Gebrauch einer Waffe ist unverzüglich der Polizei wie auch dem Gewerbetreibenden anzuzeigen",
     "geprueft": null
   },
   {
@@ -554,7 +554,7 @@
     "nr": 17,
     "quelle": "Gewerberecht_mündliche_Prüfungsfragen.pdf",
     "frage": "Was enthält der Dienstausweis und welche Regeln gelten hierüber?",
-    "erw": "Name und Anschrift Gewerbetreibender • Vor- und Nachname SMA • Beide Bewacherregister-IDs • Beide Unterschriften • Dienstausweis (unterscheiden von amtlichen Ausweisen) UND z.B Personalausweis mitführen. Gewerberecht mündliche Prüfungsfragen 09.2025",
+    "erw": "Name und Anschrift Gewerbetreibender • Vor- und Nachname SMA • Beide Bewacherregister-IDs • Beide Unterschriften • Dienstausweis (unterscheiden von amtlichen Ausweisen) UND z. B. Personalausweis mitführen.",
     "geprueft": null
   },
   {
@@ -599,7 +599,7 @@
     "nr": 2,
     "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
     "frage": "Was bedeutet der Begriff Föderalismus?",
-    "erw": "= wie vertikale Gewaltenteilung. Kompetenzverteilung zwischen Bund , Länder und Kommunen.",
+    "erw": "= wie vertikale Gewaltenteilung. Kompetenzverteilung zwischen Bund, Ländern und Kommunen.",
     "geprueft": null
   },
   {
@@ -616,8 +616,8 @@
     "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
     "nr": 4,
     "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
-    "frage": "Erklären Sie den Begriff horizontale Gewaltenteilung: • Legislative (gesetzgebende Gewalt), (Bundesrat, Bundestag) • Judikative(Rechtsprechende Gewalt), (Richter bzw. Gerichte) • Executive (ausführende Gewalt) (Polizei,...",
-    "erw": "",
+    "frage": "Erklären Sie den Begriff horizontale Gewaltenteilung.",
+    "erw": "Gewaltenteilung zwischen den drei Gewalten: • Legislative (gesetzgebende Gewalt: Bundesrat, Bundestag) • Judikative (rechtsprechende Gewalt: Richter bzw. Gerichte) • Exekutive (ausführende Gewalt: Polizei, Verwaltung)",
     "geprueft": null
   },
   {
@@ -653,7 +653,7 @@
     "nr": 8,
     "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Rechtsgüter kennen Sie?",
-    "erw": "Leben • Leib • Freiheit • Ehre • Eigentum • sonstige Hausrecht, Namensrecht, Patentrecht, Recht auf sexuelle Selbstbestimmung • Recht auf Informationelle Selbstbestimmung. RdöSO mündliche Prüfungsfragen 09.2025",
+    "erw": "Leben • Leib • Freiheit • Ehre • Eigentum • sonstige Hausrecht, Namensrecht, Patentrecht, Recht auf sexuelle Selbstbestimmung • Recht auf Informationelle Selbstbestimmung.",
     "geprueft": null
   },
   {
@@ -707,7 +707,16 @@
     "nr": 14,
     "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
     "frage": "Was bedeutet Rechtsstaat?",
-    "erw": "staatliches Handeln ist durch Recht und Gesetz begrenzt • Menschen vor staatlicher Willkür schützen • ihre Grundrechte zu garantieren. 15 Welche Aufgabe hat die Polizei? • Gefahrenabwehr • Strafverfolgung • Polizei ist Ermittlungsperson der Staatsanwaltschaft.",
+    "erw": "staatliches Handeln ist durch Recht und Gesetz begrenzt • Menschen vor staatlicher Willkür schützen • ihre Grundrechte zu garantieren.",
+    "geprueft": null
+  },
+  {
+    "excelId": "RdOesO-15",
+    "thema": "Recht der oeffentlichen Sicherheit und Ordnung",
+    "nr": 15,
+    "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
+    "frage": "Welche Aufgabe hat die Polizei?",
+    "erw": "Gefahrenabwehr • Strafverfolgung • Polizei ist Ermittlungsperson der Staatsanwaltschaft.",
     "geprueft": null
   },
   {
@@ -734,7 +743,7 @@
     "nr": 18,
     "quelle": "RdÖsO_mündliche_Prüfungsfragen.pdf",
     "frage": "Unter welchen Voraussetzungen dürfen SM in die Rechte anderer Bürger eingreifen?",
-    "erw": "Bei einer Rechtsgrundlage, z.b Rechtfertigungsgründe oder Selbsthilferechte RdöSO mündliche Prüfungsfragen 09.2025",
+    "erw": "Bei einer Rechtsgrundlage, z.b Rechtfertigungsgründe oder Selbsthilferechte",
     "geprueft": null
   },
   {
@@ -796,7 +805,7 @@
     "thema": "Grundlagen der Sicherheitstechnik",
     "nr": 2,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
-    "frage": "Retten (von Menschen) •\nWas ist die Widerstandszeit?",
+    "frage": "Was ist die Widerstandszeit?",
     "erw": "Die Zeit vom Sicherungselement, die ein geübter Täter braucht, um es zu überwinden. Also wie lange die Sicherung dem Täter standhält.",
     "geprueft": null
   },
@@ -842,7 +851,7 @@
     "nr": 7,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Was gibt es für Zaunarten?",
-    "erw": "Streckmetallzaun, Stahlprofilzaun, Maschendrahtzaun, Stahlgitterzaun. Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Streckmetallzaun, Stahlprofilzaun, Maschendrahtzaun, Stahlgitterzaun.",
     "geprueft": null
   },
   {
@@ -878,7 +887,7 @@
     "nr": 11,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Was gibt es für Schlossarten?",
-    "erw": "Buntbartschloss • Zylinderschloss • Transponderschloss • mechatronisches Schloss • Zahlenkombinationsschloss Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Buntbartschloss • Zylinderschloss • Transponderschloss • mechatronisches Schloss • Zahlenkombinationsschloss",
     "geprueft": null
   },
   {
@@ -904,7 +913,7 @@
     "thema": "Grundlagen der Sicherheitstechnik",
     "nr": 14,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
-    "frage": "Welche 2 verschienenen \"Glasarten\" vom Fenster gibt es?",
+    "frage": "Welche 2 verschiedenen \"Glasarten\" vom Fenster gibt es?",
     "erw": "ESG (Einscheibensicherheitsglas) • VSG (Verbundsicherheitsglas)",
     "geprueft": null
   },
@@ -923,7 +932,7 @@
     "nr": 16,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Wie kann man den Widerstandswert von Fenstern erhöhen?",
-    "erw": "Sicherheitsfolien • Metallgitter • Rollläden Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Sicherheitsfolien • Metallgitter • Rollläden",
     "geprueft": null
   },
   {
@@ -959,7 +968,7 @@
     "nr": 20,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Nenne ein paar Komponenten von GMAs?",
-    "erw": "Melder (Sensoren / \"Sinnesorgane\", die ausschlagen) • Meldelinien (Draht / Kabelverbindung) • Stromversorgung (auch Notstrom / Akku) • Melder Zentrale Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Melder (Sensoren / \"Sinnesorgane\", die ausschlagen) • Meldelinien (Draht / Kabelverbindung) • Stromversorgung (auch Notstrom / Akku) • Melder Zentrale",
     "geprueft": null
   },
   {
@@ -968,7 +977,7 @@
     "nr": 21,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Einbruchsmelder gibt es?",
-    "erw": "Es gibt Einbruchmelder zur: • Freilandüberwachung o Elektrisch-mechanische Melder § z.B. Spanndrahtmelder o Elektrische Mikrowellenmelder • Außenhautüberwachung o Elektro-Akustische Melder § Glasbruchmelder o Elektro-Mechanische Melder § Magnetkontakte • Innenraumüberwachung o Elektro-Optische Melder § Infrarot-Bewegungsmelder § Ultraschallmelder • Objektüberwachung § Kapazitiver Feldänderungsmelder § Körperschallmelder",
+    "erw": "Es gibt Einbruchmelder zur: • Freilandüberwachung o Elektrisch-mechanische Melder o z.B. Spanndrahtmelder o Elektrische Mikrowellenmelder • Außenhautüberwachung o Elektro-Akustische Melder o Glasbruchmelder o Elektro-Mechanische Melder o Magnetkontakte • Innenraumüberwachung o Elektro-Optische Melder o Infrarot-Bewegungsmelder o Ultraschallmelder • Objektüberwachung o Kapazitiver Feldänderungsmelder o Körperschallmelder",
     "geprueft": null
   },
   {
@@ -986,7 +995,7 @@
     "nr": 23,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Brandmelder gibt es?",
-    "erw": "Wärmemelder o Wärmemaximalmelder -> 60 Grad o Wärmedifferentialmelder -> schneller Anstieg von Hitze • Infrarot- und UV-Flammenmelder • Handmelder • Rauchmelder o Streulichtmelder o Durchlichtmelder o Ionisationsmelder Erinnerung: Sprinkleranlage: Roter Kolben platzt bei 68 Grad. Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Wärmemelder o Wärmemaximalmelder -> 60 Grad o Wärmedifferentialmelder -> schneller Anstieg von Hitze • Infrarot- und UV-Flammenmelder • Handmelder • Rauchmelder o Streulichtmelder o Durchlichtmelder o Ionisationsmelder Erinnerung: Sprinkleranlage: Roter Kolben platzt bei 68 Grad.",
     "geprueft": null
   },
   {
@@ -1049,7 +1058,7 @@
     "nr": 30,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Woraus besteht der vorbeugende Brandschutz?",
-    "erw": "Bauliche Maßnahmen o Schwer entflammbare Baumaterialien o Deutliche Kennzeichnung von Flucht- und Rettungswegen • Technische Maßnahmen Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen o Ausstattung mit genügend Handfeuerlöschern o Installation von BMA (Brandmeldeanlagen) • Organisatorische Maßnahmen o Erstellen von Brandschutzplänen o Erstellen von Anweisungen für das Verhalten im Gefahrenfall • Personelle Maßnahmen o Schulung des Personals o Training von Evakuierungsmaßnahmen",
+    "erw": "Bauliche Maßnahmen o Schwer entflammbare Baumaterialien o Deutliche Kennzeichnung von Flucht- und Rettungswegen • Technische Maßnahmen o Ausstattung mit genügend Handfeuerlöschern o Installation von BMA (Brandmeldeanlagen) • Organisatorische Maßnahmen o Erstellen von Brandschutzplänen o Erstellen von Anweisungen für das Verhalten im Gefahrenfall • Personelle Maßnahmen o Schulung des Personals o Training von Evakuierungsmaßnahmen",
     "geprueft": null
   },
   {
@@ -1058,7 +1067,7 @@
     "nr": 31,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Wie lauten die taktischen Grundsätze beim Abwehrenden Brandschutz?",
-    "erw": "",
+    "erw": "Die taktischen Grundsätze lauten: Retten, Löschen, Bergen, Schützen. Vorrang hat immer die Menschenrettung (Rettung geht der Brandbekämpfung vor), danach Löschen, Bergen von Sachwerten und Schützen angrenzender Bereiche.",
     "geprueft": null
   },
   {
@@ -1076,7 +1085,7 @@
     "nr": 33,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Brandklassen gibt es?",
-    "erw": "Brandklasse A: o Feste Stoffe, meist organischer Natur, die unter Glutbildung verbrennen. (zB. Holz) • Brandklasse B: o flüssige, oder flüssig werdende Stoffe (z.B. Benzin, Kunststoffe) • Brandklasse C: o Gase (z.B. Erdgas) • Brandklasse D: o Metallbrände (z.B. Lithium (z.B. Akku)) • Brandklasse F: o Speiseöle / Speisefette Mündliche Prüfungsfragen Sicherheitstechnik Dezember 2025 DBA Marcel Heinen",
+    "erw": "Brandklasse A: o Feste Stoffe, meist organischer Natur, die unter Glutbildung verbrennen. (zB. Holz) • Brandklasse B: o flüssige, oder flüssig werdende Stoffe (z.B. Benzin, Kunststoffe) • Brandklasse C: o Gase (z.B. Erdgas) • Brandklasse D: o Metallbrände (z.B. Lithium (z.B. Akku)) • Brandklasse F: o Speiseöle / Speisefette",
     "geprueft": null
   },
   {
@@ -1084,8 +1093,8 @@
     "thema": "Grundlagen der Sicherheitstechnik",
     "nr": 34,
     "quelle": "Sicherheitstechnik_mündliche_Prüfungsfragen.pdf",
-    "frage": "Wie lösche ich die Brandklasse… • A, B, C: o ABC Pulverlöscher • D: o Metallbrandpulverlöscher • F: o Fettbrandlöscher",
-    "erw": "",
+    "frage": "Wie lösche ich die Brandklassen?",
+    "erw": "A, B, C: ABC-Pulverlöscher • D: Metallbrandpulverlöscher • F: Fettbrandlöscher",
     "geprueft": null
   },
   {
@@ -1129,8 +1138,8 @@
     "thema": "Straf- und Verfahrensrecht",
     "nr": 1,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
-    "frage": "Garant durch: Vertrag (Security), Rechtsverhältnisse (Eltern-Kind-Beziehung), SchaKen von Gefahren (Ich habe selbst\nWie teilt sich das Strafgesetzbuch auf?",
-    "erw": "z.B. ein Hindernis geschaKen und nicht abgesichert) iii. Beispiel: Körperverletzung durch Unterlassen: Security greift bei Schlägerei nicht ein. Diebstahl durch Unterlassen: Ladendetektiv greift beim Diebstahl nicht ein, obwohl er es mitbekommt.\na. Allgemeiner Teil b. Besonderer Teil",
+    "frage": "Wie teilt sich das Strafgesetzbuch auf?",
+    "erw": "a. Allgemeiner Teil b. Besonderer Teil",
     "geprueft": null
   },
   {
@@ -1139,7 +1148,7 @@
     "nr": 2,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
     "frage": "Welche Gesetze sind wichtig im Strafrecht?",
-    "erw": "a. Strafgesetzbuch (StGB) b. Strafprozessordnung (StPO) à z.B. vorläufige Festnahme, Aufgaben der Polizei, Aufgaben der Staatsanwaltschaft… c. Strafrechtlichen Nebengesetze (BtmG, WaKG…..)",
+    "erw": "a. Strafgesetzbuch (StGB) b. Strafprozessordnung (StPO): z.B. vorläufige Festnahme, Aufgaben der Polizei, Aufgaben der Staatsanwaltschaft… c. Strafrechtliche Nebengesetze (z. B. BtMG, WaffG)",
     "geprueft": null
   },
   {
@@ -1148,7 +1157,7 @@
     "nr": 3,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
     "frage": "Was wird im Allgemeinen Teil geregelt?",
-    "erw": "a. Im Allgemeinen Teil wird die Grundlage für die Tatbestände und den Deliktsaufbau geschaKen. b. Enthalten sind Regeln, wie: i. Keine Strafe ohne Gesetz (§1) ii. Unterschied Vergehen / Verbrechen iii. Irrtümer iv. Rechtfertigungsgründe v. Schuldunfähigkeit",
+    "erw": "a. Im Allgemeinen Teil wird die Grundlage für die Tatbestände und den Deliktsaufbau geschaffen. b. Enthalten sind Regeln, wie: i. Keine Strafe ohne Gesetz (§1) ii. Unterschied Vergehen / Verbrechen iii. Irrtümer iv. Rechtfertigungsgründe v. Schuldunfähigkeit",
     "geprueft": null
   },
   {
@@ -1228,7 +1237,7 @@
     "thema": "Straf- und Verfahrensrecht",
     "nr": 12,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
-    "frage": "Was gibt es für subjektive Tatbestände",
+    "frage": "Was gibt es für subjektive Tatbestände?",
     "erw": "a. Vorsatz i. Direkter Vorsatz (mit Wissen und Wollen) ii. Bedingter Vorsatz (nimmt es billigend in Kauf / Scheiß-Egal-Einstellung) b. Fahrlässigkeit i. Objektive Sorgfaltspflichtverletzung ii. Vorhersehbarkeit iii. Vermeidbarkeit",
     "geprueft": null
   },
@@ -1283,7 +1292,7 @@
     "nr": 18,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
     "frage": "Was gibt es für Deliktarten?",
-    "erw": "a. OOizialdelikte à Straftat, die verfolgt werden muss und von Amts wegen verfolgt wird. Es muss kein Strafantrag gestellt werden. b. Antragsdelikte i. Absolute Antragsdeliktà Strafantrag ist Verfahrensvoraussetzung ii. Relative Antragsdeliktà Strafantrag, oder \"besonderes öKentliches Interesse\" muss vorliegen c. Privatklagedelikteà Staatsanwaltschaft stellt das Verfahren mit Verweis auf den Privatklageweg ein, Geschädigter muss selbst die Anklageschrift bei Gericht einreichen. Oft bei Hausfriedensbruch,...",
+    "erw": "a. Offizialdelikte à Straftat, die verfolgt werden muss und von Amts wegen verfolgt wird. Es muss kein Strafantrag gestellt werden. b. Antragsdelikte i. Absolute Antragsdelikt: Strafantrag ist Verfahrensvoraussetzung ii. Relative Antragsdelikt: Strafantrag, oder \"besonderes öffentliches Interesse\" muss vorliegen c. Privatklagedelikte: Staatsanwaltschaft stellt das Verfahren mit Verweis auf den Privatklageweg ein, Geschädigter muss selbst die Anklageschrift bei Gericht einreichen. Oft bei Hausfriedensbruch.",
     "geprueft": null
   },
   {
@@ -1318,8 +1327,8 @@
     "thema": "Straf- und Verfahrensrecht",
     "nr": 22,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
-    "frage": "Was sind die Tatbestandsvoraussetzungen von einem Hausfriedensbruch (§123 StGB?",
-    "erw": "a. Objektiv: i. Wohnung, Geschäftsraum oder befriedetes Besitztum ii. Alt. 1: Widerrechtliches Eindringen Alt. 2: auf AuOorderung sich nicht entfernen b. Subjektiv: i. Vorsatz",
+    "frage": "Was sind die Tatbestandsvoraussetzungen von einem Hausfriedensbruch (§123 StGB)?",
+    "erw": "a. Objektiv: i. Wohnung, Geschäftsraum oder befriedetes Besitztum ii. Alt. 1: Widerrechtliches Eindringen Alt. 2: auf Aufforderung sich nicht entfernen b. Subjektiv: i. Vorsatz",
     "geprueft": null
   },
   {
@@ -1328,7 +1337,7 @@
     "nr": 23,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
     "frage": "Welche Varianten fallen unter §243 StGB, besonders schwerer Fall des Diebstahls?",
-    "erw": "a. In Räume Einbrechen, …(Einsteigen, Eindringen, falscher Schlüssel, verborgen halten) b. Besonders gesicherte Sache stehlen (Abgeschlossen, Tresor, etc.) c. Gewerbsmäßig d. Kirche e. Wissenschaft / Kunst / Geschichte f. Ausnutzen von: Hilflosigkeit, Unglücksfall oder gemeiner Gefahr g. Diebstahl VON WaOen (ohne Führen!)",
+    "erw": "a. In Räume Einbrechen, …(Einsteigen, Eindringen, falscher Schlüssel, verborgen halten) b. Besonders gesicherte Sache stehlen (Abgeschlossen, Tresor, etc.) c. Gewerbsmäßig d. Kirche e. Wissenschaft / Kunst / Geschichte f. Ausnutzen von: Hilflosigkeit, Unglücksfall oder gemeiner Gefahr g. Diebstahl VON Waffen (ohne Führen!)",
     "geprueft": null
   },
   {
@@ -1337,7 +1346,7 @@
     "nr": 24,
     "quelle": "StGB_mündlichePrüfungsfragen.pdf",
     "frage": "Welche Varianten fallen unter die gefährliche Körperverletzung nach § 224 StGB?",
-    "erw": "a. Gift, gesundheitsschädliche StoKe b. WaOe oder gefährliches Werkzeug c. Hinterlistiger Überfall d. Gemeinschaftlich e. Lebens gefährdende Behandlung",
+    "erw": "a. Gift, gesundheitsschädliche Stoffe b. Waffe oder gefährliches Werkzeug c. Hinterlistiger Überfall d. Gemeinschaftlich e. lebensgefährdende Behandlung",
     "geprueft": null
   },
   {
@@ -1364,7 +1373,7 @@
     "nr": 1,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist Psychologie?",
-    "erw": "Die Wissenschaft, die sich mir dem Leben und Verhalten des Menschen, sowie derer Ursachen, Folgen und Bedingungen beschäftigt.",
+    "erw": "Die Wissenschaft, die sich mit dem Leben und Verhalten des Menschen, sowie deren Ursachen, Folgen und Bedingungen beschäftigt.",
     "geprueft": null
   },
   {
@@ -1399,8 +1408,8 @@
     "thema": "Umgang mit Menschen / Deeskalation",
     "nr": 5,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
-    "frage": "Beschreibe das Johari Fenster • Das Johari-Fenster ist ein Kommunikationsmodell, das die Selbst- und Fremdwahrnehmung einer Person visualisiert. Es besteht aus 4 Feldern: • Dinge, die nur mir bekannt sind. • Dinge, die...",
-    "erw": "",
+    "frage": "Beschreibe das Johari Fenster.",
+    "erw": "Das Johari-Fenster ist ein Kommunikationsmodell, das die Selbst- und Fremdwahrnehmung einer Person visualisiert. Es besteht aus 4 Feldern: • Dinge, die nur mir bekannt sind (Privatbereich) • Dinge, die nur anderen bekannt sind (blinder Fleck) • Dinge, die mir und anderen bekannt sind (öffentlicher Bereich) • Dinge, die weder mir noch anderen bekannt sind (unbewusster Bereich)",
     "geprueft": null
   },
   {
@@ -1409,7 +1418,7 @@
     "nr": 6,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Mit welchen unterschiedlichen Personengruppen hat man als SMA zu tun?",
-    "erw": "Betrunkene: aggressionsbereiter à Eigensicherung, klare Anweisungen, Geduld • Senioren: Mangelnde Komprissbereitschaft à freundlich, respektvoll, verständnisvoll • Jugendliche: eigenes Wertesystem, respektlos, gewaltbereit, Drang zur Gruppenbildung à höflich, ernst nehmen, Selbstsicher auftreten, Grenzen aufzeigen, Vorbildfunktion einnehmen • Flüchtlinge: schlechte Deutschkenntnisse, anderes Rechtsverständnis à Klare, einfach Aussagen treben, freundlich, Verständnis zeigen, Körper/Zeichensprache anwenden Umgang...",
+    "erw": "Betrunkene: aggressionsbereit → Eigensicherung, klare Anweisungen, Geduld • Senioren: Mangelnde Kompromissbereitschaft → freundlich, respektvoll, verständnisvoll • Jugendliche: eigenes Wertesystem, respektlos, gewaltbereit, Drang zur Gruppenbildung → höflich, ernst nehmen, Selbstsicher auftreten, Grenzen aufzeigen, Vorbildfunktion einnehmen • Flüchtlinge: schlechte Deutschkenntnisse, anderes Rechtsverständnis → Klare, einfache Aussagen treffen, freundlich, Verständnis zeigen, Körper/Zeichensprache anwenden Umgang.",
     "geprueft": null
   },
   {
@@ -1418,7 +1427,7 @@
     "nr": 7,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist Frustration?",
-    "erw": "Frustration ist das negatives Gefühl, das entsteht, wenn ein erklärtes Ziel auf ein Hindernis tribt. • Folgen: Aggression, mangelnde Motivation, Minderwertigkeitsgefühle.",
+    "erw": "Frustration ist das negative Gefühl, das entsteht, wenn ein erklärtes Ziel auf ein Hindernis trifft. • Folgen: Aggression, mangelnde Motivation, Minderwertigkeitsgefühle.",
     "geprueft": null
   },
   {
@@ -1436,7 +1445,7 @@
     "nr": 9,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist Aggression?",
-    "erw": "Aggression ist jedes (psychische oder physische) Handeln mit der Absicht, Schaden zuzufügen (zu verletzen, beschädigen oder zerstören). • Die Emotion WUT wird \"rausgelassen\" • Ursachen: Frustration, Triebe, Überlebensinstinke",
+    "erw": "Aggression ist jedes (psychische oder physische) Handeln mit der Absicht, Schaden zuzufügen (zu verletzen, beschädigen oder zerstören). • Die Emotion WUT wird \"rausgelassen\" • Ursachen: Frustration, Triebe, Überlebensinstinkte.",
     "geprueft": null
   },
   {
@@ -1481,7 +1490,7 @@
     "nr": 14,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist Eskalation?",
-    "erw": "Die Stufenweise Steigerung des Konflikts in seiner Intensität, bis hin zu Gewalt. Umgang mit Menschen mündliche Prüfungsfragen 09.2025",
+    "erw": "Die stufenweise Steigerung des Konflikts in seiner Intensität, bis hin zu Gewalt.",
     "geprueft": null
   },
   {
@@ -1499,7 +1508,7 @@
     "nr": 16,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Fragearten gibt es?",
-    "erw": "Obene Fragen (W-Fragen, Motivationsfragen, Problemfragen, können nicht mit Ja oder Nein beantwortet werden) • Geschlossene Fragen (Ja / Nein-Fragen, Suggestivfragen, Motivationsfragen, Alternativfragen (Pizza oder Pommes?)",
+    "erw": "Offene Fragen (W-Fragen, Motivationsfragen, Problemfragen, können nicht mit Ja oder Nein beantwortet werden) • Geschlossene Fragen (Ja / Nein-Fragen, Suggestivfragen, Motivationsfragen, Alternativfragen (Pizza oder Pommes?))",
     "geprueft": null
   },
   {
@@ -1508,7 +1517,7 @@
     "nr": 17,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Distanzzonen nach Edward Hall gibt es?",
-    "erw": "Intimzone (bis ca. 45-60 cm / eine Armlänge): Zutritt für Familie / Partner • Persönliche Zone / erweiterter Nahbereich (bis 1,20m): Zutritt für Freunde, gute Bekannte • Soziale Zone / gesellschaftlicher Bereich (bis 3,60m): Zutritt für Kollegen • Öcentliche Zone / Bereich (mehr als 3,60m): Kommunikation zu einer Gruppe / Menschenmenge",
+    "erw": "Intimzone (bis ca. 45-60 cm / eine Armlänge): Zutritt für Familie / Partner • Persönliche Zone / erweiterter Nahbereich (bis 1,20m): Zutritt für Freunde, gute Bekannte • Soziale Zone / gesellschaftlicher Bereich (bis 3,60m): Zutritt für Kollegen • Öffentliche Zone / Bereich (mehr als 3,60m): Kommunikation zu einer Gruppe / Menschenmenge",
     "geprueft": null
   },
   {
@@ -1516,7 +1525,7 @@
     "thema": "Umgang mit Menschen / Deeskalation",
     "nr": 18,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
-    "frage": "Was ist der Halo Ecekt?",
+    "frage": "Was ist der Halo Effekt?",
     "erw": "Beurteilungs-/Wahrnehmungsfehler. Aus einer positiven Eigenschaft wird auf wird auf andere Eigenschaften geschlossen. (\"überstrahlt\" (Halo=Heiligenschein))",
     "geprueft": null
   },
@@ -1526,7 +1535,7 @@
     "nr": 19,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was sind die 4 Seiten einer Nachricht / 4-Ohren-Modell nach Schulz von Thun?",
-    "erw": "Sachebene: Reine Informationsebene • Beziehungsebene: Zeigt die Beziehung zwischen Sender und Empfänger. Nachrichten auf dem Beziehungsohr können als Kritik empfunden werden. • Appellebene: Zu was der Sender den Empfänger veranlassen möchte. • Selbstocenbarung: Sender gibt Infos über sich preis.",
+    "erw": "Sachebene: Reine Informationsebene • Beziehungsebene: Zeigt die Beziehung zwischen Sender und Empfänger. Nachrichten auf dem Beziehungsohr können als Kritik empfunden werden. • Appellebene: Zu was der Sender den Empfänger veranlassen möchte. • Selbstoffenbarung: Sender gibt Infos über sich preis.",
     "geprueft": null
   },
   {
@@ -1544,7 +1553,7 @@
     "nr": 21,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was beschreibt die Bedürfnispyramide nach A.Maslow?",
-    "erw": "Sie unterscheidet die Bedürfnisse des Menschen nach Rang und zwischen Stillbaren Defizitbedürfnissen und unstillbaren Wachstumsbedürfnissen. • Physiologische Bedürfnisse (Grundbedürfnisse): Essen, Trinken, Schlafen • Sicherheitsbedürfnisse: Existenzsicherung, Schutz vor Bedrohung, Dach über Kopf • Soziale Bedürfnisse: Soziale Beziehungen, Zugehörigkeit • Individualbedürfnisse: Anerkennung, Wertschätzung • Selbstverwirklichung: Das eigene Potential entfalten Umgang mit Menschen mündliche Prüfungsfragen 09.2025",
+    "erw": "Sie unterscheidet die Bedürfnisse des Menschen nach Rang und zwischen Stillbaren Defizitbedürfnissen und unstillbaren Wachstumsbedürfnissen. • Physiologische Bedürfnisse (Grundbedürfnisse): Essen, Trinken, Schlafen • Sicherheitsbedürfnisse: Existenzsicherung, Schutz vor Bedrohung, Dach über Kopf • Soziale Bedürfnisse: Soziale Beziehungen, Zugehörigkeit • Individualbedürfnisse: Anerkennung, Wertschätzung • Selbstverwirklichung: Das eigene Potential entfalten.",
     "geprueft": null
   },
   {
@@ -1598,7 +1607,7 @@
     "nr": 27,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist Wahrnehmung?",
-    "erw": "Aufnahme aller Informationen oder Reize, unserer Umwelt. Z.B. durch Sehen, Hören, Riechen… • Wahrnehmung wird beeinflusst durch Motivation, Aufmerksamkeit, Vorurteile, • dadurch kann zur selektiven Wahrnehmung kommen (Auswahl bestimmter Informationen / Ausfiltern von unwichtig bewerteten Informationen Umgang mit Menschen mündliche Prüfungsfragen 09.2025",
+    "erw": "Aufnahme aller Informationen oder Reize, unserer Umwelt. Z.B. durch Sehen, Hören, Riechen… • Wahrnehmung wird beeinflusst durch Motivation, Aufmerksamkeit, Vorurteile, • dadurch kann zur selektiven Wahrnehmung kommen (Auswahl bestimmter Informationen / Ausfiltern von unwichtig bewerteten Informationen).",
     "geprueft": null
   },
   {
@@ -1652,7 +1661,7 @@
     "nr": 33,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist eine Katastrophe?",
-    "erw": "Ein erhebliches Schadensereignis, • plötzlich und unerwartet eingetreten. Umgang mit Menschen mündliche Prüfungsfragen 09.2025",
+    "erw": "Ein erhebliches Schadensereignis, • plötzlich und unerwartet eingetreten.",
     "geprueft": null
   },
   {
@@ -1669,7 +1678,7 @@
     "thema": "Umgang mit Menschen / Deeskalation",
     "nr": 35,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
-    "frage": "Welche Panikbegrice gibt es?",
+    "frage": "Welche Panikbegriffe gibt es?",
     "erw": "Panikstimmung: Gefahr liegt in der Luft, Menschen werden unruhig • Panikereignis: Die Katastrophe, z.B. Feuer, Schreie, Lichtausfall • Paniksturm: Fluchtverhalten durch Furcht und Schrecken / Überlebenstrieb • Panikstarre: (oft bei Kindern) Vor Angst, unfähig sich zu bewegen.",
     "geprueft": null
   },
@@ -1679,7 +1688,7 @@
     "nr": 36,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist die Gesprächstechnik Schallplatte mit Sprung?",
-    "erw": "Wenn der Gesprächspartner \"zu gemach hat\" , wird hier der Standpunkt häufig wiederholt. Aneinanderreihung gleicher oder ähnlicher Sätze",
+    "erw": "Wenn der Gesprächspartner \"zu genüge getan hat\", wird hier der Standpunkt häufig wiederholt. Aneinanderreihung gleicher oder ähnlicher Sätze",
     "geprueft": null
   },
   {
@@ -1688,7 +1697,7 @@
     "nr": 37,
     "quelle": "UmM_mündliche_Prüfungsfragen.pdf",
     "frage": "Was ist die Vernebelungstechnik?",
-    "erw": "Provokationen emotionslos bestätigen / ins Leere laufen lassen, keinen Angribspunkt bieten • Dadurch Verliert der \"Angreifer\" die Lust",
+    "erw": "Provokationen emotionslos bestätigen / ins Leere laufen lassen, keinen Angriffspunkt bieten • Dadurch verliert der \"Angreifer\" die Lust",
     "geprueft": null
   },
   {
@@ -1723,8 +1732,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 1,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Wann hat man Umgang mit einer Waffe?\nZweck (Angri6 oder Verteidigung, oder Jagd oder Sport oder Spiel oder Distanzinjektion...) •\no Zum Beispiel Kriegswa6en, Butterflymesser, Stahlrute, Totschläger, Schlagringe, Pfe6erspray ohne Prüfzeichen, getarnte Waffen…",
-    "erw": "Wenn man eine Waffe o besitzt o führt o erwirbt o mitnimmt (transportieren), …..",
+    "frage": "Wann hat man Umgang mit einer Waffe?\nZweck (Angriff oder Verteidigung, oder Jagd oder Sport oder Spiel oder Distanzinjektion...) •\no Zum Beispiel Kriegswaffen, Butterflymesser, Stahlrute, Totschläger, Schlagringe, Pfefferspray ohne Prüfzeichen, getarnte Waffen…",
+    "erw": "Wenn man eine Waffe o besitzt o führt o erwirbt o mitnimmt (transportieren), …",
     "geprueft": null
   },
   {
@@ -1732,8 +1741,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 2,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Geschoss wird durch einen Lauf getrieben\nWas sind Waffen im Sinne des Waffengesetzes?",
-    "erw": "Schusswa2en (z.B. Pistole) • Schusswa6en gleichgestellte Gegenstände o (Abschießen von Munition (z.B. Schreckschusswa6e) oder feste Körper durch Muskelkraft verschossen (z.B. Armbrust)) • Tragbare Gegenstände o dafür da, gegen Menschen eingesetzt zu werden (z.B. Hieb- und Stoßwa6en) • Tragbare Gegenstände o nicht dafür da, gegen Menschen eingesetzt zu werden, aber dazu besonders geeignet UND im Wa6G aufgelistet (z.B. Viehtreiber Elektrogerät)",
+    "frage": "Was sind Waffen im Sinne des Waffengesetzes?",
+    "erw": "Schusswaffen (z.B. Pistole) • Schusswaffen gleichgestellte Gegenstände o (Abschießen von Munition (z.B. Schreckschusswaffe) oder feste Körper durch Muskelkraft verschossen (z.B. Armbrust)) • Tragbare Gegenstände o dafür da, gegen Menschen eingesetzt zu werden (z.B. Hieb- und Stoßwaffen) • Tragbare Gegenstände o nicht dafür da, gegen Menschen eingesetzt zu werden, aber dazu besonders geeignet UND im WaffG aufgelistet (z.B. Viehtreiber Elektrogerät)",
     "geprueft": null
   },
   {
@@ -1741,8 +1750,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 3,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Was sind Schusswa2en?",
-    "erw": "",
+    "frage": "Was sind Schusswaffen?",
+    "erw": "Schusswaffen sind die Oberkategorie der Waffen: Das Geschoss wird durch einen Lauf getrieben, durch z. B. kalte oder heiße Gase.",
     "geprueft": null
   },
   {
@@ -1750,8 +1759,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 4,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Was ist der Unterschied zwischen einer Schusswa6e und einer Feuerwa6e?",
-    "erw": "Schusswa2en = \"Oberkategorie\"à Geschoss wird durch einen Lauf getrieben o durch z.B. kalte oder heiße Gase • Feuerwa2en sind auch Schusswa6en, aber das Geschoss wird mit heißen Gasen durch den Lauf getrieben",
+    "frage": "Was ist der Unterschied zwischen einer Schusswaffe und einer Feuerwaffe?",
+    "erw": "Schusswaffen = \"Oberkategorie\": Geschoss wird durch einen Lauf getrieben, durch z. B. kalte oder heiße Gase • Feuerwaffen sind auch Schusswaffen, aber das Geschoss wird mit heißen Gasen durch den Lauf getrieben",
     "geprueft": null
   },
   {
@@ -1759,8 +1768,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 5,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Was sind die wesentlichen Teile von Schusswa6en?",
-    "erw": "Verschluss, Lauf mit Patronenlager, Gri2stück mit Abzugseinrichtung",
+    "frage": "Was sind die wesentlichen Teile von Schusswaffen?",
+    "erw": "Verschluss, Lauf mit Patronenlager, Griffstück mit Abzugseinrichtung",
     "geprueft": null
   },
   {
@@ -1769,7 +1778,7 @@
     "nr": 6,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Waffen tragen das Prüfzeichen PTB im Kreis?",
-    "erw": "Schreckschusswa6en, Reizstoffwa6en, Signalwa6en (SRS-Waffen)",
+    "erw": "Schreckschusswaffen, Reizstoffwaffen, Signalwaffen (SRS-Waffen)",
     "geprueft": null
   },
   {
@@ -1778,7 +1787,7 @@
     "nr": 7,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Waffen tragen das Prüfzeichen F im Fünfeck?",
-    "erw": "F steht für Federdruck. Also (meist) Luftdruckwa6en mit kalten Gasen von 0,5-7,5 Joule.",
+    "erw": "F steht für Federdruck. Also (meist) Luftdruckwaffen mit kalten Gasen von 0,5-7,5 Joule.",
     "geprueft": null
   },
   {
@@ -1795,8 +1804,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 9,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Wann ist eine Waffe zugri2sbereit?",
-    "erw": "Wenn ich sie mit wenigen Handgri2en (zwei) in Anschlag bringen kann. Mündliche Prüfungsfragen Umgang mit Waffen Dezember 2025 DBA Marcel Heinen",
+    "frage": "Wann ist eine Waffe zugriffsbereit?",
+    "erw": "Wenn ich sie mit wenigen Handgriffen (zwei) in Anschlag bringen kann.",
     "geprueft": null
   },
   {
@@ -1805,7 +1814,7 @@
     "nr": 10,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Wann transportiere ich eine Waffe?",
-    "erw": "Wenn sie NICHT schussbereit und NICHT zugri2sbereit mitgenommen wird. • Waffen müssen in einem verschlossenen Behältnis transportiert werden, getrennt von der Munition.",
+    "erw": "Wenn sie NICHT schussbereit und NICHT zugriffsbereit mitgenommen wird. • Waffen müssen in einem verschlossenen Behältnis transportiert werden, getrennt von der Munition.",
     "geprueft": null
   },
   {
@@ -1813,7 +1822,7 @@
     "thema": "Umgang mit Waffen",
     "nr": 11,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Wann darf ich als SMA im bewa6neten Bereich arbeiten?",
+    "frage": "Wann darf ich als SMA im bewaffneten Bereich arbeiten?",
     "erw": "Waffensachkunde (Lehrgang / Befähigungsnachweis) • Mindestens 18 Jahre alt (in der Praxis meist 25) • Zuverlässigkeit (strenger als im Gewerberecht) • Körperlich und geistig geeignet.",
     "geprueft": null
   },
@@ -1841,7 +1850,7 @@
     "nr": 14,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Wozu berechtigt eine Waffenbesitzkarte?",
-    "erw": "Zum Erwerben (z.B. kaufen) und Besitzen einer Schusswa6e",
+    "erw": "Zum Erwerben (z.B. kaufen) und Besitzen einer Schusswaffe",
     "geprueft": null
   },
   {
@@ -1859,7 +1868,7 @@
     "nr": 16,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Wozu berechtigt ein \"großer\" Waffenschein?",
-    "erw": "Zum Führen einer (scharfen) Schusswa6e o Notwendig zum Führen für Schusswa6en mit mehr als 0,5 Joule",
+    "erw": "Zum Führen einer (scharfen) Schusswaffe o Notwendig zum Führen für Schusswaffen mit mehr als 0,5 Joule",
     "geprueft": null
   },
   {
@@ -1877,7 +1886,7 @@
     "nr": 18,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Waffenscheine gibt es?",
-    "erw": "\"Großer\" Waffenschein (Schusswa6en) • Kleiner Waffenschein (SRS-Waffen) Mündliche Prüfungsfragen Umgang mit Waffen Dezember 2025 DBA Marcel Heinen",
+    "erw": "\"Großer\" Waffenschein (Schusswaffen) • Kleiner Waffenschein (SRS-Waffen)",
     "geprueft": null
   },
   {
@@ -1886,7 +1895,7 @@
     "nr": 19,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Wozu berechtigt der kleine Waffenschein?",
-    "erw": "Zum (verdeckten) Führen einer SRS-Waffe o Schreckschuss, Reizstoff und Signalwa6e",
+    "erw": "Zum (verdeckten) Führen einer SRS-Waffe o Schreckschuss, Reizstoff und Signalwaffe",
     "geprueft": null
   },
   {
@@ -1894,7 +1903,7 @@
     "thema": "Umgang mit Waffen",
     "nr": 20,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Wie müssen Schusswa6en gelagert werden?",
+    "frage": "Wie müssen Schusswaffen gelagert werden?",
     "erw": "In einem geeigneten Waffenschrank • ungeladen, getrennt von der Munition",
     "geprueft": null
   },
@@ -1913,7 +1922,7 @@
     "nr": 22,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Was heißt Führen und was heißt Besitzen?",
-    "erw": "Führen ist das \"mitnehmen\" außerhalb meiner Wohnung, zugri6sbereit • Besitzen ist bei mir zu Hause, im befriedeten Besitztum (z.B. Schießstand)",
+    "erw": "Führen ist das \"mitnehmen\" außerhalb meiner Wohnung, zugriffsbereit • Besitzen ist bei mir zu Hause, im befriedeten Besitztum (z.B. Schießstand)",
     "geprueft": null
   },
   {
@@ -1921,8 +1930,8 @@
     "thema": "Umgang mit Waffen",
     "nr": 23,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
-    "frage": "Was sind Anscheinswa6en?",
-    "erw": "Sehen aus wie echte Schusswa2en, sind aber keine. o Sind Spielzeuge o unbrauchbar gemachte Schusswa6en o Nachbildungen von Schusswa6en.",
+    "frage": "Was sind Anscheinswaffen?",
+    "erw": "Sehen aus wie echte Schusswaffen, sind aber keine. o Sind Spielzeuge o unbrauchbar gemachte Schusswaffen o Nachbildungen von Schusswaffen.",
     "geprueft": null
   },
   {
@@ -1931,7 +1940,7 @@
     "nr": 24,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Welche Waffen darf man grundsätzlich nicht führen?",
-    "erw": "Anscheinswa2en • Einhandmesser und Messer mit mehr als 12 cm Klingenlänge • gewisse Hieb-und Stoßwa6en wie z.B. Teleskopschlagstock. o Diese ganzen Waffen darf ich aber mit berechtigtem Interesse führen, z.B. zur Berufsausübung. Ansonsten wäre das Führen eine Ordnungswidrigkeit.",
+    "erw": "Anscheinswaffen • Einhandmesser und Messer mit mehr als 12 cm Klingenlänge • gewisse Hieb- und Stoßwaffen wie z.B. Teleskopschlagstock. o Diese ganzen Waffen darf ich aber mit berechtigtem Interesse führen, z.B. zur Berufsausübung. Ansonsten wäre das Führen eine Ordnungswidrigkeit.",
     "geprueft": null
   },
   {
@@ -1958,7 +1967,7 @@
     "nr": 27,
     "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
     "frage": "Wo dürfen keine Waffen (sogar trotz Waffenschein) geführt werden?",
-    "erw": "Bei ö2entlichen Veranstaltungen • in Waffenverbotszonen",
+    "erw": "Bei öffentlichen Veranstaltungen • in Waffenverbotszonen",
     "geprueft": null
   },
   {

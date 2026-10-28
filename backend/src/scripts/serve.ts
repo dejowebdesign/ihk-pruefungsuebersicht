@@ -26,8 +26,10 @@ async function main() {
   // Bootstrap the oral-exam question pool BEFORE the HTTP listener starts.
   // A fresh deploy (empty SQLite volume) ships zero OralQuestion rows, which
   // would make "create oral exam" fail with "pool is empty — run seed first".
-  // This is idempotent (counts first; upserts only on an empty/partial pool)
-  // and never touches existing exams/ratings, so repeated restarts are safe.
+  // This is idempotent (compares stored content against the shipped seed file;
+  // upserts only on missing rows or outdated question/answer text) and never
+  // touches existing exams/ratings, so repeated restarts are safe and a
+  // corrected question text in oral-questions.json reaches the live database.
   // Runs unconditionally (not gated on --with-scheduler) because oral exams
   // are a core feature available on every deployment, scheduler or not.
   try {
