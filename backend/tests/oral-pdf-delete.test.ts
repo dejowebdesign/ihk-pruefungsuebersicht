@@ -17,6 +17,7 @@ import { seedOralPool } from "../src/oral/seed";
 import { createExam, rateQuestion, completeExam, deleteExam, ExamNotFoundError } from "../src/oral/service";
 import { mulberry32 } from "../src/oral/randomize";
 import { ORAL_QUESTIONS_PER_EXAM, ORAL_THEMES, ORAL_UVV_THEME } from "../src/oral/themes";
+import { textWidth, PDF_METRICS } from "../src/oral/pdf-writer";
 import { createApp } from "../src/api/app";
 import { bootstrapAdmin } from "../src/auth/service";
 
@@ -84,6 +85,122 @@ function extractPdfText(pdf: Buffer): string {
     out.push(s);
   }
   return out.join("\n");
+}
+
+/** A text operation recovered from the PDF content stream, with its position. */
+interface PositionedText {
+  /** Decoded visible text. */
+  text: string;
+  /** Left edge of the glyph run, in PDF points (origin bottom-left). */
+  x: number;
+  /** Baseline of the glyph run. The visible text sits above this. */
+  baseline: number;
+  size: number;
+  bold: boolean;
+}
+
+/**
+ * Recover every `BT ... Tm ... Tj ET` text operation with its real position.
+ *
+ * A content-stream text op looks like:
+ *   q 0.000 0.000 0.000 rg BT /F2 10 Tf 1 0 0 1 64.00 700.00 Tm (Text) Tj ET Q
+ * The two numbers before `Tm` are the translation, i.e. the left edge and the
+ * baseline. Right-aligned text is already shifted by the writer, so `x` is the
+ * true left edge in both cases. Presence-only assertions cannot catch an
+ * overlap, so the layout test needs these coordinates.
+ */
+function extractPositionedText(pdf: Buffer): PositionedText[] {
+  const latin = pdf.toString("latin1");
+  const ops: PositionedText[] = [];
+  const re =
+    /BT \/(F1|F2) ([\d.]+) Tf 1 0 0 1 (-?[\d.]+) (-?[\d.]+) Tm (\((?:\\.|[^\\()])*\)) Tj ET/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(latin)) !== null) {
+    ops.push({
+      text: decodePdfLiteral(m[5]),
+      x: Number(m[3]),
+      baseline: Number(m[4]),
+      size: Number(m[2]),
+      bold: m[1] === "F2",
+    });
+  }
+  return ops;
+}
+
+/** Decode a PDF literal string (`(…)`) written with WinAnsi + octal escapes. */
+function decodePdfLiteral(literal: string): string {
+  const raw = literal.slice(1, -1);
+  let s = "";
+  for (let i = 0; i < raw.length; i++) {
+    if (raw[i] !== "\\") {
+      s += raw[i];
+      continue;
+    }
+    const next = raw[i + 1];
+    if (next >= "0" && next <= "7") {
+      s += String.fromCharCode(parseInt(raw.slice(i + 1, i + 4), 8));
+      i += 3;
+    } else {
+      s += next;
+      i += 1;
+    }
+  }
+  return s;
+}
+
+/** Helvetica metrics: how far glyphs rise above / fall below the baseline. */
+const ASCENT_RATIO = 0.72;
+const DESCENT_RATIO = 0.24;
+
+/** Vertical extent of a positioned text run (y grows upwards). */
+function textExtent(t: PositionedText): { top: number; bottom: number } {
+  return {
+    top: t.baseline + ASCENT_RATIO * t.size,
+    bottom: t.baseline - DESCENT_RATIO * t.size,
+  };
+}
+
+/** Horizontal extent of a positioned text run. */
+function textSpan(t: PositionedText): { left: number; right: number } {
+  const width = textWidth(t.text, t.size, t.bold ? "bold" : "regular");
+  return { left: t.x, right: t.x + width };
+}
+
+/** A filled rectangle recovered from the PDF content stream. */
+interface PositionedRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** Fill colour as written by the writer, e.g. "0.941 0.992 0.957". */
+  fill: string;
+}
+
+/** Recover every filled `re f` rectangle with its geometry. */
+function extractFilledRects(pdf: Buffer): PositionedRect[] {
+  const latin = pdf.toString("latin1");
+  const rects: PositionedRect[] = [];
+  const re = /q ([\d.]+ [\d.]+ [\d.]+) rg (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) re f Q/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(latin)) !== null) {
+    rects.push({
+      fill: m[1],
+      x: Number(m[2]),
+      y: Number(m[3]),
+      width: Number(m[4]),
+      height: Number(m[5]),
+    });
+  }
+  return rects;
+}
+
+/** The result box: full content width and the known box height. */
+function findResultBox(pdf: Buffer): PositionedRect {
+  const box = extractFilledRects(pdf).find(
+    (r) => r.height === 64 && Math.abs(r.width - (PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN * 2)) < 0.01,
+  );
+  if (!box) throw new Error("result box not found in the PDF");
+  return box;
 }
 
 async function createRatedExam(
@@ -298,6 +415,190 @@ describe("PDF content matches the stored results", () => {
     const res = await app.request(`/api/oral/exams/${examId}/pdf`, { headers: adminToken() });
     const text = extractPdfText(Buffer.from(await res.arrayBuffer()));
     expect(text).toMatch(/Seite 1 von \d+/);
+  });
+});
+
+// ── result box layout ──────────────────────────────────────────────────────
+// Regression: "Gesamtergebnis" and "<n> von <m> Punkten" were both emitted at
+// the box TOP baseline, so they overprinted each other and their ascenders rose
+// above the box border. Presence-only assertions cannot see that, so these
+// tests read the actual Tm coordinates out of the content stream.
+describe("PDF result box layout", () => {
+  let passId: string;
+  let failId: string;
+  let passPdf: Buffer;
+  let failPdf: Buffer;
+
+  beforeAll(async () => {
+    passId = await createRatedExam("Layout Bestanden", Array(13).fill("richtig"), 91);
+    await completeExam(client, passId);
+    failId = await createRatedExam("Layout Durchgefallen", Array(13).fill("falsch"), 92);
+    await completeExam(client, failId);
+    passPdf = Buffer.from(
+      await (await app.request(`/api/oral/exams/${passId}/pdf`, { headers: adminToken() })).arrayBuffer(),
+    );
+    failPdf = Buffer.from(
+      await (await app.request(`/api/oral/exams/${failId}/pdf`, { headers: adminToken() })).arrayBuffer(),
+    );
+  });
+
+  /** The four texts of the result box, located by their rendered content. */
+  function resultBoxTexts(pdf: Buffer, totalPoints: number, maxPoints: number) {
+    const ops = extractPositionedText(pdf);
+    const one = (predicate: (t: PositionedText) => boolean, what: string): PositionedText => {
+      const hits = ops.filter(predicate);
+      expect(hits, `expected exactly one ${what} in the PDF`).toHaveLength(1);
+      return hits[0];
+    };
+    return {
+      label: one((t) => t.text === "Gesamtergebnis", '"Gesamtergebnis"'),
+      points: one(
+        (t) => t.text === `${totalPoints} von ${maxPoints} Punkten`,
+        "points line",
+      ),
+      percent: one((t) => /^\d+ %$/.test(t.text), "percent"),
+      status: one((t) => t.text === "Bestanden" || t.text === "Nicht bestanden", "status"),
+    };
+  }
+
+  it("draws the label and the points line at different vertical positions", async () => {
+    const stored = await client.oralExam.findUnique({ where: { id: passId } });
+    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+
+    expect(t.label.baseline).not.toBeCloseTo(t.points.baseline, 1);
+    // The points line sits BELOW the label (smaller y), with a real gap.
+    expect(t.points.baseline).toBeLessThan(t.label.baseline);
+    const gap = t.label.baseline - t.points.baseline;
+    // Far enough apart that the 11pt points line cannot reach the 10pt label.
+    expect(gap).toBeGreaterThan(ASCENT_RATIO * t.points.size + DESCENT_RATIO * t.label.size);
+
+    // Their visible boxes must not intersect either.
+    const labelBox = textExtent(t.label);
+    const pointsBox = textExtent(t.points);
+    expect(pointsBox.top).toBeLessThan(labelBox.bottom);
+  });
+
+  it("keeps both left-hand texts inside the result box", async () => {
+    const stored = await client.oralExam.findUnique({ where: { id: passId } });
+    const box = findResultBox(passPdf);
+    const boxTop = box.y + box.height;
+    const boxBottom = box.y;
+    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+
+    for (const [name, op] of [["Gesamtergebnis", t.label], ["points", t.points]] as const) {
+      const e = textExtent(op);
+      // Fully inside: no part of the glyph box crosses the border.
+      expect(e.top, `${name} rises above the result box`).toBeLessThanOrEqual(boxTop);
+      expect(e.bottom, `${name} drops below the result box`).toBeGreaterThanOrEqual(boxBottom);
+      // And not on the border line itself.
+      expect(e.top, `${name} touches the top border`).toBeLessThan(boxTop);
+      expect(e.bottom, `${name} touches the bottom border`).toBeGreaterThan(boxBottom);
+    }
+    // The left group starts inside the box's left padding.
+    expect(t.label.x).toBeGreaterThan(box.x);
+    expect(t.points.x).toBeGreaterThan(box.x);
+  });
+
+  it("separates the left text group from the right-hand percent and status", async () => {
+    const stored = await client.oralExam.findUnique({ where: { id: passId } });
+    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+
+    // Right-hand texts are right-aligned to the same edge.
+    const rightEdge = PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN - 16;
+    expect(textSpan(t.percent).right).toBeCloseTo(rightEdge, 1);
+    expect(textSpan(t.status).right).toBeCloseTo(rightEdge, 1);
+
+    // No horizontal intersection between the left group and the right group.
+    const leftGroup = [t.label, t.points].map(textSpan);
+    const rightGroup = [t.percent, t.status].map(textSpan);
+    for (const l of leftGroup) {
+      for (const r of rightGroup) {
+        expect(l.right, `left text overlaps "${r === rightGroup[0] ? "percent" : "status"}"`)
+          .toBeLessThan(r.left);
+      }
+    }
+
+    // The percent and the status do not collide with each other vertically.
+    expect(textExtent(t.status).top).toBeLessThan(textExtent(t.percent).bottom);
+    // Both stay inside the box vertically.
+    const box = findResultBox(passPdf);
+    for (const op of [t.percent, t.status]) {
+      const e = textExtent(op);
+      expect(e.top).toBeLessThanOrEqual(box.y + box.height);
+      expect(e.bottom).toBeGreaterThanOrEqual(box.y);
+    }
+  });
+
+  it("leaves a gap between the result box and the following table header", async () => {
+    const box = findResultBox(passPdf);
+    const boxBottom = box.y;
+    // The table header row is the next filled rect below the box.
+    const nextRect = extractFilledRects(passPdf)
+      .filter((r) => r.y + r.height <= boxBottom + 0.01)
+      .sort((a, b) => (b.y + b.height) - (a.y + a.height))[0];
+    expect(nextRect, "no table header below the result box").toBeTruthy();
+    const gap = boxBottom - (nextRect.y + nextRect.height);
+    expect(gap).toBeGreaterThanOrEqual(12);
+
+    // No text from the result box intrudes into that gap.
+    const stored = await client.oralExam.findUnique({ where: { id: passId } });
+    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+    for (const op of [t.points, t.status]) {
+      expect(textExtent(op).bottom).toBeGreaterThan(boxBottom);
+    }
+  });
+
+  it("still renders the stored points, percent and result unchanged", async () => {
+    const pass = await client.oralExam.findUnique({ where: { id: passId } });
+    const fail = await client.oralExam.findUnique({ where: { id: failId } });
+    expect(pass!.result).toBe("Bestanden");
+    expect(fail!.result).toBe("Nicht bestanden");
+
+    const p = resultBoxTexts(passPdf, pass!.totalPoints, pass!.maxPoints);
+    expect(p.points.text).toBe(`${pass!.totalPoints} von ${pass!.maxPoints} Punkten`);
+    expect(p.percent.text).toBe(`${Math.round(pass!.percent)} %`);
+    expect(p.status.text).toBe(pass!.result);
+
+    const f = resultBoxTexts(failPdf, fail!.totalPoints, fail!.maxPoints);
+    expect(f.points.text).toBe(`${fail!.totalPoints} von ${fail!.maxPoints} Punkten`);
+    expect(f.percent.text).toBe(`${Math.round(fail!.percent)} %`);
+    expect(f.status.text).toBe(fail!.result);
+
+    // The values are the persisted ones, not a recomputation.
+    expect(pass!.totalPoints).toBe(100);
+    expect(pass!.percent).toBe(100);
+    expect(fail!.totalPoints).toBe(0);
+    expect(fail!.percent).toBe(0);
+  });
+
+  it("lays out a pass and a fail exam with the same geometry", async () => {
+    // Only the colours and the texts differ; the box and the baselines must not.
+    const passBox = findResultBox(passPdf);
+    const failBox = findResultBox(failPdf);
+    expect(passBox.y).toBeCloseTo(failBox.y, 2);
+    expect(passBox.fill).not.toBe(failBox.fill);
+
+    const passStored = await client.oralExam.findUnique({ where: { id: passId } });
+    const failStored = await client.oralExam.findUnique({ where: { id: failId } });
+    const p = resultBoxTexts(passPdf, passStored!.totalPoints, passStored!.maxPoints);
+    const f = resultBoxTexts(failPdf, failStored!.totalPoints, failStored!.maxPoints);
+    expect(p.label.baseline).toBeCloseTo(f.label.baseline, 2);
+    expect(p.points.baseline).toBeCloseTo(f.points.baseline, 2);
+    expect(p.percent.baseline).toBeCloseTo(f.percent.baseline, 2);
+    expect(p.status.baseline).toBeCloseTo(f.status.baseline, 2);
+  });
+
+  it("keeps the widest possible values inside the box", async () => {
+    // "100 von 100 Punkten" and "Nicht bestanden" are the widest strings the
+    // box can ever hold; neither may cross the box padding or the other group.
+    const box = findResultBox(passPdf);
+    const rightEdge = PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN - 16;
+    const leftWidth = textWidth("100 von 100 Punkten", 11, "regular");
+    const rightWidth = textWidth("Nicht bestanden", 12, "bold");
+    const leftEnd = PDF_METRICS.MARGIN + 16 + leftWidth;
+    const rightStart = rightEdge - rightWidth;
+    expect(leftEnd).toBeLessThan(rightStart);
+    expect(rightStart).toBeGreaterThan(box.x + box.width / 2);
   });
 });
 
