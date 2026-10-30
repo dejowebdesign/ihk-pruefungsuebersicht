@@ -104,7 +104,7 @@ export default function HomePage() {
           <h1 className="hero__title">IHK Prüfungsübersicht</h1>
           <p className="hero__subtitle">Sachkundeprüfung §34a – Prüfungsinformationen</p>
           <SearchBar value={search} onChange={setSearch} />
-          <p style={{ marginTop: 14, color: "var(--text-muted)", fontSize: "0.95rem" }}>
+          <p className="hero__note">
             Prüfungsbedingungen und Informationen der verschiedenen IHK-Standorte.
           </p>
         </div>

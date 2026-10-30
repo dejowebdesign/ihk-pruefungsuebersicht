@@ -38,11 +38,11 @@ ENV HOSTNAME=0.0.0.0
 # assets are emitted separately into .next/static and must be copied on top.
 COPY --from=build /app/frontend/.next/standalone ./
 COPY --from=build /app/frontend/.next/static ./frontend/.next/static
-# NOTE: public/ is intentionally NOT copied. The app ships no static public
-# assets (no favicon/icons referenced in metadata), and the directory is empty
-# and untracked — copying it would break builds from a fresh checkout
-# ("COPY failed: file not found"). Add a public/ COPY here only if real
-# public assets are introduced.
+# public/ holds the hero background photo (hero.png). Next.js does NOT copy it
+# into the standalone output, so it must be copied explicitly or the hero
+# background 404s in the container. The directory is now tracked and non-empty,
+# so this COPY is safe on a fresh checkout.
+COPY --from=build /app/frontend/public ./frontend/public
 
 EXPOSE 3000
 
