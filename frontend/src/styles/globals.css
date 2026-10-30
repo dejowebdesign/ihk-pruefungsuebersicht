@@ -421,37 +421,63 @@ h4 {
 }
 
 /* ── hero ─────────────────────────────────────────────────────────────────
-   A frosted band rather than a white-to-grey gradient, so the top of the page
-   reads as matte slate instead of glaring white. */
+   The hero uses the § 34a key art as a full-bleed background photo. The left
+   half of that image is deliberately dark and empty, which is exactly where the
+   heading, the subtitle, the search field and the note sit, so a left-to-right
+   scrim darkens that side only and leaves the security officer on the right
+   clearly visible.
+
+   `background-size: cover` keeps the aspect ratio (the photo is never
+   distorted) and `background-position: right center` anchors it to the right
+   edge, so when a narrow viewport crops the image horizontally the right half
+   with the officer is what stays in frame. The scrim is a separate background
+   layer painted on top of the photo, not an extra element, so the markup and
+   the page structure are untouched. */
 .hero {
   padding: 52px 0 36px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-subtle);
+  /* Shown while the photo loads and behind any letterboxing. */
+  background-color: var(--bg-subtle);
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(6, 10, 16, 0.86) 0%,
+      rgba(6, 10, 16, 0.66) 34%,
+      rgba(6, 10, 16, 0.26) 62%,
+      rgba(6, 10, 16, 0.04) 100%
+    ),
+    url("/hero.png");
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: center, right center;
 }
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .hero {
-    background: linear-gradient(
-      180deg,
-      var(--glass-strong) 0%,
-      rgba(244, 246, 248, 0.4) 100%
-    );
-    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
-    backdrop-filter: blur(var(--glass-blur-sm)) saturate(140%);
-  }
-}
+/* The photo replaces the frosted band, so the glass treatment is dropped here;
+   it would otherwise paint over the image. */
 .hero__title {
   font-size: clamp(1.7rem, 4vw, 2.35rem);
   font-weight: 800;
   letter-spacing: -0.025em;
   margin: 0 0 8px;
-  color: var(--text);
+  /* Fixed light text: the scrim above is dark in both themes, so the theme's
+     dark light-mode text colour would be unreadable here. */
+  color: #f5f8fb;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 .hero__subtitle {
   font-size: 1.06rem;
-  color: var(--text-muted);
+  color: rgba(228, 236, 244, 0.93);
   margin: 0 0 26px;
   max-width: 62ch;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+/* The trailing note moved out of an inline style so its colour can follow the
+   scrim; an inline colour would win over any rule here. */
+.hero__note {
+  margin-top: 14px;
+  color: rgba(216, 226, 238, 0.88);
+  font-size: 0.95rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* ── search bar ─────────────────────────────────────────────────────────── */
@@ -1175,8 +1201,21 @@ p.state {
     display: inline-flex;
     margin-left: auto;
   }
+  /* On a narrow viewport `cover` has to crop the photo horizontally and keeps
+     the right half (the officer). The text then spans the full width instead of
+     sitting only over the dark left side, so the scrim is evened out into a
+     near-uniform darkening: the officer stays recognisable while the heading,
+     subtitle and note keep their contrast. */
   .hero {
     padding: 34px 0 26px;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(6, 10, 16, 0.84) 0%,
+        rgba(6, 10, 16, 0.76) 55%,
+        rgba(6, 10, 16, 0.58) 100%
+      ),
+      url("/hero.png");
   }
   .ihk-grid,
   .skeleton-grid {
