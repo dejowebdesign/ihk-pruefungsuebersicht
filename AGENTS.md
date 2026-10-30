@@ -169,6 +169,42 @@ npm -w frontend run dev
 12000). `ihk-web` depends on `ihk-api` (healthy) and proxies `/api` via
 `BACKEND_URL=http://ihk-api:3001`.
 
+**`public/` is NOT part of the standalone output.** `next build` with
+`output: "standalone"` emits `.next/standalone/frontend/` without a `public/`
+directory (verified: the path does not exist after a build), so any static
+asset in `frontend/public/` must be copied explicitly in `frontend/Dockerfile`:
+
+```dockerfile
+COPY --from=build /app/frontend/public ./frontend/public
+```
+
+Without it the file 404s in the container while working fine in `next dev`.
+The hero background (`frontend/public/hero.png`) depends on this.
+
+## Hero background image
+
+`frontend/public/hero.png` (1962×802) is the start-page hero background. The
+left half of the photo is dark and empty by design, which is where the heading,
+subtitle, search field and note sit, so the scrim runs left→right and leaves the
+officer on the right visible.
+
+- Two background layers: `linear-gradient(scrim), url("/hero.png")`. The scrim
+  is a layer rather than an extra element, so the hero markup is unchanged.
+- `background-size: cover` on **both** layers (aspect ratio preserved, no
+  distortion) and `background-position: center, right center` — when a viewport
+  is narrower than the photo the right half with the officer stays in frame.
+  Desktop crops ~48% vertically, tablet ~13% vertically, mobile ~49%
+  horizontally.
+- Hero text uses **fixed light colours** (`#f5f8fb` etc.) plus a small
+  `text-shadow`, NOT theme tokens: `--text` is dark in light mode and would be
+  unreadable on the photo. Measured contrast ≥13:1 at all three widths.
+- The old frosted band's `backdrop-filter` is dropped for `.hero` (it would blur
+  the photo). The `--glass-blur-sm` token is still used by the sticky header/nav.
+- Below 768px the text spans the full width instead of only the dark side, so
+  the mobile override flattens the scrim (0.84 → 0.58) rather than fading out.
+- `frontend/tests/hero-background.test.ts` guards all of the above by parsing
+  `globals.css`; mutation-checked against 9 regressions.
+
 ## Phase 8 — Oral exam ("Mündliche Prüfung") spec (from Excel reference)
 
 Source workbook: `Pruefungsmatrix_muendliche_Pruefung_34a_vereinfacht_mit_Antworten.xlsx`
