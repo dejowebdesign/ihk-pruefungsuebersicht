@@ -16,7 +16,12 @@ import { setPrismaClient, disconnectPrisma } from "../src/db/prisma";
 import { seedOralPool } from "../src/oral/seed";
 import { createExam, rateQuestion, completeExam, deleteExam, ExamNotFoundError } from "../src/oral/service";
 import { mulberry32 } from "../src/oral/randomize";
-import { ORAL_QUESTIONS_PER_EXAM, ORAL_THEMES, ORAL_UVV_THEME } from "../src/oral/themes";
+import {
+  ORAL_QUESTIONS_PER_EXAM,
+  ORAL_THEMES,
+  ORAL_MAIN_THEME_NAMES,
+  ORAL_OTHER_THEME_NAMES,
+} from "../src/oral/themes";
 import { textWidth, PDF_METRICS } from "../src/oral/pdf-writer";
 import { createApp } from "../src/api/app";
 import { bootstrapAdmin } from "../src/auth/service";
@@ -293,10 +298,10 @@ describe("PDF content matches the stored results", () => {
 
     // The PDF must show exactly what the database holds — no recomputation.
     expect(text).toContain(`${Math.round(stored!.percent)} %`);
-    expect(text).toContain(`${stored!.totalPoints} von ${stored!.maxPoints} Punkten`);
-    expect(text).toContain(`${stored!.totalPoints} / ${stored!.maxPoints}`);
     expect(text).toContain(stored!.result!);
     expect(text).toContain("Parität Prüfling");
+    // No points anywhere in the PDF (Phase 11 removed the points system).
+    expect(text).not.toMatch(/Punkte/);
   });
 
   it("renders each stored per-question rating and point value", async () => {
@@ -319,10 +324,15 @@ describe("PDF content matches the stored results", () => {
     for (const item of items) {
       // Frage-ID is printed verbatim, so every pooled question shows up.
       expect(text).toContain(item.question.excelId);
-      // The stored weight snapshot and the stored point value are rendered.
-      expect(text).toContain(String(item.points));
-      expect(text).toContain(String(item.weight));
+      // The theme weight snapshot is rendered as a percentage.
+      expect(text).toContain(`${item.weight} %`);
     }
+    // The per-question result column shows the 100/50/0 % shares.
+    expect(text).toContain("100 %");
+    expect(text).toContain("50 %");
+    expect(text).toContain("0 %");
+    // The points system is gone from the PDF.
+    expect(text).not.toMatch(/Punkte/);
     // The rating labels are rendered as German text.
     expect(text).toContain("Teilweise richtig");
     expect(text).toContain("Richtig");
@@ -383,12 +393,14 @@ describe("PDF content matches the stored results", () => {
     expect(res.status).toBe(200);
     const text = extractPdfText(Buffer.from(await res.arrayBuffer()));
 
-    // 64 points is what the STORED values say (4 × 16 = 64) even though the
-    // current 9-theme weighting could never produce that combination.
+    // 64 % is what the STORED values say even though the current weighting
+    // could never produce that combination.
     expect(text).toContain("64 %");
-    expect(text).toContain("64 von 100 Punkten");
     expect(text).toContain("Alt-Thema 1");
     expect(text).toContain("Alt-Thema 8");
+    // The stored result is rendered verbatim and no points appear.
+    expect(text).toContain("Bestanden");
+    expect(text).not.toMatch(/Punkte/);
     // The exam was not rewritten by rendering it.
     const after = await client.oralExam.findUnique({ where: { id: exam.id } });
     expect(after!.totalPoints).toBe(64);
@@ -443,49 +455,51 @@ describe("PDF result box layout", () => {
   });
 
   /** The four texts of the result box, located by their rendered content. */
-  function resultBoxTexts(pdf: Buffer, totalPoints: number, maxPoints: number) {
-    const ops = extractPositionedText(pdf);
+  function resultBoxTexts(pdf: Buffer) {
+    // The result box's own texts only. "Gesamtergebnis" and the percentage
+    // also occur in the per-theme breakdown table, so restrict the search to
+    // the vertical band of the result box (identified by its filled rect).
+    const box = findResultBox(pdf);
+    const inBox = (t: PositionedText) =>
+      t.baseline > box.y && t.baseline < box.y + box.height;
+    const ops = extractPositionedText(pdf).filter(inBox);
     const one = (predicate: (t: PositionedText) => boolean, what: string): PositionedText => {
       const hits = ops.filter(predicate);
-      expect(hits, `expected exactly one ${what} in the PDF`).toHaveLength(1);
+      expect(hits, `expected exactly one ${what} in the result box`).toHaveLength(1);
       return hits[0];
     };
     return {
       label: one((t) => t.text === "Gesamtergebnis", '"Gesamtergebnis"'),
-      points: one(
-        (t) => t.text === `${totalPoints} von ${maxPoints} Punkten`,
-        "points line",
-      ),
+      // Phase 11: the points line was replaced by the pass threshold.
+      sub: one((t) => t.text === "Bestehensgrenze 50 %", "threshold line"),
       percent: one((t) => /^\d+ %$/.test(t.text), "percent"),
       status: one((t) => t.text === "Bestanden" || t.text === "Nicht bestanden", "status"),
     };
   }
 
-  it("draws the label and the points line at different vertical positions", async () => {
-    const stored = await client.oralExam.findUnique({ where: { id: passId } });
-    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+  it("draws the label and the threshold line at different vertical positions", async () => {
+    const t = resultBoxTexts(passPdf);
 
-    expect(t.label.baseline).not.toBeCloseTo(t.points.baseline, 1);
-    // The points line sits BELOW the label (smaller y), with a real gap.
-    expect(t.points.baseline).toBeLessThan(t.label.baseline);
-    const gap = t.label.baseline - t.points.baseline;
-    // Far enough apart that the 11pt points line cannot reach the 10pt label.
-    expect(gap).toBeGreaterThan(ASCENT_RATIO * t.points.size + DESCENT_RATIO * t.label.size);
+    expect(t.label.baseline).not.toBeCloseTo(t.sub.baseline, 1);
+    // The threshold line sits BELOW the label (smaller y), with a real gap.
+    expect(t.sub.baseline).toBeLessThan(t.label.baseline);
+    const gap = t.label.baseline - t.sub.baseline;
+    // Far enough apart that the 11pt line cannot reach the 10pt label.
+    expect(gap).toBeGreaterThan(ASCENT_RATIO * t.sub.size + DESCENT_RATIO * t.label.size);
 
     // Their visible boxes must not intersect either.
     const labelBox = textExtent(t.label);
-    const pointsBox = textExtent(t.points);
-    expect(pointsBox.top).toBeLessThan(labelBox.bottom);
+    const subBox = textExtent(t.sub);
+    expect(subBox.top).toBeLessThan(labelBox.bottom);
   });
 
   it("keeps both left-hand texts inside the result box", async () => {
-    const stored = await client.oralExam.findUnique({ where: { id: passId } });
     const box = findResultBox(passPdf);
     const boxTop = box.y + box.height;
     const boxBottom = box.y;
-    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+    const t = resultBoxTexts(passPdf);
 
-    for (const [name, op] of [["Gesamtergebnis", t.label], ["points", t.points]] as const) {
+    for (const [name, op] of [["Gesamtergebnis", t.label], ["threshold", t.sub]] as const) {
       const e = textExtent(op);
       // Fully inside: no part of the glyph box crosses the border.
       expect(e.top, `${name} rises above the result box`).toBeLessThanOrEqual(boxTop);
@@ -496,12 +510,11 @@ describe("PDF result box layout", () => {
     }
     // The left group starts inside the box's left padding.
     expect(t.label.x).toBeGreaterThan(box.x);
-    expect(t.points.x).toBeGreaterThan(box.x);
+    expect(t.sub.x).toBeGreaterThan(box.x);
   });
 
   it("separates the left text group from the right-hand percent and status", async () => {
-    const stored = await client.oralExam.findUnique({ where: { id: passId } });
-    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
+    const t = resultBoxTexts(passPdf);
 
     // Right-hand texts are right-aligned to the same edge.
     const rightEdge = PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN - 16;
@@ -509,7 +522,7 @@ describe("PDF result box layout", () => {
     expect(textSpan(t.status).right).toBeCloseTo(rightEdge, 1);
 
     // No horizontal intersection between the left group and the right group.
-    const leftGroup = [t.label, t.points].map(textSpan);
+    const leftGroup = [t.label, t.sub].map(textSpan);
     const rightGroup = [t.percent, t.status].map(textSpan);
     for (const l of leftGroup) {
       for (const r of rightGroup) {
@@ -541,33 +554,30 @@ describe("PDF result box layout", () => {
     expect(gap).toBeGreaterThanOrEqual(12);
 
     // No text from the result box intrudes into that gap.
-    const stored = await client.oralExam.findUnique({ where: { id: passId } });
-    const t = resultBoxTexts(passPdf, stored!.totalPoints, stored!.maxPoints);
-    for (const op of [t.points, t.status]) {
+    const t = resultBoxTexts(passPdf);
+    for (const op of [t.sub, t.status]) {
       expect(textExtent(op).bottom).toBeGreaterThan(boxBottom);
     }
   });
 
-  it("still renders the stored points, percent and result unchanged", async () => {
+  it("still renders the stored percent and result unchanged", async () => {
     const pass = await client.oralExam.findUnique({ where: { id: passId } });
     const fail = await client.oralExam.findUnique({ where: { id: failId } });
     expect(pass!.result).toBe("Bestanden");
     expect(fail!.result).toBe("Nicht bestanden");
 
-    const p = resultBoxTexts(passPdf, pass!.totalPoints, pass!.maxPoints);
-    expect(p.points.text).toBe(`${pass!.totalPoints} von ${pass!.maxPoints} Punkten`);
+    const p = resultBoxTexts(passPdf);
+    expect(p.sub.text).toBe("Bestehensgrenze 50 %");
     expect(p.percent.text).toBe(`${Math.round(pass!.percent)} %`);
     expect(p.status.text).toBe(pass!.result);
 
-    const f = resultBoxTexts(failPdf, fail!.totalPoints, fail!.maxPoints);
-    expect(f.points.text).toBe(`${fail!.totalPoints} von ${fail!.maxPoints} Punkten`);
+    const f = resultBoxTexts(failPdf);
+    expect(f.sub.text).toBe("Bestehensgrenze 50 %");
     expect(f.percent.text).toBe(`${Math.round(fail!.percent)} %`);
     expect(f.status.text).toBe(fail!.result);
 
     // The values are the persisted ones, not a recomputation.
-    expect(pass!.totalPoints).toBe(100);
     expect(pass!.percent).toBe(100);
-    expect(fail!.totalPoints).toBe(0);
     expect(fail!.percent).toBe(0);
   });
 
@@ -578,22 +588,20 @@ describe("PDF result box layout", () => {
     expect(passBox.y).toBeCloseTo(failBox.y, 2);
     expect(passBox.fill).not.toBe(failBox.fill);
 
-    const passStored = await client.oralExam.findUnique({ where: { id: passId } });
-    const failStored = await client.oralExam.findUnique({ where: { id: failId } });
-    const p = resultBoxTexts(passPdf, passStored!.totalPoints, passStored!.maxPoints);
-    const f = resultBoxTexts(failPdf, failStored!.totalPoints, failStored!.maxPoints);
+    const p = resultBoxTexts(passPdf);
+    const f = resultBoxTexts(failPdf);
     expect(p.label.baseline).toBeCloseTo(f.label.baseline, 2);
-    expect(p.points.baseline).toBeCloseTo(f.points.baseline, 2);
+    expect(p.sub.baseline).toBeCloseTo(f.sub.baseline, 2);
     expect(p.percent.baseline).toBeCloseTo(f.percent.baseline, 2);
     expect(p.status.baseline).toBeCloseTo(f.status.baseline, 2);
   });
 
   it("keeps the widest possible values inside the box", async () => {
-    // "100 von 100 Punkten" and "Nicht bestanden" are the widest strings the
+    // "Bestehensgrenze 50 %" and "Nicht bestanden" are the widest strings the
     // box can ever hold; neither may cross the box padding or the other group.
     const box = findResultBox(passPdf);
     const rightEdge = PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN - 16;
-    const leftWidth = textWidth("100 von 100 Punkten", 11, "regular");
+    const leftWidth = textWidth("Bestehensgrenze 50 %", 11, "regular");
     const rightWidth = textWidth("Nicht bestanden", 12, "bold");
     const leftEnd = PDF_METRICS.MARGIN + 16 + leftWidth;
     const rightStart = rightEdge - rightWidth;
@@ -737,7 +745,7 @@ describe("exam deletion", () => {
     });
     expect(JSON.stringify(themesAfter)).toEqual(JSON.stringify(themesBefore));
     expect(JSON.stringify(questionsAfter)).toEqual(JSON.stringify(questionsBefore));
-    expect(questionsAfter.length).toBe(377);
+    expect(questionsAfter.length).toBe(431);
     expect(themesAfter.length).toBe(ORAL_THEMES.length);
 
     // Only the intended exam disappeared; every other exam still exists.
@@ -855,8 +863,8 @@ describe("exam deletion", () => {
   });
 });
 
-describe("13-question logic is untouched by the new features", () => {
-  it("a fresh exam still has 13 questions across 9 themes with exactly one UVV", async () => {
+describe("13-question / 8-theme logic is untouched by the new features", () => {
+  it("a fresh exam still has 13 questions across 8 themes", async () => {
     const { examId } = await createExam(client, { candidateName: "Logik-Check" }, mulberry32(1201));
     const items = await client.oralExamQuestion.findMany({
       where: { examId },
@@ -865,28 +873,32 @@ describe("13-question logic is untouched by the new features", () => {
     expect(items.length).toBe(ORAL_QUESTIONS_PER_EXAM);
     expect(items.length).toBe(13);
     expect(items.map((i) => i.orderKey)).toEqual(Array.from({ length: 13 }, (_, i) => i + 1));
-    expect(items.slice(0, 9).map((i) => i.themeName)).toEqual(ORAL_THEMES.map((t) => t.name));
-    expect(items.filter((i) => i.themeName === ORAL_UVV_THEME).length).toBe(1);
+    // The first 12 slots are the fixed part: 4 main themes x2, 4 others x1.
+    expect(new Set(items.map((i) => i.themeName)).size).toBe(8);
+    for (const name of ORAL_MAIN_THEME_NAMES) {
+      expect(items.filter((i) => i.themeName === name)).toHaveLength(2);
+    }
+    for (const name of ORAL_OTHER_THEME_NAMES) {
+      expect(items.filter((i) => i.themeName === name).length).toBeGreaterThanOrEqual(1);
+    }
     const perTheme = new Map<string, number>();
     for (const i of items) perTheme.set(i.themeName, (perTheme.get(i.themeName) ?? 0) + 1);
     expect(Math.max(...perTheme.values())).toBeLessThanOrEqual(2);
     expect(new Set(items.map((i) => i.questionId)).size).toBe(13);
-    expect(items.reduce((s, i) => s + i.weight, 0)).toBe(100);
   });
 
   it("scoring is unchanged: all richtig → 100/Bestanden, all teilweise → 50", async () => {
     const full = await createRatedExam("Voll", Array(13).fill("richtig"), 1202);
     await completeExam(client, full);
     const fullExam = await client.oralExam.findUnique({ where: { id: full } });
-    expect(fullExam!.totalPoints).toBe(100);
     expect(fullExam!.percent).toBe(100);
     expect(fullExam!.result).toBe("Bestanden");
 
     const half = await createRatedExam("Halb", Array(13).fill("teilweise richtig"), 1203);
     await completeExam(client, half);
     const halfExam = await client.oralExam.findUnique({ where: { id: half } });
-    expect(halfExam!.totalPoints).toBe(50);
-    expect(halfExam!.result).toBe("Bestanden"); // 50 is exactly the threshold
+    expect(halfExam!.percent).toBe(50);
+    expect(halfExam!.result).toBe("Bestanden"); // 50 % is exactly the threshold
   });
 
   it("deleting one exam does not alter another exam's stored ratings", async () => {

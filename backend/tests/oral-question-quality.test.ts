@@ -165,7 +165,7 @@ describe("oral question pool — seed file integrity", () => {
   it("keeps a stable content fingerprint so unintended edits are visible", () => {
     // Guards against a silent bulk rewrite: any change to the pool text must
     // come with a deliberate update of this hash.
-    expect(seedFingerprint(rows)).toBe("20b569b37eb1261d");
+    expect(seedFingerprint(rows)).toBe("33551966b57f8232");
   });
 });
 
@@ -297,10 +297,9 @@ describe("seed file matches the database after a correction run", () => {
       where: { examId },
       orderBy: { orderKey: "asc" },
     });
-    // 13 questions across 9 themes, exactly one UVV, <=2 per theme
+    // 13 questions across 8 themes, 4 main themes x2, <=2 per theme
     expect(items).toHaveLength(ORAL_QUESTIONS_PER_EXAM);
-    expect(new Set(items.map((i) => i.themeName)).size).toBe(9);
-    expect(items.filter((i) => i.themeName === "Unfallverhuetungsvorschriften")).toHaveLength(1);
+    expect(new Set(items.map((i) => i.themeName)).size).toBe(8);
     const perTheme = items.reduce<Record<string, number>>((acc, i) => {
       acc[i.themeName] = (acc[i.themeName] ?? 0) + 1;
       return acc;
@@ -313,7 +312,7 @@ describe("seed file matches the database after a correction run", () => {
     }
     await completeExam(client, examId);
     const before = await client.oralExam.findUnique({ where: { id: examId } });
-    expect(before!.totalPoints).toBe(ORAL_TOTAL_WEIGHT);
+    expect(before!.percent).toBe(ORAL_TOTAL_WEIGHT);
     expect(before!.result).toBe("Bestanden");
     const ratingsBefore = items.map((i) => `${i.orderKey}:${i.questionId}`);
 
@@ -325,7 +324,6 @@ describe("seed file matches the database after a correction run", () => {
     expect((await ensureOralPoolSeeded(client)).seeded).toBe(true);
 
     const after = await client.oralExam.findUnique({ where: { id: examId } });
-    expect(after!.totalPoints).toBe(before!.totalPoints);
     expect(after!.percent).toBe(before!.percent);
     expect(after!.result).toBe(before!.result);
     expect(after!.status).toBe("completed");
@@ -335,6 +333,8 @@ describe("seed file matches the database after a correction run", () => {
     });
     expect(itemsAfter.map((i) => `${i.orderKey}:${i.questionId}`)).toEqual(ratingsBefore);
     expect(itemsAfter.every((i) => i.rating === "richtig")).toBe(true);
-    for (const i of itemsAfter) expect(i.points).toBe(i.weight);
+    // The percentage model derives everything from the rating; the legacy
+    // points column stays 0 for percent exams.
+    for (const i of itemsAfter) expect(i.points).toBe(0);
   });
 });

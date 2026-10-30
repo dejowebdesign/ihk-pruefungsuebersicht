@@ -153,6 +153,16 @@ export interface OralQuestion {
 
 export type OralRating = "richtig" | "teilweise richtig" | "falsch";
 
+/** Per-theme weighted result, computed server-side from the stored ratings. */
+export interface OralThemeBreakdown {
+  themeName: string;
+  weight: number;
+  asked: number;
+  achieved: number;
+  percent: number;
+  contribution: number;
+}
+
 export interface OralExamQuestion {
   id: string;
   examId: string;
@@ -161,7 +171,6 @@ export interface OralExamQuestion {
   themeName: string;
   weight: number;
   rating: OralRating | null;
-  points: number;
   note: string | null;
   question: { excelId: string; question: string; answer: string | null; source: string | null };
 }
@@ -180,6 +189,8 @@ export interface OralExam {
   totalPoints: number;
   percent: number;
   result: "Bestanden" | "Nicht bestanden" | null;
+  /** Weighted per-theme breakdown (percentage model), served by the backend. */
+  breakdown?: OralThemeBreakdown[];
   items?: OralExamQuestion[];
 }
 

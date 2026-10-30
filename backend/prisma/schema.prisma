@@ -301,9 +301,13 @@ model Session {
 // Stored so the exam/round logic reads weights from one authoritative place.
 model OralTheme {
   id        String   @id @default(cuid())
-  orderKey  Int      @unique // 1..9, defines the fixed theme order in an exam
-  name      String   @unique // exact Excel label, e.g. "Buergerliches Gesetzbuch / Jedermannsrechte"
-  weight    Int      // "Gewichtung" (8,12,12,12,8,16,8,16,8; sum 100). All divisible by 4.
+  orderKey  Int      @unique // 1..8, defines the fixed theme order in an exam
+  name      String   @unique // exact label, e.g. "Buergerliches Gesetzbuch / Jedermannsrechte"
+  weight    Int      // percentage weight (18,18,18,10,9,9,9,9; sum exactly 100)
+  // Phase 11: how many questions this theme contributes on EVERY exam (2 for
+  // the 4 main themes, 1 for the others). The rotating 13th question is an
+  // additional question on top of this, so a theme may end up with 2.
+  questionsPerExam Int @default(1)
 
   questions OralQuestion[]
 
@@ -369,9 +373,17 @@ model OralExam {
   completedAt  DateTime?
 
   // Cached final result (computed by the scoring lib, written on completion).
+  //
+  // scoringVersion distinguishes the grading model an exam was created under:
+  //   2 = Phase 11 weighted percentage (current default for new exams)
+  //   1 = legacy points model (pre-Phase-11 exams; kept readable/recomputable)
+  scoringVersion Int     @default(2)
+  // LEGACY points fields — kept so pre-Phase-11 exams keep their exact stored
+  // values and can still be recomputed under scoringVersion 1. They are NEVER
+  // shown in the UI or the PDF any more (Phase 11 removed all points display).
   maxPoints    Int       @default(100)
   totalPoints  Int       @default(0)
-  percent      Float     @default(0) // 0..100 (Excel percent × 100). Exact; no rounding needed.
+  percent      Float     @default(0) // 0..100. Exact; no rounding needed.
   result       String?   // "Bestanden" | "Nicht bestanden"
 
   items        OralExamQuestion[]
@@ -398,9 +410,13 @@ model OralExamQuestion {
   exam        OralExam   @relation(fields: [examId], references: [id], onDelete: Cascade)
   questionId  String
   question    OralQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
-  orderKey    Int        // 1..13 (9 base themes in order, then 4 extra slots)
+  orderKey    Int        // 1..13 (fixed slots in theme order, then the rotating one)
   themeName   String     // snapshot of the theme name at creation time
-  weight      Int        // snapshot of the theme weight at creation time
+  // Snapshot of the THEME weight (percent) at creation time. Phase 11: this is
+  // the theme's weight, NOT a per-question share — the scorer divides by the
+  // number of questions asked from the theme, so the weight stays fixed whether
+  // 1 or 2 questions were drawn.
+  weight      Int
   rating      String?    // "richtig" | "teilweise richtig" | "falsch" | null
   points      Float      @default(0) // Excel G-column value
   note        String?    // examiner note
@@ -409,4 +425,20 @@ model OralExamQuestion {
   @@unique([examId, questionId])
   @@index([examId])
   @@index([questionId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Phase 11 — rotation state for the 13th question
+//
+// A single row holds the monotonically increasing counter that decides which
+// of the 4 "other" themes supplies the rotating 13th question. Stored in the
+// DB (not in memory) so the rotation survives restarts and is never reset to
+// its first theme, and advanced with an atomic `increment` so parallel exam
+// starts each receive a distinct slot.
+// ─────────────────────────────────────────────────────────────────────────
+
+model OralRotationState {
+  id        String   @id // always "oral-rotation" (single row)
+  counter   Int      @default(0) // number of exams created so far
+  updatedAt DateTime @updatedAt
 }
