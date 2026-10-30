@@ -165,7 +165,7 @@ describe("oral question pool — seed file integrity", () => {
   it("keeps a stable content fingerprint so unintended edits are visible", () => {
     // Guards against a silent bulk rewrite: any change to the pool text must
     // come with a deliberate update of this hash.
-    expect(seedFingerprint(rows)).toBe("9685bc7888e5c140");
+    expect(seedFingerprint(rows)).toBe("20b569b37eb1261d");
   });
 });
 
