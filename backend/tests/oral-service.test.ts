@@ -16,7 +16,7 @@ import { createApp } from "../src/api/app";
 import { makeRequester } from "./helpers/request";
 
 const TEST_TOKEN = "oral-test-token-do-not-use-in-prod-0123456789abcdef";
-const SEED_QUESTION_COUNT = 342; // 218 original + 123 from Fragen.txt + 1 (RdOesO-15, split from a merged record)
+const SEED_QUESTION_COUNT = 377; // 342 + 35 (27 UmW + 8 StGB, imported 2026)
 
 let dbPath: string;
 let client: PrismaClient;

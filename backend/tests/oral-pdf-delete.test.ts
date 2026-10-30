@@ -737,7 +737,7 @@ describe("exam deletion", () => {
     });
     expect(JSON.stringify(themesAfter)).toEqual(JSON.stringify(themesBefore));
     expect(JSON.stringify(questionsAfter)).toEqual(JSON.stringify(questionsBefore));
-    expect(questionsAfter.length).toBe(342);
+    expect(questionsAfter.length).toBe(377);
     expect(themesAfter.length).toBe(ORAL_THEMES.length);
 
     // Only the intended exam disappeared; every other exam still exists.

@@ -3076,5 +3076,320 @@
     "frage": "Was ist eine Objekteinweisung?",
     "erw": "Einweisung des Mitarbeiters in besondere Gefahren, örtliche Besonderheiten und Abläufe vor Einsatzbeginn.",
     "geprueft": null
+  },
+  {
+    "excelId": "UmW-32",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was bedeutet „erwerben“ im Sinne des Waffengesetzes?",
+    "erw": "Das Erlangen der tatsächlichen Gewalt über die Schusswaffe.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-33",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Wer gilt als Erwerber einer Waffe und auf welche Weise kann eine Person die tatsächliche Gewalt über eine Waffe erlangen? Nennen Sie Beispiele.",
+    "erw": "Als Erwerber gilt jede Person, die die tatsächliche Gewalt über eine Waffe erlangt. Dies kann beispielsweise geschehen durch:\n\n- Kauf: Eine Person kauft eine Waffe und nimmt sie in Besitz.\n- Diebstahl: Eine Person entwendet eine Waffe und bringt sie unter ihre Kontrolle.\n- Finden: Eine Person findet eine Waffe und nimmt sie an sich.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-34",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Wer ist sachkundig im Sinne des Waffengesetzes?",
+    "erw": "Wer die Waffensachkundeprüfung erfolgreich abgelegt hat oder eine Gesellenprüfung im Büchsenmacherhandwerk erfolgreich abgelegt hat.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-35",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was bedeutet „Führen“ im Sinne des Waffengesetzes?",
+    "erw": "Das Ausüben der tatsächlichen Gewalt außerhalb der eigenen Wohnung, Geschäfts-räume, des eigenen befriedeten Besitztums oder einer Schießstätte.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-36",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Durch wen und wie wird im Sinne des Waffengesetzes die persönliche Eignung einer Person festgestellt?",
+    "erw": "Die persönliche Eignung wird von der zuständigen Behörde geprüft; ggf. ist ein amts- oder fachärztliches oder fachpsychologisches Zeugnis beizubringen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-37",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Wann ist eine Waffe „schussbereit“?",
+    "erw": "Wenn Sie geladen ist, d. h. dass Munition oder Geschosse in der Trommel, im in die Waffe eingefügten Magazin oder im Patronen- oder Geschosslager sind, auch wenn sie nicht gespannt ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-38",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Welche Voraussetzungen müssen Sie als Antragsteller für die Erteilung einer Waffenbesitzkarte erfüllen?",
+    "erw": "1. Ich muss ein Bedürfnis nachweisen.\n2. Ich muss die persönliche Eignung besitzen.\n3. Ich muss die erforderliche Zuverlässigkeit besitzen.\n4. Ich muss die erforderliche Sachkunde nachweisen.\n5. Ich muss das 18. Lebensjahr vollendet haben.(Beachte: Altersbeschränkungen bei Sportschützen)\n6. Nachweise der sicheren Aufbewahrung für Schusswaffen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-39",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Das Fortbestehen des Bedürfnisses wird nach erstmaliger Erteilung einer waffenrechtlichen Erlaubnis von der Behörde geprüft. Welche Frist hat der Gesetzgeber hier vorgesehen?",
+    "erw": "Mindestens alle fünf Jahre",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-40",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was sind „Anscheinswaffen“ im Sinne des Waffengesetzes?",
+    "erw": "Schusswaffen, die ihrer äußeren Form nach im Gesamterscheinungsbild den Anschein von Feuerwaffen (Anlage 1 Abschnitt 1 Unterabschnitt 1 Nr. 2.1 WaffG) hervorrufen und bei denen zum Antrieb der Geschosse keine heißen Gase verwendet werden.\n\nNachbildungen von Schusswaffen mit dem Aussehen der o.g. Schusswaffen und unbrauchbar gemachte Schusswaffen mit dem Aussehen der o.g. Schusswaffen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-41",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was muss der Erwerbsberechtigte nach dem Kauf einer Schusswaffe von einer Privatperson/Händler veranlassen?",
+    "erw": "Er muss innerhalb von zwei Wochen bei der zuständigen Behörde den Erwerb schriftlich oder elektronisch anzeigen und seine Waffenbesitzkarte zur Eintragung vorlegen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-42",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Dürfen Schalldämpfer für erlaubnis-pflichtige Schusswaffen erworben werden?",
+    "erw": "Ja, jedoch unterliegen Schalldämpfer für erlaubnispflichtige Schusswaffen ebenfalls der Erlaubnispflicht.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-43",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Braucht ein Volljähriger für den Erwerb von Druckluft-, Federdruck- oder CO2-Waffen eine Erwerbsberechtigung?",
+    "erw": "Nein, wenn die Waffe mit „F im Fünfeck“ gekennzeichnet ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-44",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Welche Erlaubnisse berechtigen zum Erwerb von Munition?",
+    "erw": "1. Waffenbesitzkarte, sofern eine Munitionserwerbsberechtigung eingetragen ist.\n2. Gültiger Jagdschein (Langwaffenmunition)\n3. Munitionserwerbsschein",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-45",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Sie überlassen einem Berechtigten auf Dauer Ihr Großkaliber-Sportgewehr. Innerhalb welcher Frist müssen Sie Ihrer Behörde das Überlassen anzeigen?",
+    "erw": "Innerhalb von 2 Wochen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-46",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Unter welchen Voraussetzungen darf Ihnen ein Waffenhändler eine erlaubnispflichtige Schusswaffe zum Ausprobieren ohne vorherige Erlaubnis der zuständigen Behörde überlassen?",
+    "erw": "Das ist nur erlaubt, wenn man bereits eine WBK besitzt und der Erwerb vorübergehend ist (höchstens einen Monat).",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-47",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was hat der Erbe einer Schusswaffe zu veranlassen?",
+    "erw": "Beantragung einer WBK bei der zuständigen Waffenbehörde binnen eines Monats nach Annahme der Erbschaft.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-48",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Sie wollen eine Waffe mit einem anderen Berechtigten dauerhaft tauschen, was müssen Sie berücksichtigen?",
+    "erw": "Ein Waffentausch ist gesetzlich nicht vorgesehen, jeder muss für die angestrebte Waffe erwerbsberechtigt sein und den Erwerb, sowie das Überlassen der anderen Waffe seiner zuständigen Behörde fristgerecht melden.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-49",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was darf der Inhaber eines Kleinen Waffenscheins?",
+    "erw": "Schreckschuss-, Reizstoff- und Signalwaffen mit dem Zulassungszeichen „PTB im Kreis“ in der Öffentlichkeit (ausgenommen öffentliche Veranstaltungen) führen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-50",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Wer ist zum zugriffsbereiten Führen von Schreckschuss-, Reizstoff- und Signalwaffen, deren Erwerb und Besitz erlaubnisfrei ist, berechtigt?",
+    "erw": "Inhaber des Kleinen Waffenscheines.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-51",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "In welchem Behältnis darf erlaubnis-pflichtige Munition gelagert werden?",
+    "erw": "Stahlblechbehältnis mit Schwenkriegelschloss.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-52",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Darf eine Schusswaffe, auch wenn sie ungeladen ist, auf Menschen gerichtet werden?",
+    "erw": "Nein, außer bei Notwehr.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-53",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Wie soll eine Schusswaffe an eine andere Person übergeben werden?",
+    "erw": "Ungeladen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-54",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was sollte als erstes geschehen, wenn man eine Schusswaffe übergeben bekommt?",
+    "erw": "Die Waffe ist sofort auf ihren Ladezustand zu überprüfen.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-55",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Welche Munition dürfen Sie aus Ihrer Waffe verschießen?",
+    "erw": "Munition, für die diese Waffe konstruiert und zugelassen ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-56",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Nennen Sie mindestens fünf Grundregeln zum Umgang mit einer Schusswaffe, die Sie unbedingt beachten müssen!",
+    "erw": "Hier sind allgemeine Sicherheitsregeln zu benennen wie z.B.:\n\n- eine Schusswaffe ist immer als geladen zu betrachten, so lange man sich nicht persönlich vom Gegenteil überzeugt hat\n- es ist immer dafür Sorge zu tragen, dass kein Unbefugter die Waffe an sich nehmen kann\n- die Waffe darf nur in sicherer Richtung ge- und entladen werden\n- eine geladene Waffe darf nicht aus der Hand gelegt werden\n- eine Schusswaffe darf nicht spielerisch auf Personen gerichtet werden\n- kein Hantieren mit Waffen unter dem Einfluss berauschender Mittel",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-57",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Was versteht man unter Gefahrenbereich?",
+    "erw": "Die Höchstreichweite von aus Schusswaffen abgefeuerten Geschossen.\n\nDer Bereich, in dem Menschen oder Sachen gefährdet werden können.",
+    "geprueft": null
+  },
+  {
+    "excelId": "UmW-58",
+    "thema": "Umgang mit Waffen",
+    "nr": null,
+    "quelle": "UmW_mündliche_Prüfungsfragen.pdf",
+    "frage": "Woran erkennen Sie, dass die von Ihnen zu erwerbende Munition zu Ihrer Schusswaffe passt?",
+    "erw": "Kennzeichnung auf Schusswaffe und Munitionsverpackung / Patronenhülse identisch.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-59",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Erklären Sie den Begriff „Notwehrexzess“ und seine strafrechtliche Bedeutung!",
+    "erw": "Beim Notwehrexzess wird das zulässige Maß der Abwehr überschritten.\n\nDas Handeln wird nur dann entschuldigt, wenn in Furcht, Verwirrung oder Schrecken über die Grenzen der Notwehr hinausgegangen worden ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-60",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Was ist ein Notstand?",
+    "erw": "Bei einem Notstand besteht eine gegenwärtige Gefahr für ein Rechtsgut, die nur durch Verletzung eines anderen Rechtsgutes abgewendet werden kann, wobei eine Abwägung der wider-streitenden Interessen stattfinden muss, in deren Ergebnis das als minderwertiger erkannte Rechtsgut geopfert wird.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-61",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Was bedeutet rechtfertigender Notstand?",
+    "erw": "In rechtfertigendem Notstand handelt, wer in einer gegenwärtigen, nicht anders abwendbaren Gefahr für Leben, Leib, Freiheit, Ehre, Eigentum oder ein anderes Rechtsgut eine Tat begeht, um die Gefahr von sich oder einem An-deren abzuwenden, wenn bei Abwägung der widerstreitenden Interessen das geschützte Interesse das beeinträchtigte wesentlich überwiegt.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-62",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Was bedeutet entschuldigender Notstand?",
+    "erw": "Wer in einer gegenwärtigen, nicht anders abwendbaren Gefahr für Leben, Leib oder Freiheit eine rechtswidrige Tat begeht, um die Ge-fahr von sich, einem Angehörigen oder einer anderen ihm nahestehenden Person abzuwenden, handelt ohne Schuld.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-63",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Nennen Sie vier wesentliche Voraussetzungen für den rechtfertigenden Notstand!",
+    "erw": "1. Gegenwärtige Gefahr liegt vor.\n2. Rechtsgüter sind bedroht (Leben, Leib, Freiheit, Ehre, Eigentum).\n3. Das zu schützende Rechtsgut ist wesentlich höherwertiger als das beeinträchtigte.\n4. Die Abwehrhandlung muss angemessen sein.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-64",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Was ist ein gegenwärtiger Angriff?",
+    "erw": "Jede unmittelbar bevorstehende, gerade statt-findende oder fortdauernde Verletzung eines Rechtsgutes.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-65",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Welche Verteidigungshandlung ist erforderlich, um einen Angriff abzuwenden?",
+    "erw": "Die Erforderlichkeit bestimmt sich nach Stärke und Gefährlichkeit des Angriffs; grundsätzlich ist das mildeste Mittel zur Abwehr zu wählen, das erfolgversprechend ist.",
+    "geprueft": null
+  },
+  {
+    "excelId": "StGB-66",
+    "thema": "Straf- und Verfahrensrecht",
+    "nr": null,
+    "quelle": "StGB_mündlichePrüfungsfragen.pdf",
+    "frage": "Was bedeutet „rechtswidrig“?",
+    "erw": "Ein Angriff ist rechtswidrig, wenn er gegen eine Rechtsnorm verstößt und ein Rechtfertigungsgrund nicht gegeben ist.",
+    "geprueft": null
   }
 ]

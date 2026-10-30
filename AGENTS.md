@@ -212,8 +212,8 @@ is seeded into the app DB via a seed script; the public `/fragen` questions
   duplicates skipped** (existing questions never deleted or changed). New
   questions are numbered by appending to each theme's existing excelId prefix
   (e.g. `UmM-41`..`UmM-50`, new prefix `UVV-01`..`UVV-11`).
-- Pool per theme (after extension): StGB 58, Sicherheitstechnik 53, UmM 50,
-  BGB 44, Datenschutz 42, RdOesO 32, UmW 31, Gewerberecht 20, UVV 11.
+- Pool per theme (after extension): StGB 66, UmW 58, Sicherheitstechnik 53,
+  UmM 50, BGB 44, Datenschutz 42, RdOesO 33, Gewerberecht 20, UVV 11 (377 total).
 
 ### Grading logic (1:1 — DO NOT change)
 - **3 Bewertungsstufen:** `richtig` / `teilweise richtig` / `falsch`.
@@ -307,10 +307,9 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
 - **Exams read question text live** via the pool join (`api/routes/oral.ts`),
   while rating/points/weight/note are snapshotted on `OralExamQuestion`. So
   text corrections never alter historical scores; only display text changes.
-- **Pool count is now 342** (was 341). `RdOesO-14` held a second question inside
-  its answer field; it became `RdOesO-15`. Two tests hardcode the count:
+- **Pool count is now 377** (was 342). Two tests hardcode the count:
   `oral-service.test.ts` (`SEED_QUESTION_COUNT`) and `oral-pdf-delete.test.ts`
-  (`.toBe(342)`).
+  (`.toBe(377)`).
 - **`seedFingerprint()`** (exported from `src/oral/seed.ts`) hashes the pool
   text. `tests/oral-question-quality.test.ts` asserts the exact value, so any
   pool edit must update that hash deliberately.
@@ -324,6 +323,43 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
   official statute text was performed and none is claimed; two records are
   explicitly left open (`Sicherheitstechnik-31`, `Datenschutz-22`).
 
+## Phase 10 — 35 new questions imported (DONE)
+
+- **+35 questions**: 27 `Umgang mit Waffen` (`UmW-32`…`UmW-58`, was 31) and
+  8 `Straf- und Verfahrensrecht` (`StGB-59`…`StGB-66`, was 58). Pool 342 → 377.
+  All imported **verbatim** from the task text; no existing record changed, none
+  deleted, no duplicates found. Append-only diff in
+  `backend/prisma/seed/oral-questions.json`.
+- **Pool per theme (now):** StGB 66, UmW 58, Sicherheitstechnik 53, UmM 50,
+  BGB 44, Datenschutz 42, RdOesO 33, Gewerberecht 20, UVV 11.
+- **Text was generated from the source, never retyped.** A parser
+  (`/tmp/q35/parse_original.py` at the time; the authoritative copy now lives in
+  `tests/oral-import-2026.test.ts` as `EXPECTED`) produced the records, which
+  caught two manual transcription errors (a `Behältnis` typo and lost blank
+  lines). Prefer generating over retyping for future bulk imports.
+- **Newline convention:** these 35 are the first pool entries whose `erw`
+  contains real `\n` (bullet lists). Existing entries separate items with `•`.
+  `.oral-take__answer` already sets `white-space: pre-wrap`, so they render
+  correctly — but if you add a new answer surface, keep `pre-wrap`.
+- **`quelle` must be copied byte-for-byte** from an existing record of the same
+  theme. The file mixes NFC/NFD; typing the filename by hand introduces a new
+  (differently-normalised) source string. `tests/oral-import-2026.test.ts`
+  asserts `sources.size === 9` to catch this.
+- **Tests:** `backend/tests/oral-import-2026.test.ts` (13 tests) pins all 35
+  pairs verbatim, the id range, theme mapping, umlaut/quote fidelity, list
+  lengths, append-only pre-existing records, and the 9 source strings. It was
+  mutation-tested (10 mutations: reword, shorten, wrong theme, duplicate,
+  umlaut strip, delete, pre-existing edit, renumber, invented source, invented
+  option) — all 10 caught.
+- **Review notes:** `docs/oral-import-2026-review.md` lists formatting quirks
+  (hyphen artifacts from the source line-wraps, e.g. `Geschäfts-räume`,
+  `wider-streitenden`) and open questions (overlap with `UmW-08`, `StGB-32/33/35`).
+  Nothing was corrected — the flagged text is stored verbatim.
+- **Verified end-to-end:** backend 329 tests, frontend 167 tests, production
+  build ✓; all 35 served by `GET /api/oral/pool`, drawn into real exams, and
+  rendered in the take-screen with intact umlauts.
+- **Sections 2–4 of that task (auth, user management, PDF export, exam delete)
+  were already on `main`** (PRs #3/#4/#5) — verified, not rebuilt.
 ## PDF layout pitfalls (`backend/src/oral/pdf.ts`)
 
 - **A PDF baseline is the text's BOTTOM edge, not the top.** `text(value, x, size)`
