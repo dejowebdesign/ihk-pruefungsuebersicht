@@ -100,7 +100,21 @@ oral.get("/exams/:id", async (c) => {
         ).themes
       : undefined;
 
-  return c.json({ ...exam, breakdown });
+  // Expose the question wording the candidate was ACTUALLY asked. The item
+  // snapshot wins; rows created before the snapshot existed fall back to the
+  // linked pool row, which for them is the only surviving copy. `question` is
+  // replaced by the resolved snapshot so every client renders the same text
+  // without needing to know about the fallback.
+  const items = exam.items.map((i) => ({
+    ...i,
+    question: {
+      ...i.question,
+      question: i.questionText ?? i.question.question,
+      answer: i.answerText ?? i.question.answer,
+    },
+  }));
+
+  return c.json({ ...exam, items, breakdown });
 });
 
 // ---- read: score (read-only — never recomputes/writes) ----
@@ -224,9 +238,15 @@ oral.patch("/exams/:id/questions/:order", requireStaff, async (c) => {
       : typeof body.note === "string" || body.note === null
         ? body.note
         : null;
+  const candidateAnswer =
+    body.candidateAnswer === undefined
+      ? undefined
+      : typeof body.candidateAnswer === "string" || body.candidateAnswer === null
+        ? body.candidateAnswer
+        : null;
 
   try {
-    await rateQuestion(prisma(), examId, order, { rating, note });
+    await rateQuestion(prisma(), examId, order, { rating, note, candidateAnswer });
     return c.json({ ok: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "could not rate question";

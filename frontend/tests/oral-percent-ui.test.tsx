@@ -56,7 +56,8 @@ function makeExam(over: Partial<OralExam> = {}): OralExam {
         weight: 18,
         rating: "richtig",
         note: "Sehr sicher",
-        question: { excelId: "BGB-01", question: "Frage 1?", answer: "Antwort 1" },
+        candidateAnswer: "Meine Antwort",
+        question: { excelId: "BGB-01", question: "Frage 1?", answer: "Antwort 1", source: null },
       },
     ],
     ...over,
@@ -100,11 +101,13 @@ async function renderExamPage() {
 }
 
 describe("oral result screen — percent only", () => {
-  it("shows the overall percent rounded and the result", async () => {
+  it("shows the overall percent with two decimals and the result", async () => {
     mockApi(makeExam());
     await renderExamPage();
-    // 78 % appears in the big result and in the breakdown total row.
-    expect(screen.getAllByText("78 %").length).toBeGreaterThanOrEqual(1);
+    // 77.5 must render as "77,50 %" everywhere — the same value the PDF shows.
+    // A rounded "78 %" here was the exact bug the customer reported.
+    expect(screen.getAllByText("77,50 %").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText("78 %")).toBeNull();
     expect(screen.getByText("Bestanden")).toBeTruthy();
   });
 
@@ -129,9 +132,10 @@ describe("oral result screen — percent only", () => {
     expect(bgb.textContent).toContain("100 %");
     expect(bgb.textContent).toContain("18 %");
 
-    // The total row carries the overall result.
+    // The total row carries the overall result, unrounded.
     expect(within(table).getByText("Gesamtergebnis")).toBeTruthy();
-    expect(table.textContent).toContain("78 %");
+    expect(table.textContent).toContain("77,50 %");
+    expect(table.textContent).not.toContain("78 %");
   });
 
   it("shows a fractional theme result exactly (no premature rounding)", async () => {

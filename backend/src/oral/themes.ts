@@ -106,6 +106,50 @@ export function normalizeThemeName(name: string): string {
   return ORAL_LEGACY_THEME_ALIASES[name] ?? name;
 }
 
+/**
+ * Short display labels for the 8 themes.
+ *
+ * The stored names are the authoritative Excel spellings and are never
+ * changed, but they are too long for a PDF table cell or a narrow phone
+ * screen (the merged theme is 74 characters). These labels are DISPLAY ONLY:
+ * reports and the UI still key everything by the full stored name.
+ */
+const ORAL_THEME_SHORT: Readonly<Record<string, string>> = {
+  "Buergerliches Gesetzbuch / Jedermannsrechte": "BGB / Jedermannsrechte",
+  "Straf- und Verfahrensrecht": "Straf- und Verfahrensrecht",
+  "Umgang mit Menschen / Deeskalation": "Umgang mit Menschen",
+  [ORAL_MERGED_THEME_NAME]: "Oeff. Sicherheit / Gewerberecht",
+  "Datenschutzrecht": "Datenschutzrecht",
+  "Unfallverhuetungsvorschriften": "UVV / DGUV",
+  "Umgang mit Waffen": "Umgang mit Waffen",
+  "Grundlagen der Sicherheitstechnik": "Sicherheitstechnik",
+};
+
+/** Short label for a theme (falls back to the full stored name). */
+export function shortThemeName(name: string): string {
+  const normalized = normalizeThemeName(name);
+  return ORAL_THEME_SHORT[normalized] ?? normalized;
+}
+
+/**
+ * Compact abbreviation used in a question heading, e.g. "BGB" in
+ * "Frage 1 - BGB". Derived from the short label's first segment.
+ */
+export function themeAbbreviation(name: string): string {
+  const normalized = normalizeThemeName(name);
+  const abbr: Record<string, string> = {
+    "Buergerliches Gesetzbuch / Jedermannsrechte": "BGB",
+    "Straf- und Verfahrensrecht": "StGB",
+    "Umgang mit Menschen / Deeskalation": "UmM",
+    [ORAL_MERGED_THEME_NAME]: "RdOesO/GewO",
+    "Datenschutzrecht": "Datenschutz",
+    "Unfallverhuetungsvorschriften": "UVV",
+    "Umgang mit Waffen": "Waffen",
+    "Grundlagen der Sicherheitstechnik": "Sicherheitstechnik",
+  };
+  return abbr[normalized] ?? shortThemeName(normalized);
+}
+
 export function themeByOrder(orderKey: number): OralThemeDef {
   const t = ORAL_THEMES.find((x) => x.orderKey === orderKey);
   if (!t) throw new Error(`unknown oral theme orderKey: ${orderKey}`);

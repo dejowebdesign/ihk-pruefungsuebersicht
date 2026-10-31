@@ -171,7 +171,16 @@ export interface OralExamQuestion {
   themeName: string;
   weight: number;
   rating: OralRating | null;
+  /** Examiner note (Prüferkommentar); null when none was written. */
   note: string | null;
+  /** The candidate's documented answer; null when none was written down. */
+  candidateAnswer: string | null;
+  /**
+   * The question as it was asked. `question`/`answer` are the FROZEN snapshot
+   * taken when the exam was created (the backend resolves the snapshot and
+   * falls back to the pool row for pre-snapshot exams), so a later pool edit
+   * cannot change what a historical exam shows.
+   */
   question: { excelId: string; question: string; answer: string | null; source: string | null };
 }
 
@@ -240,6 +249,8 @@ export interface OralUpdateInput {
 export interface OralRateInput {
   rating?: OralRating | null;
   note?: string | null;
+  /** The candidate's own answer, as documented during the exam. */
+  candidateAnswer?: string | null;
 }
 
 export interface AdminStatus {
