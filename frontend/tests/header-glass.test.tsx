@@ -246,11 +246,31 @@ describe("Header — dark glass stylesheet", () => {
   it("paints dark, milky glass with a real background blur", () => {
     const glass = supportsRule(".site-header__inner");
     expect(glass).toMatch(/background:\s*var\(--hd-glass\)/);
-    expect(glass).toMatch(/backdrop-filter:\s*blur\(18px\)\s*saturate\(150%\)/);
-    expect(glass).toMatch(/-webkit-backdrop-filter:\s*blur\(18px\)/);
+    expect(glass).toMatch(/backdrop-filter:\s*blur\(20px\)\s*saturate\(155%\)/);
+    expect(glass).toMatch(/-webkit-backdrop-filter:\s*blur\(20px\)/);
     // The fill must be translucent, or the page behind could not show through.
     const glassToken = css.match(/--hd-glass:\s*([^;]+);/);
     expect(glassToken?.[1]).toMatch(/^rgba\([^)]*0\.\d+\)$/);
+  });
+
+  it("keeps the fill translucent enough for the page to show through", () => {
+    // The brief asked for a brighter, more transparent bar. The alpha must be
+    // clearly below the old near-opaque 0.72/0.84 pair, the compact tint must
+    // still be denser than the top one, and — because "gute Lesbarkeit" is part
+    // of the brief — the top alpha must stay at the level where the nav label
+    // still clears WCAG AA (4.5:1) over the lightest surface the sticky bar can
+    // scroll across. 0.58 (as suggested) measured 3.99:1 there, so 0.64 is the
+    // floor.
+    const alpha = (name: string) =>
+      Number(css.match(new RegExp(`${name}:\\s*rgba\\([^)]*,\\s*(0\\.\\d+)\\)`))?.[1]);
+    const top = alpha("--hd-glass");
+    const compact = alpha("--hd-glass-strong");
+    expect(top, "--hd-glass not translucent enough").toBeLessThan(0.7);
+    expect(top, "--hd-glass below the AA-safe floor").toBeGreaterThanOrEqual(0.64);
+    expect(compact, "--hd-glass-strong not translucent enough").toBeLessThan(0.76);
+    expect(compact, "compact tint must stay denser than the top bar").toBeGreaterThan(top);
+    // Brighter anthracite/navy: the old fills were rgb(11,18,33)/rgb(9,16,30).
+    expect(css).toMatch(/--hd-glass:\s*rgba\(19,\s*30,\s*47,/);
   });
 
   it("keeps a dark fallback for browsers without backdrop-filter", () => {
@@ -385,7 +405,7 @@ describe("Header — logo slot", () => {
 });
 
 describe("Header — identity block", () => {
-  it("shows both the username and the role chip", async () => {
+  it("shows only the role badge, never the username", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       status: 200,
@@ -396,11 +416,29 @@ describe("Header — identity block", () => {
     const { Header } = await import("@/components/Header");
     const { container } = render(<Header />);
     await waitFor(() => expect(screen.getByText("Administrator")).toBeInTheDocument());
-    // The brief requires the account name AND the role label to stay visible.
-    expect(container.querySelector(".session__role--admin")?.textContent).toBe("Administrator");
-    expect(container.querySelector(".session__name")?.textContent).toBe("admin");
-    // The name ellipsises instead of widening the bar on a narrow screen.
-    expect(rule(".session__name", "text-overflow")).toMatch(/text-overflow:\s*ellipsis/);
+    // The single badge carries the role; the account name is not shown at all —
+    // not as text and not in a tooltip.
+    const badge = container.querySelector(".session__role--admin");
+    expect(badge?.textContent).toBe("Administrator");
+    expect(screen.queryByText("admin")).not.toBeInTheDocument();
+    expect(container.querySelector(".session__name")).toBeNull();
+    expect(container.querySelector(".session__user")).toBeNull();
+    expect(container.querySelector("[title*='admin']")).toBeNull();
+  });
+
+  it("labels the examiner role as Prüfer", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () =>
+        JSON.stringify({ user: { id: "u1", username: "anna", role: "examiner", active: true } }),
+    } as unknown as Response);
+
+    const { Header } = await import("@/components/Header");
+    const { container } = render(<Header />);
+    await waitFor(() => expect(screen.getByText("Prüfer")).toBeInTheDocument());
+    expect(container.querySelector(".session__role--examiner")?.textContent).toBe("Prüfer");
+    expect(screen.queryByText("anna")).not.toBeInTheDocument();
   });
 });
 
@@ -452,6 +490,43 @@ describe("Header — no layout shift", () => {
     // bar out of flow, so the page's own box is untouched.
     const compact = rule(".site-header--scrolled .site-header__inner", "--header-bar-h");
     expect(compact).not.toMatch(/position:\s*fixed|position:\s*absolute/);
+  });
+});
+
+describe("Header — band matches the visible bar", () => {
+  it("reserves exactly the bar's height, with no dead space", () => {
+    // The old band was 116px while the bar was only 96px, so 20px of empty
+    // header container sat between the bar and the first page block. The band
+    // and the bar must now agree, or a full-bleed hero cannot sit flush.
+    const band = Number(css.match(/--header-h:\s*(\d+)px/)?.[1]);
+    const bar = Number(css.match(/--header-bar-h:\s*(\d+)px/)?.[1]);
+    expect(band, "--header-h must equal --header-bar-h").toBe(bar);
+  });
+
+  it("drops the page's top padding only when a full-bleed band leads", () => {
+    // The start page hero paints its own top padding, so `.page`'s 28px would
+    // read as an empty strip under the bar. Scoped with `:has()` so every other
+    // page keeps its spacing.
+    const flush = rule(".page:has(> .hero)", "padding-top");
+    expect(flush).toMatch(/padding-top:\s*0/);
+    // The default padding is untouched for every other page.
+    expect(rule(".page", "padding: 28px")).toMatch(/padding:\s*28px 0 56px/);
+    // The hero must still own its own top padding — the gap is removed, not
+    // simply replaced by a touching edge.
+    const hero = rule(".hero", "background-position");
+    expect(hero).toMatch(/padding:\s*\d+px 0/);
+  });
+
+  it("keeps the band equal to the bar at every breakpoint", () => {
+    // The phone block shortens the bar to 84px; if `--header-h` did not follow,
+    // the band would reserve 12px of dead space between the bar and the hero —
+    // the very gap this order removes, only on mobile.
+    const at = css.indexOf("@media (max-width: 768px)");
+    expect(at, "phone breakpoint missing").toBeGreaterThan(-1);
+    const block = css.slice(at, css.indexOf("\n}", at));
+    const band = Number(block.match(/--header-h:\s*(\d+)px/)?.[1]);
+    const bar = Number(block.match(/--header-bar-h:\s*(\d+)px/)?.[1]);
+    expect(band, "mobile --header-h must equal --header-bar-h").toBe(bar);
   });
 });
 
