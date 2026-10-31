@@ -17,6 +17,13 @@
   --glass-strong: rgba(246, 248, 250, 0.88); /* dialog, sticky header */
   --glass-blur: 14px;
   --glass-blur-sm: 8px;
+  /* One reusable glass recipe for the raised surfaces (cards, panels, dialogs,
+     dropdowns, chips). Centralising the three ingredients — translucent fill,
+     hairline contour, soft shadow — keeps every frosted surface consistent and
+     lets a theme override all of them by swapping these tokens. */
+  --glass-border: rgba(255, 255, 255, 0.55); /* light top edge of the pane */
+  --glass-shadow: 0 1px 2px rgba(37, 45, 53, 0.05), 0 10px 28px rgba(37, 45, 53, 0.09);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.6); /* top light catch */
 
   /* Hairline contours — deliberately translucent so glass layers stack. */
   --border: rgba(78, 91, 104, 0.22);
@@ -76,53 +83,64 @@
 
   --maxw: 1200px;
 
-  /* The header occupies a constant band of `--header-h`. The visible bar floats
-     inside that band and only changes its own height, so compacting it never
-     reflows the page below — no content jump, no gap, and the band's height is
-     what `--header-h` means to every other rule. */
-  --header-h: 66px;
-  --header-bar-h: 56px;
-  --header-bar-h-compact: 48px;
-  --logo-h: 38px;
-  --logo-h-compact: 30px;
-  --header-gap: 18px;
-  --header-gap-compact: 12px;
-  --header-pad: 10px; /* breathing room between the bar and the viewport edge */
-  --header-pad-compact: 8px;
-  --header-gap-x: 22px; /* horizontal padding inside the bar */
-  --header-gap-x-compact: 16px;
-  --header-radius: 18px;
-  --header-radius-compact: 14px;
-  /* One shared curve so every part of the shrink (height, padding, logo,
+  /* The header occupies a constant band. At the top it is FULL-BLEED: the bar
+     spans the whole viewport with no edge gap and no rounding. Once scrolled it
+     narrows horizontally (the primary motion) and only drops a little height,
+     so it becomes a floating rounded glass strip instead of a thin line. The
+     band height never changes, so the page below never moves. */
+  --header-h: 116px;
+  --header-bar-h: 96px;
+  --header-bar-h-compact: 84px;
+  --logo-h: 54px;
+  --logo-h-compact: 46px;
+  --header-gap: 20px;
+  --header-gap-compact: 16px;
+  --header-pad: 0px; /* full-bleed at the top: flush with the viewport edge */
+  --header-pad-compact: 10px;
+  --header-gap-x: 30px; /* horizontal padding inside the bar */
+  --header-gap-x-compact: 24px;
+  --header-radius: 0px; /* square while full-bleed */
+  --header-radius-compact: 22px; /* rounded once it floats */
+  /* The visible bar is 100% wide at the top and ~90% while scrolled, capped so
+     it never grows into a huge letterbox on very wide monitors. The cap only
+     applies to the compact state — at the top the bar is genuinely full-bleed
+     at any viewport width. */
+  --header-width: 100%;
+  --header-width-compact: 90%;
+  --header-maxw: 100%;
+  --header-maxw-compact: 1440px;
+  /* One shared curve so every part of the shrink (width, height, padding, logo,
      spacing, rounding) moves in lockstep. */
-  --header-motion: 280ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  --header-motion: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* ── dark-glass header palette ────────────────────────────────────────────
      The navigation is deliberately dark in BOTH themes (that is the requested
-     look), so these are fixed values rather than theme tokens. They are
-     measured against the worst case — the glass over a white page, which is the
-     lightest surface it can ever sit on:
+     look), so these are fixed values rather than theme tokens. The fill, blur
+     and shadow are lifted from the reference bar (a translucent anthracite
+     over `blur(18px) saturate(150%)`), then re-checked against the worst case —
+     the glass over a white page, the lightest surface it can ever sit on:
        text         #eef3fa on glass  5.9:1   (16.0:1 on the solid fallback)
        text-muted   #d5dde8 on glass  4.9:1   (12.6:1)
-       accent-ink   #9ff2e2 on the active pill  4.7:1
+       accent-ink   #6ff0dc on the active pill  6.1:1
        primary-ink  #cfe8ff on the role chip    5.6:1 (opaque chip)
      Every value therefore clears WCAG AA for normal text in both themes. */
-  --hd-glass: rgba(15, 23, 42, 0.70);
-  --hd-glass-strong: rgba(11, 18, 33, 0.82); /* compact state: a touch denser */
-  --hd-solid: #131b2b; /* fallback where backdrop-filter is unsupported */
+  --hd-glass: rgba(11, 18, 33, 0.72);
+  --hd-glass-strong: rgba(9, 16, 30, 0.84); /* compact state: a touch denser */
+  --hd-solid: #101828; /* fallback where backdrop-filter is unsupported */
   --hd-border: rgba(255, 255, 255, 0.10);
-  --hd-border-strong: rgba(255, 255, 255, 0.16);
+  --hd-border-strong: rgba(110, 168, 254, 0.16); /* blue hairline, as reference */
   --hd-text: #eef3fa;
   --hd-text-muted: #d5dde8;
   --hd-accent: #7fe3d0;
-  --hd-accent-ink: #9ff2e2;
+  --hd-accent-ink: #6ff0dc;
   --hd-primary-ink: #cfe8ff;
   --hd-primary-soft: rgba(48, 76, 105, 0.85);
-  --hd-accent-soft: rgba(13, 148, 136, 0.26);
+  --hd-accent-soft: rgba(15, 46, 44, 0.85);
   --hd-surface: rgba(255, 255, 255, 0.07); /* hover / control fill */
   --hd-surface-hover: rgba(255, 255, 255, 0.13);
-  --hd-shadow: 0 8px 30px rgba(0, 0, 0, 0.18), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  --hd-shadow-compact: 0 12px 34px rgba(0, 0, 0, 0.34), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  --hd-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.45);
+  --hd-shadow-compact: 0 6px 16px -8px rgba(0, 0, 0, 0.75),
+    0 2px 6px rgba(0, 0, 0, 0.45);
 
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", sans-serif;
@@ -143,6 +161,11 @@
   --bg-elevated: #182029;
   --glass: rgba(30, 39, 50, 0.72);
   --glass-strong: rgba(26, 34, 44, 0.9);
+  /* Dark-mode glass reads by its edge, not its fill: a very faint light
+     contour on top of a deep fill. */
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 30px rgba(0, 0, 0, 0.5);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   --border: rgba(148, 165, 184, 0.2);
   --border-strong: rgba(148, 165, 184, 0.36);
@@ -328,12 +351,18 @@ h4 {
 }
 
 /* ── header ───────────────────────────────────────────────────────────────
-   A floating dark-glass navigation bar.
+   A dark-glass navigation bar that is FULL-BLEED at the top and pulls in
+   horizontally once the page is scrolled.
 
    `.site-header` is the positioning frame and reserves a CONSTANT band of
-   `--header-h`; the visible bar lives in `.site-header__inner` and only changes
-   its own height, so compacting it never reflows the page underneath — no
+   `--header-h`; the visible bar lives in `.site-header__inner`. Only the bar's
+   own width/height change, so compacting never reflows the page underneath — no
    content jump, no white gap at the seam.
+
+   The three areas are a grid (`brand | center | actions`) rather than a flex
+   row with `margin-left: auto`. That is what keeps the layout identical when
+   the middle column is empty (login page) and when the identity block is
+   absent: the columns have fixed tracks, so nothing slides sideways.
 
    The glass is deliberately dark in both themes (the requested look), so the
    bar does not read the theme tokens; the `--hd-*` palette above is fixed and
@@ -357,23 +386,33 @@ h4 {
 .site-header__inner {
   position: relative;
   pointer-events: auto;
-  width: 100%;
-  max-width: min(var(--maxw), 100% - 2 * var(--header-pad));
+  /* Width is the PRIMARY motion: 100% flush at the top, ~90% centred once
+     scrolled, capped so very wide monitors do not stretch it. */
+  width: var(--header-width);
+  max-width: min(var(--header-maxw), 100% - 2 * var(--header-pad));
   margin: 0 auto;
   height: var(--header-bar-h);
   padding: 0 var(--header-gap-x);
-  display: flex;
+  /* Stable three-column track: logo | navigation | actions. Both outer tracks
+     are equal fractions, so the middle track — and therefore the navigation
+     inside it — sits exactly on the bar's centre line. (`auto 1fr auto` would
+     shift the nav off-centre whenever the two sides differ in width, which they
+     do: the logo and the identity block are not the same size.) The `minmax(0,
+     …)` floor lets the tracks shrink below their content instead of forcing the
+     bar wider, which is what stops the identity block overflowing on phones. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: var(--header-gap);
+  column-gap: var(--header-gap);
   border: 1px solid var(--hd-border);
   border-radius: var(--header-radius);
   /* Fallback for browsers without backdrop-filter: an opaque dark bar. */
   background: var(--hd-solid);
   box-shadow: var(--hd-shadow);
   /* Every dimension of the shrink shares one duration and one curve, so the
-     height, the logo and the spacing all land together. */
-  transition: height var(--header-motion), padding var(--header-motion),
-    gap var(--header-motion), max-width var(--header-motion),
+     width, height, logo and spacing all land together. */
+  transition: width var(--header-motion), height var(--header-motion),
+    padding var(--header-motion), column-gap var(--header-motion),
     border-radius var(--header-motion), border-color var(--header-motion),
     background-color var(--header-motion), box-shadow var(--header-motion);
 }
@@ -382,19 +421,23 @@ h4 {
     /* Dark, milky glass: a translucent anthracite fill over a heavy blur, plus
        a hairline highlight on the top edge for the "polished" read. */
     background: var(--hd-glass);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
   }
   .site-header--scrolled .site-header__inner {
     background: var(--hd-glass-strong);
   }
 }
 /* ── compact state (after the scroll threshold) ─────────────────────────── */
-/* The edge gap lives on the frame, so it shrinks here rather than on the bar. */
+/* The edge gap lives on the frame, so it shrinks here rather than on the bar.
+   Width narrows the most (100% → 90%); height only drops a little, so the bar
+   stays comfortable instead of becoming a thin line. */
 .site-header--scrolled {
   --header-pad: var(--header-pad-compact);
 }
 .site-header--scrolled .site-header__inner {
+  --header-width: var(--header-width-compact);
+  --header-maxw: var(--header-maxw-compact);
   --header-bar-h: var(--header-bar-h-compact);
   --header-gap-x: var(--header-gap-x-compact);
   --header-gap: var(--header-gap-compact);
@@ -404,12 +447,13 @@ h4 {
   box-shadow: var(--hd-shadow-compact);
 }
 .site-header--scrolled .nav a {
-  padding: 5px 10px;
+  height: 34px;
+  padding: 0 11px;
 }
 .site-header--scrolled .theme-toggle,
 .site-header--scrolled .nav__toggle {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
 }
 /* The global focus ring uses --primary, which is invisible on the dark glass.
    The mint accent keeps keyboard focus clearly visible on the bar itself. */
@@ -422,23 +466,13 @@ h4 {
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 1.02rem;
   color: var(--hd-text);
-  letter-spacing: -0.01em;
-  /* The logo never shrinks; the wordmark may ellipsize so a narrow viewport
-     loses letters instead of pushing the controls off the bar. */
-  flex-shrink: 1;
-  min-width: 0;
+  /* The logo never shrinks: on a narrow bar the middle column yields instead,
+     which is what keeps the brand mark whole. */
+  flex-shrink: 0;
 }
 .brand:hover {
   text-decoration: none;
-}
-.brand__text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 /* The uploaded logo is used as-is: original file, original aspect ratio, no
    filter, no recolouring, no cropping. `contain` guarantees it is never
@@ -447,7 +481,7 @@ h4 {
   display: block;
   height: var(--logo-h);
   width: auto;
-  max-width: 220px;
+  max-width: 260px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -472,22 +506,42 @@ h4 {
   background: linear-gradient(140deg, var(--accent-deep), var(--primary));
   color: #0c1319;
 }
+
+/* ── header columns ───────────────────────────────────────────────────────
+   The middle column is always present (even when empty on /login) and centres
+   its content; the right column always ends with the theme toggle. Fixed tracks
+   + `margin-left: auto` on the toggle mean the control never moves between
+   signed-out, admin and examiner states. */
+.header__center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
 .nav {
   display: flex;
   align-items: center;
   gap: 2px;
-  margin-left: auto;
   min-width: 0;
 }
 .nav a {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
   color: var(--hd-text-muted);
   font-weight: 500;
-  padding: 7px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.92rem;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
   white-space: nowrap;
   transition: background var(--header-motion), color var(--header-motion),
-    padding var(--header-motion);
+    padding var(--header-motion), height var(--header-motion);
 }
 .nav a:hover {
   background: var(--hd-surface);
@@ -504,8 +558,8 @@ h4 {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   padding: 0;
   background: var(--hd-surface);
   border: 1px solid var(--hd-border-strong);
@@ -523,9 +577,11 @@ h4 {
 .theme-toggle {
   display: inline-grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  margin-left: 8px;
+  width: 42px;
+  height: 42px;
+  /* Pinned to the far right of the actions column, so it stays the rightmost
+     control in every state. */
+  margin-left: auto;
   background: var(--hd-surface);
   border: 1px solid var(--hd-border-strong);
   border-radius: var(--radius-sm);
@@ -1271,6 +1327,66 @@ p.state {
   gap: 6px;
 }
 
+/* ── back to top ─────────────────────────────────────────────────────────
+   Round, floating glass control fixed to the bottom-right. Hidden (and taken
+   out of the tab order via `visibility`) until the page has scrolled far
+   enough, then fades/scales in. `pointer-events: none` while hidden means it
+   can never intercept a click meant for the page behind it. */
+.to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 999px;
+  color: var(--hd-text);
+  border: 1px solid var(--hd-border-strong);
+  background: var(--hd-solid);
+  box-shadow: var(--hd-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.92);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 0s linear 220ms,
+    background 180ms ease, border-color 180ms ease;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .to-top {
+    background: var(--hd-glass-strong);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+}
+.to-top--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 0s,
+    background 180ms ease, border-color 180ms ease;
+}
+.to-top:hover {
+  background: var(--hd-surface-hover);
+  border-color: var(--hd-accent);
+  color: var(--hd-accent-ink);
+}
+.to-top:focus-visible {
+  outline: 2px solid var(--hd-accent-ink);
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .to-top {
+    right: 16px;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
 /* ── admin ─────────────────────────────────────────────────────────────── */
 .admin-card {
   background: var(--bg-solid);
@@ -1318,9 +1434,23 @@ p.state {
 }
 
 /* ── responsive ────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
+/* The inline navigation gives way to the existing hamburger dropdown as soon as
+   the widest realistic row no longer fits. The admin row (logo + five entries +
+   identity + toggle) needs roughly 1050px, so the breakpoint sits just below
+   that rather than at the usual phone width — otherwise the entries would be
+   squeezed against the identity block. */
+@media (max-width: 1049px) {
   .nav {
     display: none;
+  }
+  /* With the inline navigation gone the middle track would be empty and still
+     claim half the bar. Collapsing it to zero width hands that space to the
+     actions column, so the identity block fits a phone without overflowing.
+     The centre box itself stays in the DOM (not `display:none`) because the
+     mobile dropdown is its child; it is not positioned, so the absolute panel
+     still anchors to the bar. */
+  .site-header__inner {
+    grid-template-columns: auto 0 minmax(0, 1fr);
   }
   /* The mobile menu keeps its existing structure — a dropdown panel anchored to
      the bar — and only takes on the header's dark glass. It is positioned
@@ -1338,14 +1468,14 @@ p.state {
     gap: 2px;
     background: var(--hd-solid);
     border: 1px solid var(--hd-border);
-    border-radius: var(--header-radius);
+    border-radius: 18px;
     box-shadow: var(--hd-shadow-compact);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .nav--open {
       background: var(--hd-glass-strong);
-      -webkit-backdrop-filter: blur(20px) saturate(140%);
-      backdrop-filter: blur(20px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      backdrop-filter: blur(18px) saturate(150%);
     }
   }
   /* Menu rows stay at a comfortable tap size even when the bar is compact; the
@@ -1358,8 +1488,10 @@ p.state {
   }
   .nav__toggle {
     display: inline-flex;
-    margin-left: auto;
   }
+}
+
+@media (max-width: 768px) {
   /* On a narrow viewport `cover` has to crop the photo horizontally and keeps
      the right half (the officer). The text then spans the full width instead of
      sitting only over the dark left side, so the scrim is evened out into a
@@ -1390,8 +1522,34 @@ p.state {
   .detail-head__name {
     font-size: 1.45rem;
   }
+  /* Phones/tablets: the full-bleed bar is a touch shorter and its edge padding
+     tighter, so a 96px band does not eat a large share of a small viewport. The
+     shrink-on-scroll behaviour is unchanged. */
+  .site-header {
+    --header-bar-h: 84px;
+    --header-bar-h-compact: 72px;
+    --logo-h: 46px;
+    --logo-h-compact: 40px;
+    --header-gap-x: 18px;
+    --header-gap-x-compact: 16px;
+    --header-pad-compact: 8px;
+  }
   .site-header__inner {
-    gap: 12px;
+    column-gap: 12px;
+  }
+}
+
+/* Very small phones (≤380px): the brand and spacing step down so the row still
+   fits. The identity-specific overrides live at the end of the file, after the
+   `.session*` base rules they must beat. */
+@media (max-width: 380px) {
+  .site-header {
+    --logo-h: 40px;
+    --logo-h-compact: 34px;
+    --header-gap-x: 14px;
+    --header-gap-x-compact: 12px;
+    --header-gap: 10px;
+    --header-gap-compact: 8px;
   }
 }
 
@@ -1761,19 +1919,21 @@ p.state {
 
 /* ── session / identity (header) ──────────────────────────────────────────
    Sits on the dark glass, so the labels use the fixed header palette rather
-   than the page tokens. The role chip is the one opaque element — it carries
-   the role name, which must never be lost in the blur. */
+   than the page tokens. Only the ROLE is shown (no username) as a small glass
+   chip; the sign-out button follows it, and the theme toggle after that is the
+   rightmost control. */
 .session {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: auto;
-  /* Shrinkable, so a narrow bar compresses the identity text instead of
-     overflowing. The bar is a flex row with no wrap; every child that can
-     yield space must be allowed to. */
+  /* Shrinkable, so a narrow bar compresses the chip instead of overflowing.
+     The bar is a grid with no wrap; every child that can yield space must be
+     allowed to. */
   min-width: 0;
   flex-shrink: 1;
 }
+/* Username + role wrapper. Shrinkable, so a long name ellipsises rather than
+   widening the bar. */
 .session__user {
   display: flex;
   align-items: center;
@@ -1794,16 +1954,19 @@ p.state {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The role chip: a small frosted pill with a light contour, matching the glass
+   language of the bar. */
 .session__role {
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
+  letter-spacing: 0.06em;
+  padding: 5px 11px;
   border-radius: 999px;
   background: var(--hd-surface);
   color: var(--hd-text-muted);
   border: 1px solid var(--hd-border-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   white-space: nowrap;
 }
 .session__role--admin {
@@ -2073,9 +2236,6 @@ p.state {
   .oral-row-actions {
     justify-content: flex-start;
   }
-  .session__name {
-    max-width: 90px;
-  }
   .modal__actions {
     flex-direction: column-reverse;
   }
@@ -2240,5 +2400,50 @@ p.state {
   }
   .oral-result__big {
     font-size: 2.8rem;
+  }
+}
+
+/* ── narrow-screen header identity ────────────────────────────────────────
+   These overrides sit at the END of the file on purpose. A `@media` block adds
+   no specificity, so a later plain `.session__role` rule would silently win
+   over an earlier media override — the trap that let the role chip overflow a
+   320px bar. Keeping them last (and thus after the `.session*` base rules)
+   makes the small-screen step-down actually take effect. */
+@media (max-width: 560px) {
+  /* The sign-out button drops its word and keeps the icon; its accessible name
+     is on the button (`aria-label`), so nothing is lost to a screen reader. */
+  .session__logout-text {
+    display: none;
+  }
+  .session__logout {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  /* The username shortens to an ellipsis before anything is allowed to push the
+     bar wider. It stays visible (the brief requires the account name). */
+  .session__name {
+    max-width: 84px;
+  }
+}
+
+@media (max-width: 380px) {
+  .header__actions,
+  .session {
+    gap: 8px;
+  }
+  .session__user {
+    gap: 6px;
+  }
+  .session__name {
+    max-width: 56px;
+  }
+  .session__role {
+    padding: 4px 8px;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+  }
+  .session__logout {
+    padding-left: 9px;
+    padding-right: 9px;
   }
 }
