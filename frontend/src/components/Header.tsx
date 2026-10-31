@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIdentity } from "@/lib/use-identity";
+import { useScrolled } from "@/lib/use-scrolled";
 import { roleLabel } from "@/lib/auth";
 
 // Navigation is role-aware: examiners only see the areas the server lets them
@@ -17,10 +18,17 @@ const ALL_LINKS = [
   { href: "/admin", label: "Verwaltung", roles: ["admin"] },
 ];
 
-export function Header() {
+/**
+ * @param logoSrc  Path of the uploaded logo file, or `null` while no file is
+ *                 present in `public/`. The decision is made on the server (see
+ *                 layout.tsx) so a missing file never renders a broken image and
+ *                 the fallback mark is chosen once, not after a failed request.
+ */
+export function Header({ logoSrc = null }: { logoSrc?: string | null }) {
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const scrolled = useScrolled();
   const { user, loaded, logout } = useIdentity();
 
   const links = ALL_LINKS.filter((l) => !user || l.roles.includes(user.role));
@@ -33,13 +41,20 @@ export function Header() {
   }
 
   return (
-    <header className="site-header">
+    <header className={`site-header${scrolled ? " site-header--scrolled" : ""}`}>
       <div className="site-header__inner">
         <Link href="/" className="brand">
-          <span className="brand__mark" aria-hidden="true">
-            IHK
-          </span>
-          <span>Prüfungsübersicht</span>
+          {logoSrc ? (
+            // The uploaded file, unmodified: original proportions via
+            // `object-fit: contain`, no filter and no recolouring.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="brand__logo" src={logoSrc} alt="IHK" />
+          ) : (
+            <span className="brand__mark" aria-hidden="true">
+              IHK
+            </span>
+          )}
+          <span className="brand__text">Prüfungsübersicht</span>
         </Link>
 
         {!onLoginPage && (
