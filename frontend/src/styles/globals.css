@@ -1903,3 +1903,162 @@ p.state {
     width: 100%;
   }
 }
+
+/* ── post-exam question review (accordion cards) ────────────────────────── */
+.oral-section {
+  margin-top: 24px;
+  text-align: left;
+}
+.oral-section__summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+.oral-hint {
+  margin: 10px 0 4px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+.oral-qcards {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.oral-qcard {
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+.oral-qcard__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.oral-qcard__summary::marker {
+  color: var(--text-muted);
+}
+.oral-qcard__num {
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.oral-qcard__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 180px;
+}
+.oral-qcard__theme {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.oral-qcard__id {
+  font-size: 0.76rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text-muted);
+}
+.oral-qcard__rating {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text-muted);
+}
+.oral-qcard__rating--richtig {
+  color: #15803d;
+  border-color: #15803d55;
+  background: #15803d14;
+}
+.oral-qcard__rating--partial {
+  color: #b45309;
+  border-color: #b4530955;
+  background: #b4530914;
+}
+.oral-qcard__rating--falsch {
+  color: #b91c1c;
+  border-color: #b91c1c55;
+  background: #b91c1c14;
+}
+.oral-qcard__body {
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.oral-qcard__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.oral-qcard__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.oral-qcard__text {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.oral-qcard__text--pre {
+  white-space: pre-wrap;
+}
+.oral-qcard__text--muted {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.oral-qcard__share {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+.oral-qcard__solution {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  padding: 10px 12px;
+}
+.oral-qcard__solution-summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+.oral-qcard__solution .oral-qcard__text {
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .oral-qcard__summary {
+    gap: 6px 10px;
+    padding: 12px;
+  }
+  .oral-qcard__meta {
+    flex: 1 1 100%;
+  }
+  .oral-qcard__body {
+    padding: 4px 12px 12px;
+  }
+  .oral-qcard__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .oral-result__big {
+    font-size: 2.8rem;
+  }
+}

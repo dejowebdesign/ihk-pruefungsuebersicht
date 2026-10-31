@@ -412,6 +412,15 @@ model OralExamQuestion {
   question    OralQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
   orderKey    Int        // 1..13 (fixed slots in theme order, then the rotating one)
   themeName   String     // snapshot of the theme name at creation time
+  // ── Question snapshot ────────────────────────────────────────────────────
+  // The wording the candidate was ACTUALLY asked, frozen at creation time.
+  // The live OralQuestion row is also linked (questionId), but it is mutable
+  // (re-imports rewrite it), so the report must read these fields instead:
+  // otherwise a later pool edit would silently change a historical report.
+  // Nullable for rows created before this snapshot existed; readers fall back
+  // to the linked pool row for those (see pdf.ts / api routes).
+  questionText String?   // full original wording at exam time
+  answerText   String?   // full Musterlösung at exam time
   // Snapshot of the THEME weight (percent) at creation time. Phase 11: this is
   // the theme's weight, NOT a per-question share — the scorer divides by the
   // number of questions asked from the theme, so the weight stays fixed whether
@@ -419,7 +428,10 @@ model OralExamQuestion {
   weight      Int
   rating      String?    // "richtig" | "teilweise richtig" | "falsch" | null
   points      Float      @default(0) // Excel G-column value
-  note        String?    // examiner note
+  note        String?    // examiner note (Prüferkommentar)
+  // The candidate's own answer, as documented by the examiner during the exam.
+  // Optional: an exam can be rated without writing the answer down.
+  candidateAnswer String?
 
   @@unique([examId, orderKey])
   @@unique([examId, questionId])

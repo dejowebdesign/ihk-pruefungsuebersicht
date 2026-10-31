@@ -47,7 +47,10 @@ export interface CreateExamInput {
 
 export interface RateInput {
   rating?: Rating | null;
+  /** Examiner note (Prüferkommentar). */
   note?: string | null;
+  /** The candidate's own answer as documented during the exam. */
+  candidateAnswer?: string | null;
 }
 
 type Tx = Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0];
@@ -128,9 +131,15 @@ export async function createExam(
   // Build the per-theme pool map from the stored themes/questions.
   const themes = await db.oralTheme.findMany();
   const themeNameById = new Map(themes.map((t) => [t.id, normalizeThemeName(t.name)]));
+  // `question`/`answer` are read here so the exam can freeze the wording the
+  // candidate was actually asked. The pool row may be rewritten later by a
+  // re-import; the exam must not follow that change.
   const allQ = await db.oralQuestion.findMany({
-    select: { id: true, excelId: true, themeId: true },
+    select: { id: true, excelId: true, themeId: true, question: true, answer: true },
   });
+  const snapshotById = new Map(
+    allQ.map((q) => [q.id, { questionText: q.question, answerText: q.answer }]),
+  );
   const pool = allQ.map((q) => ({
     id: q.id,
     excelId: q.excelId,
@@ -171,19 +180,25 @@ export async function createExam(
         },
       });
 
-      // Snapshot theme name + theme weight at creation so the exam stays stable
-      // even if the pool/themes change later.
+      // Snapshot theme name, theme weight AND the full question wording at
+      // creation, so the exam stays stable even if the pool/themes change later.
       await tx.oralExamQuestion.createMany({
-        data: slots.map((s) => ({
-          examId: exam.id,
-          questionId: s.questionId,
-          orderKey: s.orderKey,
-          themeName: s.themeName,
-          weight: s.weight,
-          rating: null,
-          points: 0, // legacy column; percent scoring does not use it
-          note: null,
-        })),
+        data: slots.map((s) => {
+          const snap = snapshotById.get(s.questionId);
+          return {
+            examId: exam.id,
+            questionId: s.questionId,
+            orderKey: s.orderKey,
+            themeName: s.themeName,
+            weight: s.weight,
+            questionText: snap?.questionText ?? null,
+            answerText: snap?.answerText ?? null,
+            rating: null,
+            points: 0, // legacy column; percent scoring does not use it
+            note: null,
+            candidateAnswer: null,
+          };
+        }),
       });
 
       await recomputeScoreTx(tx, exam.id);
@@ -221,6 +236,8 @@ export async function rateQuestion(
         rating: rating ?? null,
         points: 0,
         note: input.note === undefined ? item.note : input.note,
+        candidateAnswer:
+          input.candidateAnswer === undefined ? item.candidateAnswer : input.candidateAnswer,
       },
     });
 

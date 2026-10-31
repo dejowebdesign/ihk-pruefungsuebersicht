@@ -23,6 +23,7 @@ import {
   ORAL_OTHER_THEME_NAMES,
 } from "../src/oral/themes";
 import { textWidth, PDF_METRICS } from "../src/oral/pdf-writer";
+import { formatOverallPercent } from "../src/oral/format";
 import { createApp } from "../src/api/app";
 import { bootstrapAdmin } from "../src/auth/service";
 
@@ -87,9 +88,30 @@ function extractPdfText(pdf: Buffer): string {
         i += 1;
       }
     }
-    out.push(s);
+    // The bytes are WinAnsi(CP1252), not Latin-1: 0x95 is the bullet (U+2022),
+    // not the C1 control character. Decoding them as Latin-1 would make every
+    // "\u2022" in the pool text compare unequal to the rendered bullet.
+    out.push([...s].map(winAnsiToUnicode).join(""));
   }
   return out.join("\n");
+}
+
+/** Map one WinAnsi(CP1252) character to its Unicode equivalent. */
+function winAnsiToUnicode(ch: string): string {
+  const code = ch.charCodeAt(0);
+  if (code >= 0x80 && code <= 0x9f) {
+    const table: Record<number, string> = {
+      0x80: "\u20ac", 0x82: "\u201a", 0x83: "\u0192", 0x84: "\u201e",
+      0x85: "\u2026", 0x86: "\u2020", 0x87: "\u2021", 0x88: "\u02c6",
+      0x89: "\u2030", 0x8a: "\u0160", 0x8b: "\u2039", 0x8c: "\u0152",
+      0x8e: "\u017d", 0x91: "\u2018", 0x92: "\u2019", 0x93: "\u201c",
+      0x94: "\u201d", 0x95: "\u2022", 0x96: "\u2013", 0x97: "\u2014",
+      0x98: "\u02dc", 0x99: "\u2122", 0x9a: "\u0161", 0x9b: "\u203a",
+      0x9c: "\u0153", 0x9e: "\u017e", 0x9f: "\u0178",
+    };
+    return table[code] ?? ch;
+  }
+  return ch;
 }
 
 /** A text operation recovered from the PDF content stream, with its position. */
@@ -199,13 +221,27 @@ function extractFilledRects(pdf: Buffer): PositionedRect[] {
   return rects;
 }
 
+/** Height of the result box in pdf.ts (kept in sync deliberately). */
+const RESULT_BOX_HEIGHT = 68;
+
 /** The result box: full content width and the known box height. */
 function findResultBox(pdf: Buffer): PositionedRect {
   const box = extractFilledRects(pdf).find(
-    (r) => r.height === 64 && Math.abs(r.width - (PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN * 2)) < 0.01,
+    (r) =>
+      r.height === RESULT_BOX_HEIGHT &&
+      Math.abs(r.width - (PDF_METRICS.PAGE_WIDTH - PDF_METRICS.MARGIN * 2)) < 0.01,
   );
   if (!box) throw new Error("result box not found in the PDF");
   return box;
+}
+
+/**
+ * The PDF stores long texts wrapped across several `Tj` operations, so the
+ * extracted text contains newlines where the renderer broke a line. Comparing
+ * a full Fragestellung/Musterlösung therefore has to normalise whitespace.
+ */
+function normalizeWs(s: string): string {
+  return s.replace(/\s+/g, " ").trim();
 }
 
 async function createRatedExam(
@@ -297,7 +333,9 @@ describe("PDF content matches the stored results", () => {
     const text = extractPdfText(Buffer.from(await res.arrayBuffer()));
 
     // The PDF must show exactly what the database holds — no recomputation.
-    expect(text).toContain(`${Math.round(stored!.percent)} %`);
+    // The overall result uses TWO decimals with a German comma, so it can never
+    // disagree with the UI (the "77 %" vs "77.25 %" bug).
+    expect(text).toContain(`${formatOverallPercent(stored!.percent)} %`);
     expect(text).toContain(stored!.result!);
     expect(text).toContain("Parität Prüfling");
     // No points anywhere in the PDF (Phase 11 removed the points system).
@@ -321,13 +359,19 @@ describe("PDF content matches the stored results", () => {
     const res = await app.request(`/api/oral/exams/${examId}/pdf`, { headers: adminToken() });
     const text = extractPdfText(Buffer.from(await res.arrayBuffer()));
 
+    // Every one of the 13 questions appears with its FULL original wording and
+    // its FULL Musterlösung — a bare Frage-ID is not enough.
+    const flat = normalizeWs(text);
     for (const item of items) {
-      // Frage-ID is printed verbatim, so every pooled question shows up.
-      expect(text).toContain(item.question.excelId);
-      // The theme weight snapshot is rendered as a percentage.
-      expect(text).toContain(`${item.weight} %`);
+      expect(text, `Frage-ID ${item.question.excelId} missing`).toContain(item.question.excelId);
+      expect(flat, `Fragestellung for ${item.question.excelId} missing`).toContain(
+        normalizeWs(item.questionText!),
+      );
+      expect(flat, `Musterlösung for ${item.question.excelId} missing`).toContain(
+        normalizeWs(item.answerText!),
+      );
     }
-    // The per-question result column shows the 100/50/0 % shares.
+    // The per-question result shows the 100/50/0 % shares.
     expect(text).toContain("100 %");
     expect(text).toContain("50 %");
     expect(text).toContain("0 %");
@@ -395,7 +439,7 @@ describe("PDF content matches the stored results", () => {
 
     // 64 % is what the STORED values say even though the current weighting
     // could never produce that combination.
-    expect(text).toContain("64 %");
+    expect(text).toContain("64,00 %");
     expect(text).toContain("Alt-Thema 1");
     expect(text).toContain("Alt-Thema 8");
     // The stored result is rendered verbatim and no points appear.
@@ -472,7 +516,8 @@ describe("PDF result box layout", () => {
       label: one((t) => t.text === "Gesamtergebnis", '"Gesamtergebnis"'),
       // Phase 11: the points line was replaced by the pass threshold.
       sub: one((t) => t.text === "Bestehensgrenze 50 %", "threshold line"),
-      percent: one((t) => /^\d+ %$/.test(t.text), "percent"),
+      // The overall result is always shown with two decimals ("100,00 %").
+      percent: one((t) => /^\d+,\d{2} %$/.test(t.text), "percent"),
       status: one((t) => t.text === "Bestanden" || t.text === "Nicht bestanden", "status"),
     };
   }
@@ -568,12 +613,12 @@ describe("PDF result box layout", () => {
 
     const p = resultBoxTexts(passPdf);
     expect(p.sub.text).toBe("Bestehensgrenze 50 %");
-    expect(p.percent.text).toBe(`${Math.round(pass!.percent)} %`);
+    expect(p.percent.text).toBe(`${formatOverallPercent(pass!.percent)} %`);
     expect(p.status.text).toBe(pass!.result);
 
     const f = resultBoxTexts(failPdf);
     expect(f.sub.text).toBe("Bestehensgrenze 50 %");
-    expect(f.percent.text).toBe(`${Math.round(fail!.percent)} %`);
+    expect(f.percent.text).toBe(`${formatOverallPercent(fail!.percent)} %`);
     expect(f.status.text).toBe(fail!.result);
 
     // The values are the persisted ones, not a recomputation.

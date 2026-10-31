@@ -12,6 +12,8 @@ import {
 import { ErrorState } from "@/components/States";
 import { useIdentity } from "@/lib/use-identity";
 import { canManageExams } from "@/lib/auth";
+import { formatPercent, formatOverallPercent } from "@/lib/format";
+import { ResultView } from "@/components/OralResultView";
 
 const RATINGS: OralRating[] = ["richtig", "teilweise richtig", "falsch"];
 const RATING_LABEL: Record<OralRating, string> = {
@@ -26,11 +28,8 @@ const RATING_SHARE: Record<OralRating, string> = {
   falsch: "0 %",
 };
 
-/** Format a percentage without trailing noise: 13.5 → "13,5", 76 → "76". */
-function fmtPercent(v: number): string {
-  const rounded = Math.round(v * 100) / 100;
-  return rounded.toLocaleString("de-DE", { maximumFractionDigits: 2 });
-}
+/** Per-theme values: 13.5 → "13,5", 76 → "76" (shared with the PDF). */
+const fmtPercent = formatPercent;
 
 export default function OralExamPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -44,6 +43,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState(0);
   const [noteDraft, setNoteDraft] = useState("");
+  const [answerDraft, setAnswerDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -55,7 +55,10 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
       const e = await api.oralExam(id);
       setExam(e);
       const item = e.items?.[current];
-      if (item) setNoteDraft(item.note ?? "");
+      if (item) {
+        setNoteDraft(item.note ?? "");
+        setAnswerDraft(item.candidateAnswer ?? "");
+      }
     } catch (e: unknown) {
       setError(e instanceof ApiClientError ? e.message : null);
       setExam(null);
@@ -70,7 +73,10 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const item = exam?.items?.[current];
-    if (item) setNoteDraft(item.note ?? "");
+    if (item) {
+      setNoteDraft(item.note ?? "");
+      setAnswerDraft(item.candidateAnswer ?? "");
+    }
   }, [current, exam]);
 
   async function rate(rating: OralRating | null) {
@@ -95,7 +101,10 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
     if (!item) return;
     setSaving(true);
     try {
-      await api.oralRateQuestion(id, item.orderKey, { note: noteDraft });
+      await api.oralRateQuestion(id, item.orderKey, {
+        note: noteDraft,
+        candidateAnswer: answerDraft,
+      });
       await load();
     } catch (e: unknown) {
       setError(e instanceof ApiClientError ? e.message : "Notiz konnte nicht gespeichert werden.");
@@ -185,6 +194,8 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
           total={items.length}
           noteDraft={noteDraft}
           setNoteDraft={setNoteDraft}
+          answerDraft={answerDraft}
+          setAnswerDraft={setAnswerDraft}
           saving={saving}
           onRate={rate}
           onSaveNote={saveNote}
@@ -235,6 +246,8 @@ function ExamTaker(props: {
   total: number;
   noteDraft: string;
   setNoteDraft: (v: string) => void;
+  answerDraft: string;
+  setAnswerDraft: (v: string) => void;
   saving: boolean;
   onRate: (r: OralRating | null) => void;
   onSaveNote: () => void;
@@ -285,6 +298,18 @@ function ExamTaker(props: {
           ))}
         </div>
 
+        <label className="oral-take__answer-label" htmlFor="oral-candidate-answer">
+          Antwort des Prüflings
+        </label>
+        <textarea
+          id="oral-candidate-answer"
+          className="oral-note"
+          value={props.answerDraft}
+          onChange={(e) => props.setAnswerDraft(e.target.value)}
+          onBlur={props.onSaveNote}
+          placeholder="Optional: dokumentierte Antwort des Prüflings …"
+        />
+
         <label className="oral-take__answer-label" htmlFor="oral-note">Prüfernotiz</label>
         <textarea
           id="oral-note"
@@ -310,104 +335,6 @@ function ExamTaker(props: {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ResultView(props: {
-  exam: OralExam;
-  onCopy: () => void;
-  copied: boolean;
-  items: OralExamQuestion[];
-}) {
-  const { exam, onCopy, copied, items } = props;
-  // Per-theme breakdown is computed and served by the backend from the stored
-  // ratings; the UI only formats it.
-  const breakdown: OralThemeBreakdown[] = exam.breakdown ?? [];
-  return (
-    <div className="oral-card oral-result">
-      <h2>Gesamtergebnis</h2>
-      <div className="oral-result__big">{Math.round(exam.percent)} %</div>
-      <p>
-        <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>{exam.result}</span>
-        {" "}· Bestehensgrenze 50 %
-      </p>
-      <div className="oral-result__actions">
-        <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
-          {copied ? "Kopiert ✓" : "Gesamtwert kopieren"}
-        </button>
-        <a
-          className="btn btn--ghost"
-          href={api.oralExamPdfUrl(exam.id)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          PDF öffnen
-        </a>
-        <a className="btn btn--ghost" href={api.oralExamPdfUrl(exam.id, true)}>
-          PDF-Auswertung herunterladen
-        </a>
-      </div>
-
-      <details open style={{ marginTop: 24, textAlign: "left" }}>
-        <summary style={{ cursor: "pointer", fontWeight: 600 }}>Auswertung nach Themengebiet</summary>
-        <div className="table-scroll" style={{ marginTop: 12 }}>
-          <table className="oral-table">
-            <thead>
-              <tr>
-                <th>Themengebiet</th>
-                <th>Ergebnis</th>
-                <th>Gewichtung</th>
-                <th>Beitrag</th>
-              </tr>
-            </thead>
-            <tbody>
-              {breakdown.map((b) => (
-                <tr key={b.themeName}>
-                  <td>{b.themeName}</td>
-                  <td>{fmtPercent(b.percent)} %</td>
-                  <td>{fmtPercent(b.weight)} %</td>
-                  <td>{fmtPercent(b.contribution)} %</td>
-                </tr>
-              ))}
-              <tr style={{ fontWeight: 700 }}>
-                <td>Gesamtergebnis</td>
-                <td>{Math.round(exam.percent)} %</td>
-                <td>{fmtPercent(breakdown.reduce((s, b) => s + b.weight, 0))} %</td>
-                <td>{fmtPercent(exam.percent)} %</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </details>
-
-      <details style={{ marginTop: 24, textAlign: "left" }}>
-        <summary style={{ cursor: "pointer", fontWeight: 600 }}>Detaillierte Auswertung</summary>
-        <div className="table-scroll" style={{ marginTop: 12 }}>
-          <table className="oral-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Themenbereich</th>
-                <th>Frage-ID</th>
-                <th>Bewertung</th>
-                <th>Notiz</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={it.id}>
-                  <td>{it.orderKey}</td>
-                  <td>{it.themeName}</td>
-                  <td>{it.question.excelId}</td>
-                  <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
-                  <td>{it.note ?? ""}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
     </div>
   );
 }

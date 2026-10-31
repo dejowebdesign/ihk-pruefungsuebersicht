@@ -1,16 +1,38 @@
 // PDF report for a completed oral exam.
 //
-// Phase 11: the report shows PERCENTAGES only — the points system is gone from
-// the PDF (and the UI). It is a pure RENDERER of already-persisted values: the
-// overall percent/result are read from the cached OralExam fields and the
-// per-theme breakdown is derived from the STORED ratings, using exactly the
-// same scorer the app uses. It never re-derives a result from scratch, so the
-// PDF can never disagree with what the app displays.
+// The report has TWO clearly separated parts:
+//
+//   A) Pruefungsergebnis         - candidate, examiner, dates, status, id,
+//                                  overall percent, pass mark, pass/fail and
+//                                  the weighted table over all eight themes.
+//   B) Gestellte Pruefungsfragen - all 13 questions ACTUALLY ASKED, each with
+//                                  its full original wording, the rating, the
+//                                  candidate's documented answer, the examiner
+//                                  comment (only when present) and the full
+//                                  Musterloesung.
+//
+// Two rules govern this file:
+//
+//  1. It is a pure RENDERER of already-persisted values. The overall percent
+//     and the per-theme breakdown come from the stored exam (and the same
+//     scorer the app uses), so the PDF can never disagree with the UI.
+//  2. The question wording comes from the ITEM SNAPSHOT (questionText /
+//     answerText), never from the live pool row, so editing the pool later
+//     cannot rewrite a historical report. Items created before the snapshot
+//     existed fall back to the linked pool row (see loadExamReport).
 
 import type { PrismaClient } from "@prisma/client";
-import { renderPdf, wrapText, PDF_METRICS, type PageOp } from "./pdf-writer";
+import {
+  renderPdf,
+  wrapText,
+  textWidth,
+  PDF_METRICS,
+  type PageOp,
+  type PdfFont,
+} from "./pdf-writer";
 import { scoreExam, type Rating } from "./scoring";
-import { normalizeThemeName } from "./themes";
+import { normalizeThemeName, shortThemeName, themeAbbreviation } from "./themes";
+import { formatPercent, formatOverallPercent } from "./format";
 
 const { PAGE_WIDTH, PAGE_HEIGHT, MARGIN } = PDF_METRICS;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
@@ -23,12 +45,38 @@ const COLOR_HEAD_BG = 0xeef2ff;
 const COLOR_ROW_BG = 0xf9fafb;
 const COLOR_PASS = 0x15803d;
 const COLOR_FAIL = 0xb91c1c;
+const COLOR_PARTIAL = 0xb45309;
+
+/** Distance kept clear at the bottom of every page (the page number lives there). */
+const BOTTOM_LIMIT = MARGIN + 34;
 
 const RATING_LABEL: Record<string, string> = {
   richtig: "Richtig",
   "teilweise richtig": "Teilweise richtig",
   falsch: "Falsch",
 };
+
+const RATING_COLOR: Record<string, number> = {
+  richtig: COLOR_PASS,
+  "teilweise richtig": COLOR_PARTIAL,
+  falsch: COLOR_FAIL,
+};
+
+export interface ExamReportItem {
+  orderKey: number;
+  themeName: string;
+  weight: number;
+  rating: string | null;
+  points: number;
+  note: string | null;
+  excelId: string;
+  /** Full wording at exam time (snapshot), or the pool fallback. */
+  questionText: string | null;
+  /** Full Musterloesung at exam time (snapshot), or the pool fallback. */
+  answerText: string | null;
+  /** The candidate's documented answer, when one was written down. */
+  candidateAnswer: string | null;
+}
 
 export interface ExamReportData {
   exam: {
@@ -56,18 +104,17 @@ export interface ExamReportData {
     contribution: number;
   }>;
   candidateName: string;
-  items: Array<{
-    orderKey: number;
-    themeName: string;
-    weight: number;
-    rating: string | null;
-    points: number;
-    note: string | null;
-    excelId: string;
-  }>;
+  items: ExamReportItem[];
 }
 
-/** Load everything the report needs. Returns null for an unknown exam. */
+/**
+ * Load everything the report needs. Returns null for an unknown exam.
+ *
+ * The item snapshot is preferred; a NULL snapshot (row predates the snapshot
+ * migration) falls back to the linked pool row. The fallback never invents
+ * text: it shows the pool wording, which for such a row is the only surviving
+ * copy.
+ */
 export async function loadExamReport(
   db: PrismaClient,
   examId: string,
@@ -78,7 +125,9 @@ export async function loadExamReport(
       candidate: { select: { name: true } },
       items: {
         orderBy: { orderKey: "asc" },
-        include: { question: { select: { excelId: true } } },
+        include: {
+          question: { select: { excelId: true, question: true, answer: true } },
+        },
       },
     },
   });
@@ -121,6 +170,9 @@ export async function loadExamReport(
       points: i.points,
       note: i.note,
       excelId: i.question.excelId,
+      questionText: i.questionText ?? i.question.question,
+      answerText: i.answerText ?? i.question.answer,
+      candidateAnswer: i.candidateAnswer,
     })),
   };
 }
@@ -137,20 +189,32 @@ function fmtDateTime(d: Date | null): string {
   return `${fmtDate(d)}, ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} Uhr`;
 }
 
-/**
- * Format a percentage value for the PDF: at most two decimals, no trailing
- * zeros ("76", "13.5", "4.5", "6.75"). PDF text is Latin-1, so a decimal POINT
- * is used deliberately (not the German comma) to keep the encoding safe.
- */
-function fmtNum(v: number): string {
-  return String(Math.round(v * 100) / 100);
-}
-
 /** Share of a question's value a rating yields: 100 / 50 / 0 (%). */
 function itemShare(rating: string | null): number {
   if (rating === "richtig") return 100;
   if (rating === "teilweise richtig") return 50;
   return 0;
+}
+
+/**
+ * Wrap text while keeping paragraph breaks. A blank entry marks a paragraph
+ * gap. `wrapText` collapses ALL whitespace, so splitting on newlines first is
+ * what preserves the bullet lists that several Musterloesungen use.
+ */
+function wrapParagraphs(
+  text: string,
+  size: number,
+  font: PdfFont,
+  maxWidth: number,
+): string[] {
+  const out: string[] = [];
+  for (const raw of (text ?? "").split(/\n+/)) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    if (out.length > 0) out.push("");
+    out.push(...wrapText(trimmed, size, font, maxWidth));
+  }
+  return out.length > 0 ? out : [""];
 }
 
 /** Render the report as PDF bytes. */
@@ -165,72 +229,137 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
     y = PAGE_HEIGHT - MARGIN;
   };
 
-  const text = (
+  /** Start a new page if `needed` points do not fit above the bottom limit. */
+  const ensure = (needed: number) => {
+    if (y - needed < BOTTOM_LIMIT) newPage();
+  };
+
+  const put = (
     value: string,
     x: number,
     size: number,
-    font: "regular" | "bold" = "regular",
+    font: PdfFont = "regular",
     color = COLOR_TEXT,
     align: "left" | "right" = "left",
   ) => {
     ops.push({ kind: "text", x, y, text: value, size, font, color, align });
   };
 
-  const gap = (n: number) => {
+  const advance = (n: number) => {
     y -= n;
   };
 
-  const pageBreakIfNeeded = (needed: number) => {
-    if (y - needed < MARGIN + 40) newPage();
+  const rule = (color = COLOR_BORDER) => {
+    ops.push({
+      kind: "line",
+      x1: MARGIN,
+      y1: y,
+      x2: PAGE_WIDTH - MARGIN,
+      y2: y,
+      color,
+    });
   };
 
-  // ── header ───────────────────────────────────────────────────────────────
-  text("IHK Pruefungsuebersicht", MARGIN, 9, "bold", COLOR_MUTED);
-  gap(14);
-  text("Auswertung der muendlichen Pruefung (§ 34a)", MARGIN, 17, "bold", COLOR_PRIMARY);
-  gap(6);
-  ops.push({
-    kind: "line",
-    x1: MARGIN,
-    y1: y,
-    x2: PAGE_WIDTH - MARGIN,
-    y2: y,
-    color: COLOR_BORDER,
-  });
-  gap(22);
+  /**
+   * Draw a wrapped paragraph, continuing on the next page when it runs long.
+   * `onBreak` re-draws a context line at the top of the continuation page.
+   */
+  const paragraph = (
+    text: string,
+    opts: {
+      size?: number;
+      font?: PdfFont;
+      color?: number;
+      width?: number;
+      lineHeight?: number;
+      onBreak?: () => void;
+    } = {},
+  ): void => {
+    const {
+      size = 10,
+      font = "regular" as PdfFont,
+      color = COLOR_TEXT,
+      width = CONTENT_WIDTH,
+      lineHeight = 13,
+      onBreak,
+    } = opts;
+    const lines = wrapParagraphs(text, size, font, width);
+    for (const ln of lines) {
+      if (ln === "") {
+        // Paragraph gap: never let a gap alone push us onto a new page.
+        if (y - lineHeight * 0.6 >= BOTTOM_LIMIT) advance(lineHeight * 0.6);
+        continue;
+      }
+      if (y - lineHeight < BOTTOM_LIMIT) {
+        newPage();
+        onBreak?.();
+      }
+      ops.push({ kind: "text", x: MARGIN, y, text: ln, size, font, color, align: "left" });
+      advance(lineHeight);
+    }
+  };
 
-  // ── exam metadata ────────────────────────────────────────────────────────
+  // ----------------------------- SECTION A --------------------------------
+  put("IHK Pruefungsuebersicht", MARGIN, 9, "bold", COLOR_MUTED);
+  advance(14);
+  put("Auswertung der muendlichen Pruefung (§ 34a)", MARGIN, 17, "bold", COLOR_PRIMARY);
+  advance(6);
+  rule();
+  advance(10);
+
+  put("A - Pruefungsergebnis", MARGIN, 11, "bold", COLOR_MUTED);
+  advance(16);
+
+  // -- exam metadata, two label/value pairs per row -------------------------
   const meta: Array<[string, string]> = [
     ["Pruefling", data.candidateName],
     ["Pruefer/in", data.exam.examiner || "-"],
     ["Pruefungsdatum", fmtDate(data.exam.examDate)],
-    ["Abgeschlossen am", fmtDateTime(data.exam.completedAt)],
-    ["Status", data.exam.status === "completed" ? "Abgeschlossen" : data.exam.status],
+    ["Abschlusszeitpunkt", fmtDateTime(data.exam.completedAt)],
+    ["Pruefungsstatus", data.exam.status === "completed" ? "Abgeschlossen" : data.exam.status],
     ["Pruefungs-ID", data.exam.id],
   ];
-  const labelWidth = 110;
-  for (const [label, value] of meta) {
-    text(label, MARGIN, 10, "bold", COLOR_MUTED);
-    ops.push({ kind: "text", x: MARGIN + labelWidth, y, text: value, size: 10, font: "regular" });
-    gap(15);
+  const metaLabelW = 92;
+  const metaColW = CONTENT_WIDTH / 2;
+  const metaValueMax = metaColW - metaLabelW - 14;
+  for (let i = 0; i < meta.length; i += 2) {
+    ensure(15);
+    for (let c = 0; c < 2; c++) {
+      const entry = meta[i + c];
+      if (!entry) continue;
+      const x = MARGIN + c * metaColW;
+      ops.push({
+        kind: "text",
+        x,
+        y,
+        text: entry[0],
+        size: 9,
+        font: "bold",
+        color: COLOR_MUTED,
+      });
+      // Clip an over-long value (a cuid) so it cannot reach the next column.
+      let value = entry[1];
+      const clipped = textWidth(value, 9, "regular") > metaValueMax;
+      while (value.length > 4 && textWidth(value, 9, "regular") > metaValueMax) {
+        value = value.slice(0, -2);
+      }
+      if (clipped) value = value.slice(0, -1) + ".";
+      ops.push({ kind: "text", x: x + metaLabelW, y, text: value, size: 9, font: "regular" });
+    }
+    advance(15);
   }
-  gap(10);
+  advance(8);
 
-  // ── result box ───────────────────────────────────────────────────────────
+  // -- result box -----------------------------------------------------------
   // Every text is placed from the box TOP with an explicit baseline offset.
   // A baseline is the text's BOTTOM edge, so the visible glyphs extend roughly
   // 0.72 * size ABOVE it: a label placed at the box top would be drawn outside
   // the box, and two labels sharing one baseline would overprint each other.
-  // The box interior is [boxTop - boxHeight, boxTop], so each baseline must
-  // stay below -0.72 * size and above -(boxHeight - 0.24 * size).
-  const percent = Math.round(data.exam.percent);
+  const overall = formatOverallPercent(data.exam.percent);
   const passed = data.exam.result === "Bestanden";
-  const boxHeight = 64;
+  const boxHeight = 68;
+  ensure(boxHeight + 20);
   const boxTop = y;
-  const LABEL_Y = boxTop - 15; // "Gesamtergebnis", top-left (ascent ends at -7.8)
-  const SUB_Y = boxTop - 31; // "Bestehensgrenze 50 %", below the label
-  const PERCENT_Y = boxTop - 34; // large percent, right side
-  const RESULT_Y = boxTop - 52; // "Bestanden" / "Nicht bestanden", right, below
   ops.push({
     kind: "rect",
     x: MARGIN,
@@ -243,7 +372,7 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
   ops.push({
     kind: "text",
     x: MARGIN + 16,
-    y: LABEL_Y,
+    y: boxTop - 15,
     text: "Gesamtergebnis",
     size: 10,
     font: "bold",
@@ -252,7 +381,7 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
   ops.push({
     kind: "text",
     x: MARGIN + 16,
-    y: SUB_Y,
+    y: boxTop - 32,
     text: "Bestehensgrenze 50 %",
     size: 11,
     font: "regular",
@@ -261,8 +390,8 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
   ops.push({
     kind: "text",
     x: PAGE_WIDTH - MARGIN - 16,
-    y: PERCENT_Y,
-    text: `${percent} %`,
+    y: boxTop - 36,
+    text: `${overall} %`,
     size: 26,
     font: "bold",
     color: passed ? COLOR_PASS : COLOR_FAIL,
@@ -271,59 +400,62 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
   ops.push({
     kind: "text",
     x: PAGE_WIDTH - MARGIN - 16,
-    y: RESULT_Y,
+    y: boxTop - 55,
     text: data.exam.result ?? "-",
     size: 12,
     font: "bold",
     color: passed ? COLOR_PASS : COLOR_FAIL,
     align: "right",
   });
-  y = boxTop - boxHeight - 24;
+  y = boxTop - boxHeight - 22;
 
-  // ── per-theme breakdown (percentage model only) ───────────────────────────
-  // The weighted result per Themenbereich: Ergebnis (%) x Gewichtung (%) =
-  // Beitrag (Prozentpunkte). This is the table the customer asked for; it is
-  // omitted for legacy points exams, which have no percentage breakdown.
+  // -- per-theme breakdown --------------------------------------------------
   if (data.breakdown.length > 0) {
-    pageBreakIfNeeded(30);
-    text("Auswertung nach Themengebiet", MARGIN, 12, "bold", COLOR_TEXT);
-    gap(18);
-
     const bCols = [
-      { label: "Themengebiet", width: 300, align: "left" as const },
-      { label: "Ergebnis", width: 90, align: "right" as const },
-      { label: "Gewichtung", width: 90, align: "right" as const },
-      { label: "Beitrag", width: 60, align: "right" as const },
+      { label: "Themengebiet", width: 246, align: "left" as const },
+      { label: "Ergebnis", width: 74, align: "right" as const },
+      { label: "Gewichtung", width: 86, align: "right" as const },
+      { label: "Beitrag zum Gesamtergebnis", width: 144, align: "right" as const },
     ];
     const bWidth = bCols.reduce((a, c) => a + c.width, 0);
     const bRowH = 16;
+    const bHeadH = 22;
+    const tableH = bHeadH + bRowH * (data.breakdown.length + 1);
+
+    // Keep the whole table on one page: a split table would need its header
+    // repeated, which the customer explicitly asked to avoid.
+    ensure(tableH + 26);
+    put("Auswertung nach allen acht Themengebieten", MARGIN, 12, "bold", COLOR_TEXT);
+    advance(20);
 
     ops.push({
       kind: "rect",
       x: MARGIN,
-      y: y - 19,
+      y: y - bHeadH,
       width: bWidth,
-      height: 19,
+      height: bHeadH,
       fill: COLOR_HEAD_BG,
     });
     let bx = MARGIN;
     for (const c of bCols) {
-      ops.push({
-        kind: "text",
-        x: c.align === "right" ? bx + c.width - 5 : bx + 5,
-        y: y - 13,
-        text: c.label,
-        size: 9,
-        font: "bold",
-        color: COLOR_MUTED,
-        align: c.align,
+      const lines = wrapText(c.label, 8, "bold", c.width - 10);
+      lines.forEach((ln, li) => {
+        ops.push({
+          kind: "text",
+          x: c.align === "right" ? bx + c.width - 5 : bx + 5,
+          y: y - 10 - li * 9,
+          text: ln,
+          size: 8,
+          font: "bold",
+          color: COLOR_MUTED,
+          align: c.align,
+        });
       });
       bx += c.width;
     }
-    y -= 19;
+    y -= bHeadH;
 
     data.breakdown.forEach((b, i) => {
-      pageBreakIfNeeded(bRowH + 4);
       if (i % 2 === 1) {
         ops.push({
           kind: "rect",
@@ -335,10 +467,10 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
         });
       }
       const cells = [
-        b.themeName,
-        `${fmtNum(b.percent)} %`,
-        `${fmtNum(b.weight)} %`,
-        `${fmtNum(b.contribution)} %`,
+        shortThemeName(b.themeName),
+        `${formatPercent(b.percent)} %`,
+        `${formatPercent(b.weight)} %`,
+        `${formatPercent(b.contribution)} %`,
       ];
       let cx = MARGIN;
       cells.forEach((val, ci) => {
@@ -366,7 +498,7 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
       y -= bRowH;
     });
 
-    // Total row: contributions sum to the overall result.
+    // Total row: the contributions sum to the overall result.
     ops.push({
       kind: "rect",
       x: MARGIN,
@@ -377,16 +509,16 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
     });
     const totalCells = [
       "Gesamtergebnis",
-      `${fmtNum(data.exam.percent)} %`,
-      `${fmtNum(data.breakdown.reduce((a, b) => a + b.weight, 0))} %`,
-      `${fmtNum(data.exam.percent)} %`,
+      `${overall} %`,
+      `${formatPercent(data.breakdown.reduce((a, b) => a + b.weight, 0))} %`,
+      `${overall} %`,
     ];
-    let tx2 = MARGIN;
+    let tx = MARGIN;
     totalCells.forEach((val, ci) => {
       const c = bCols[ci];
       ops.push({
         kind: "text",
-        x: c.align === "right" ? tx2 + c.width - 5 : tx2 + 5,
+        x: c.align === "right" ? tx + c.width - 5 : tx + 5,
         y: y - 11,
         text: val,
         size: 9,
@@ -394,208 +526,159 @@ export function buildExamReportPdf(data: ExamReportData): Buffer {
         color: COLOR_TEXT,
         align: c.align,
       });
-      tx2 += c.width;
+      tx += c.width;
     });
-    y -= bRowH + 20;
+    y -= bRowH + 16;
   }
 
-  // ── per-question table ───────────────────────────────────────────────────
-  // Column layout: #, Themenbereich, Frage-ID, Bewertung, Gewichtung (%),
-  // Ergebnis (%). No points column: the points system is gone from the PDF.
-  // A separate note block per question follows the table when present.
-  const cols = [
-    { key: "orderKey", label: "#", width: 24, align: "right" as const },
-    { key: "themeName", label: "Themenbereich", width: 165, align: "left" as const },
-    { key: "excelId", label: "Frage-ID", width: 105, align: "left" as const },
-    { key: "rating", label: "Bewertung", width: 95, align: "left" as const },
-    { key: "weight", label: "Gewichtung", width: 53, align: "right" as const },
-    { key: "result", label: "Ergebnis", width: 45, align: "right" as const },
-  ];
-  const colWidths = cols.reduce((s, c) => s + c.width, 0);
-  const tableX = MARGIN;
-  const rowHeight = 17;
-  const headHeight = 19;
+  // Weighting note (belongs to section A, not to the individual questions).
+  ensure(26);
+  paragraph(
+    "Die Themengewichtung wird nur hier ausgewiesen. Sie ist unabhaengig von der " +
+      "Zahl der gestellten Fragen; das Gesamtergebnis ist die Summe der gewichteten " +
+      "Themenbeitraege. In der Einzelauswertung steht die Bewertung der Frage.",
+    { size: 8, color: COLOR_MUTED, lineHeight: 11 },
+  );
 
-  const drawTableHeader = () => {
-    ops.push({
-      kind: "rect",
-      x: tableX,
-      y: y - headHeight,
-      width: colWidths,
-      height: headHeight,
-      fill: COLOR_HEAD_BG,
-    });
-    let x = tableX;
-    for (const c of cols) {
-      const tx = c.align === "right" ? x + c.width - 5 : x + 5;
-      ops.push({
-        kind: "text",
-        x: tx,
-        y: y - 13,
-        text: c.label,
-        size: 9,
-        font: "bold",
-        color: COLOR_MUTED,
-        align: c.align,
-      });
-      x += c.width;
-    }
-    y -= headHeight;
-  };
+  // ----------------------------- SECTION B --------------------------------
+  newPage();
+  put("IHK Pruefungsuebersicht", MARGIN, 9, "bold", COLOR_MUTED);
+  advance(14);
+  put("B - Gestellte Pruefungsfragen", MARGIN, 17, "bold", COLOR_PRIMARY);
+  advance(6);
+  rule();
+  advance(10);
+  put(
+    `${data.items.length} Fragen, in der Reihenfolge der Pruefung. Die Fragestellungen ` +
+      "und Musterloesungen sind die zum Pruefungszeitpunkt gespeicherten Fassungen.",
+    MARGIN,
+    8,
+    "regular",
+    COLOR_MUTED,
+  );
+  advance(20);
 
-  const drawRow = (values: string[], shaded: boolean) => {
-    // Wrap every cell to its column width; the row grows to fit the tallest
-    // cell so long Themenbereich labels never bleed into the next column.
-    const wrapped = values.map((v, i) =>
-      wrapText(v, 9, "regular", cols[i].width - 10).slice(0, 3),
-    );
-    const lineCount = Math.max(...wrapped.map((w) => w.length));
-    const height = Math.max(rowHeight, lineCount * 11 + 6);
-
-    if (shaded) {
-      ops.push({
-        kind: "rect",
-        x: tableX,
-        y: y - height,
-        width: colWidths,
-        height,
-        fill: COLOR_ROW_BG,
-      });
-    }
-    let x = tableX;
-    wrapped.forEach((lines, i) => {
-      const c = cols[i];
-      lines.forEach((line, li) => {
-        const tx = c.align === "right" ? x + c.width - 5 : x + 5;
-        ops.push({
-          kind: "text",
-          x: tx,
-          y: y - 12 - li * 11,
-          text: line,
-          size: 9,
-          font: "regular",
-          color: COLOR_TEXT,
-          align: c.align,
-        });
-      });
-      x += c.width;
-    });
-    ops.push({
-      kind: "line",
-      x1: tableX,
-      y1: y - height,
-      x2: tableX + colWidths,
-      y2: y - height,
-      color: COLOR_BORDER,
-    });
-    y -= height;
-  };
-
-  drawTableHeader();
   data.items.forEach((item, idx) => {
-    pageBreakIfNeeded(rowHeight + 4);
-    if (y === PAGE_HEIGHT - MARGIN) drawTableHeader();
-    drawRow(
-      [
-        String(item.orderKey),
-        item.themeName,
-        item.excelId,
-        item.rating ? (RATING_LABEL[item.rating] ?? item.rating) : "nicht bewertet",
-        `${fmtNum(item.weight)} %`,
-        `${fmtNum(itemShare(item.rating))} %`,
-      ],
-      idx % 2 === 1,
-    );
-  });
-
-  // Sum row.
-  pageBreakIfNeeded(rowHeight + 4);
-  if (y === PAGE_HEIGHT - MARGIN) drawTableHeader();
-  ops.push({
-    kind: "rect",
-    x: tableX,
-    y: y - rowHeight,
-    width: colWidths,
-    height: rowHeight,
-    fill: COLOR_HEAD_BG,
-  });
-  ops.push({
-    kind: "text",
-    x: tableX + 5,
-    y: y - 12,
-    text: "Gesamtergebnis",
-    size: 9,
-    font: "bold",
-    color: COLOR_TEXT,
-  });
-  ops.push({
-    kind: "text",
-    x: tableX + colWidths - 5,
-    y: y - 12,
-    text: `${fmtNum(data.exam.percent)} %`,
-    size: 9,
-    font: "bold",
-    color: COLOR_TEXT,
-    align: "right",
-  });
-  y -= rowHeight + 20;
-
-  // ── examiner notes ───────────────────────────────────────────────────────
-  const noted = data.items.filter((i) => (i.note ?? "").trim() !== "");
-  if (noted.length > 0) {
-    pageBreakIfNeeded(30);
-    text("Pruefernotizen", MARGIN, 12, "bold", COLOR_TEXT);
-    gap(16);
-    for (const item of noted) {
-      const lines = wrapText(
-        `${item.orderKey}. ${item.themeName} (${item.excelId}): ${item.note}`,
-        9,
-        "regular",
-        CONTENT_WIDTH,
-      );
-      pageBreakIfNeeded(lines.length * 12 + 8);
-      for (const line of lines) {
-        text(line, MARGIN, 9, "regular", COLOR_TEXT);
-        gap(12);
+    const abbr = themeAbbreviation(item.themeName);
+    const ratingText = item.rating
+      ? (RATING_LABEL[item.rating] ?? item.rating)
+      : "Nicht bewertet";
+    const ratingColor = item.rating ? (RATING_COLOR[item.rating] ?? COLOR_TEXT) : COLOR_MUTED;
+    const continuation = () => {
+      put(`Frage ${item.orderKey} - ${abbr} (Fortsetzung)`, MARGIN, 9, "bold", COLOR_MUTED);
+      advance(14);
+    };
+    // A break INSIDE a question block must not leave a bare fragment at the top
+    // of the next page: re-print which question is continuing.
+    const ensureBlock = (needed: number) => {
+      if (y - needed < BOTTOM_LIMIT) {
+        newPage();
+        continuation();
       }
-      gap(4);
-    }
-    gap(8);
-  }
+    };
 
-  // ── footer note ──────────────────────────────────────────────────────────
-  pageBreakIfNeeded(40);
-  ops.push({
-    kind: "line",
-    x1: MARGIN,
-    y1: y,
-    x2: PAGE_WIDTH - MARGIN,
-    y2: y,
-    color: COLOR_BORDER,
+    // Keep the heading, the id and the first lines of the question together.
+    ensure(110);
+
+    put(`Frage ${item.orderKey} - ${abbr}`, MARGIN, 13, "bold", COLOR_PRIMARY);
+    advance(16);
+    put(`Themengebiet: ${item.themeName}`, MARGIN, 8, "regular", COLOR_MUTED);
+    advance(12);
+    put(`Frage-ID: ${item.excelId}`, MARGIN, 9, "bold", COLOR_TEXT);
+    advance(14);
+
+    // Fragestellung
+    put("Fragestellung:", MARGIN, 9, "bold", COLOR_MUTED);
+    advance(12);
+    paragraph(item.questionText || "(Kein Fragentext gespeichert.)", {
+      size: 10,
+      onBreak: continuation,
+    });
+    advance(6);
+
+    // Bewertung + the question's own share (the theme weight is NOT repeated here)
+    ensureBlock(16);
+    put("Bewertung:", MARGIN, 9, "bold", COLOR_MUTED);
+    ops.push({
+      kind: "text",
+      x: MARGIN + 62,
+      y,
+      text: `${ratingText} (${formatPercent(itemShare(item.rating))} %)`,
+      size: 10,
+      font: "bold",
+      color: ratingColor,
+    });
+    advance(16);
+
+    // Antwort des Prueflings
+    ensureBlock(30);
+    put("Antwort des Prueflings:", MARGIN, 9, "bold", COLOR_MUTED);
+    advance(12);
+    const answer = (item.candidateAnswer ?? "").trim();
+    if (answer) {
+      paragraph(answer, { size: 10 });
+    } else {
+      put("Keine Antwort dokumentiert.", MARGIN, 10, "regular", COLOR_MUTED);
+      advance(13);
+    }
+    advance(6);
+
+    // Prueferkommentar - only when one was actually stored.
+    const note = (item.note ?? "").trim();
+    if (note) {
+      ensureBlock(30);
+      put("Prueferkommentar:", MARGIN, 9, "bold", COLOR_MUTED);
+      advance(12);
+      paragraph(note, { size: 10 });
+      advance(6);
+    }
+
+    // Musterloesung - the full stored answer.
+    ensureBlock(40);
+    put("Musterloesung:", MARGIN, 9, "bold", COLOR_MUTED);
+    advance(12);
+    const solution = (item.answerText ?? "").trim();
+    if (solution) {
+      paragraph(solution, {
+        size: 10,
+        onBreak: () => {
+          put(
+            `Frage ${item.orderKey} - Musterloesung (Fortsetzung)`,
+            MARGIN,
+            9,
+            "bold",
+            COLOR_MUTED,
+          );
+          advance(14);
+        },
+      });
+    } else {
+      put("Keine Musterloesung gespeichert.", MARGIN, 10, "regular", COLOR_MUTED);
+      advance(13);
+    }
+
+    advance(12);
+    if (idx < data.items.length - 1) {
+      ensure(24);
+      rule();
+      advance(20);
+    }
   });
-  gap(14);
-  text(
-    "Bewertungsschluessel: richtig = 100 %, teilweise richtig = 50 %, falsch = 0 % der moeglichen Fragebewertung.",
-    MARGIN,
-    8,
-    "regular",
-    COLOR_MUTED,
+
+  // -- closing note ---------------------------------------------------------
+  ensure(56);
+  advance(6);
+  rule();
+  advance(14);
+  paragraph(
+    "Bewertungsschluessel: richtig = 100 %, teilweise richtig = 50 %, falsch = 0 % " +
+      "der moeglichen Fragebewertung.",
+    { size: 8, color: COLOR_MUTED, lineHeight: 11 },
   );
-  gap(11);
-  text(
-    "Die Themengewichtung ist unabhaengig von der Zahl der gestellten Fragen; das Gesamtergebnis ist die Summe der gewichteten Themenbeitraege.",
-    MARGIN,
-    8,
-    "regular",
-    COLOR_MUTED,
-  );
-  gap(11);
-  text(
-    "Bestehensgrenze: 50 %. Die Werte in diesem PDF sind die in der App gespeicherten Pruefungsergebnisse.",
-    MARGIN,
-    8,
-    "regular",
-    COLOR_MUTED,
+  paragraph("Bestehensgrenze: 50 %.", { size: 8, color: COLOR_MUTED, lineHeight: 11 });
+  paragraph(
+    "Die Werte in diesem PDF sind die in der App gespeicherten Pruefungsergebnisse.",
+    { size: 8, color: COLOR_MUTED, lineHeight: 11 },
   );
 
   pages.push(ops);
