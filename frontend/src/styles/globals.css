@@ -75,7 +75,55 @@
   radial-gradient(900px 520px at 88% 0%, rgba(86, 135, 127, 0.1), transparent 60%);
 
   --maxw: 1200px;
-  --header-h: 64px;
+
+  /* The header occupies a constant band of `--header-h`. The visible bar floats
+     inside that band and only changes its own height, so compacting it never
+     reflows the page below — no content jump, no gap, and the band's height is
+     what `--header-h` means to every other rule. */
+  --header-h: 66px;
+  --header-bar-h: 56px;
+  --header-bar-h-compact: 48px;
+  --logo-h: 38px;
+  --logo-h-compact: 30px;
+  --header-gap: 18px;
+  --header-gap-compact: 12px;
+  --header-pad: 10px; /* breathing room between the bar and the viewport edge */
+  --header-pad-compact: 8px;
+  --header-gap-x: 22px; /* horizontal padding inside the bar */
+  --header-gap-x-compact: 16px;
+  --header-radius: 18px;
+  --header-radius-compact: 14px;
+  /* One shared curve so every part of the shrink (height, padding, logo,
+     spacing, rounding) moves in lockstep. */
+  --header-motion: 280ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ── dark-glass header palette ────────────────────────────────────────────
+     The navigation is deliberately dark in BOTH themes (that is the requested
+     look), so these are fixed values rather than theme tokens. They are
+     measured against the worst case — the glass over a white page, which is the
+     lightest surface it can ever sit on:
+       text         #eef3fa on glass  5.9:1   (16.0:1 on the solid fallback)
+       text-muted   #d5dde8 on glass  4.9:1   (12.6:1)
+       accent-ink   #9ff2e2 on the active pill  4.7:1
+       primary-ink  #cfe8ff on the role chip    5.6:1 (opaque chip)
+     Every value therefore clears WCAG AA for normal text in both themes. */
+  --hd-glass: rgba(15, 23, 42, 0.70);
+  --hd-glass-strong: rgba(11, 18, 33, 0.82); /* compact state: a touch denser */
+  --hd-solid: #131b2b; /* fallback where backdrop-filter is unsupported */
+  --hd-border: rgba(255, 255, 255, 0.10);
+  --hd-border-strong: rgba(255, 255, 255, 0.16);
+  --hd-text: #eef3fa;
+  --hd-text-muted: #d5dde8;
+  --hd-accent: #7fe3d0;
+  --hd-accent-ink: #9ff2e2;
+  --hd-primary-ink: #cfe8ff;
+  --hd-primary-soft: rgba(48, 76, 105, 0.85);
+  --hd-accent-soft: rgba(13, 148, 136, 0.26);
+  --hd-surface: rgba(255, 255, 255, 0.07); /* hover / control fill */
+  --hd-surface-hover: rgba(255, 255, 255, 0.13);
+  --hd-shadow: 0 8px 30px rgba(0, 0, 0, 0.18), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --hd-shadow-compact: 0 12px 34px rgba(0, 0, 0, 0.34), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", sans-serif;
 }
@@ -280,51 +328,134 @@ h4 {
 }
 
 /* ── header ───────────────────────────────────────────────────────────────
-   Sticky, translucent, blurred. The opaque background is the fallback and the
-   @supports block swaps in the frosted version. */
+   A floating dark-glass navigation bar.
+
+   `.site-header` is the positioning frame and reserves a CONSTANT band of
+   `--header-h`; the visible bar lives in `.site-header__inner` and only changes
+   its own height, so compacting it never reflows the page underneath — no
+   content jump, no white gap at the seam.
+
+   The glass is deliberately dark in both themes (the requested look), so the
+   bar does not read the theme tokens; the `--hd-*` palette above is fixed and
+   contrast-checked against the lightest surface it can sit on. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
+  /* The band is a constant height in both states, so compacting the bar cannot
+     reflow the page below. The gap to the viewport edge is real PADDING, not a
+     child margin: a sticky element's own margin collapses through its frame,
+     which silently removed the gap once the header was pinned to the top. */
   height: var(--header-h);
-  background: var(--bg-subtle);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-}
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header {
-    background: var(--glass-strong);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  }
+  padding: var(--header-pad) 0 0;
+  /* The frame is transparent and click-through: only the bar itself is a
+     surface, so the page keeps the full band's width and pointer targets. */
+  background: transparent;
+  pointer-events: none;
+  transition: padding var(--header-motion);
 }
 .site-header__inner {
-  max-width: var(--maxw);
+  position: relative;
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(var(--maxw), 100% - 2 * var(--header-pad));
   margin: 0 auto;
-  height: 100%;
-  padding: 0 20px;
+  height: var(--header-bar-h);
+  padding: 0 var(--header-gap-x);
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--header-gap);
+  border: 1px solid var(--hd-border);
+  border-radius: var(--header-radius);
+  /* Fallback for browsers without backdrop-filter: an opaque dark bar. */
+  background: var(--hd-solid);
+  box-shadow: var(--hd-shadow);
+  /* Every dimension of the shrink shares one duration and one curve, so the
+     height, the logo and the spacing all land together. */
+  transition: height var(--header-motion), padding var(--header-motion),
+    gap var(--header-motion), max-width var(--header-motion),
+    border-radius var(--header-motion), border-color var(--header-motion),
+    background-color var(--header-motion), box-shadow var(--header-motion);
 }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header__inner {
+    /* Dark, milky glass: a translucent anthracite fill over a heavy blur, plus
+       a hairline highlight on the top edge for the "polished" read. */
+    background: var(--hd-glass);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+  }
+  .site-header--scrolled .site-header__inner {
+    background: var(--hd-glass-strong);
+  }
+}
+/* ── compact state (after the scroll threshold) ─────────────────────────── */
+/* The edge gap lives on the frame, so it shrinks here rather than on the bar. */
+.site-header--scrolled {
+  --header-pad: var(--header-pad-compact);
+}
+.site-header--scrolled .site-header__inner {
+  --header-bar-h: var(--header-bar-h-compact);
+  --header-gap-x: var(--header-gap-x-compact);
+  --header-gap: var(--header-gap-compact);
+  --logo-h: var(--logo-h-compact);
+  border-radius: var(--header-radius-compact);
+  border-color: var(--hd-border-strong);
+  box-shadow: var(--hd-shadow-compact);
+}
+.site-header--scrolled .nav a {
+  padding: 5px 10px;
+}
+.site-header--scrolled .theme-toggle,
+.site-header--scrolled .nav__toggle {
+  width: 34px;
+  height: 34px;
+}
+/* The global focus ring uses --primary, which is invisible on the dark glass.
+   The mint accent keeps keyboard focus clearly visible on the bar itself. */
+.site-header a:focus-visible,
+.site-header button:focus-visible {
+  outline: 2px solid var(--hd-accent-ink);
+  outline-offset: 2px;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
   font-weight: 700;
   font-size: 1.02rem;
-  color: var(--text);
+  color: var(--hd-text);
   letter-spacing: -0.01em;
-  flex-shrink: 0;
+  /* The logo never shrinks; the wordmark may ellipsize so a narrow viewport
+     loses letters instead of pushing the controls off the bar. */
+  flex-shrink: 1;
+  min-width: 0;
 }
 .brand:hover {
   text-decoration: none;
 }
-/* Petrol-to-navy mark. --accent-deep (not --accent) so the white "IHK"
-   reaches 6.6:1 instead of 4.1:1. */
+.brand__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The uploaded logo is used as-is: original file, original aspect ratio, no
+   filter, no recolouring, no cropping. `contain` guarantees it is never
+   stretched even if the box and the file disagree on aspect ratio. */
+.brand__logo {
+  display: block;
+  height: var(--logo-h);
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+/* Fallback mark, shown only while no logo file is present in public/. Petrol
+   to navy, and --accent-deep (not --accent) so the white "IHK" reaches 6.6:1. */
 .brand__mark {
-  width: 32px;
-  height: 32px;
+  width: var(--logo-h);
+  height: var(--logo-h);
   border-radius: 9px;
   background: linear-gradient(140deg, var(--accent-deep), var(--primary));
   display: grid;
@@ -335,6 +466,7 @@ h4 {
   letter-spacing: 0.02em;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
+  transition: width var(--header-motion), height var(--header-motion);
 }
 [data-theme="dark"] .brand__mark {
   background: linear-gradient(140deg, var(--accent-deep), var(--primary));
@@ -345,36 +477,46 @@ h4 {
   align-items: center;
   gap: 2px;
   margin-left: auto;
+  min-width: 0;
 }
 .nav a {
-  color: var(--text-muted);
+  color: var(--hd-text-muted);
   font-weight: 500;
-  padding: 8px 13px;
+  padding: 7px 12px;
   border-radius: var(--radius-sm);
   font-size: 0.92rem;
-  transition: background 0.14s ease, color 0.14s ease;
+  white-space: nowrap;
+  transition: background var(--header-motion), color var(--header-motion),
+    padding var(--header-motion);
 }
 .nav a:hover {
-  background: var(--bg-solid);
-  color: var(--text);
+  background: var(--hd-surface);
+  color: var(--hd-text);
   text-decoration: none;
 }
+/* Active entry: a soft petrol pill with a readable mint label. */
 .nav a.active {
-  color: var(--primary);
-  background: var(--primary-soft);
+  color: var(--hd-accent-ink);
+  background: var(--hd-accent-soft);
   font-weight: 600;
 }
 .nav__toggle {
   display: none;
-  background: var(--bg-solid);
-  border: 1px solid var(--border-strong);
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background: var(--hd-surface);
+  border: 1px solid var(--hd-border-strong);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  color: var(--text);
-  transition: border-color 0.14s ease;
+  color: var(--hd-text);
+  transition: background var(--header-motion), border-color var(--header-motion),
+    width var(--header-motion), height var(--header-motion);
 }
 .nav__toggle:hover {
-  border-color: var(--primary);
+  background: var(--hd-surface-hover);
+  border-color: var(--hd-accent);
 }
 
 /* ── theme toggle ───────────────────────────────────────────────────────── */
@@ -384,17 +526,20 @@ h4 {
   width: 38px;
   height: 38px;
   margin-left: 8px;
-  background: var(--bg-solid);
-  border: 1px solid var(--border-strong);
+  background: var(--hd-surface);
+  border: 1px solid var(--hd-border-strong);
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  color: var(--hd-text-muted);
   position: relative;
   flex-shrink: 0;
-  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+  transition: background var(--header-motion), border-color var(--header-motion),
+    color var(--header-motion), width var(--header-motion),
+    height var(--header-motion);
 }
 .theme-toggle:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  background: var(--hd-surface-hover);
+  border-color: var(--hd-accent);
+  color: var(--hd-accent-ink);
 }
 /* Only the icon matching the active theme is visible; the other is hidden. */
 .theme-toggle__icon {
@@ -1177,25 +1322,39 @@ p.state {
   .nav {
     display: none;
   }
+  /* The mobile menu keeps its existing structure — a dropdown panel anchored to
+     the bar — and only takes on the header's dark glass. It is positioned
+     against the bar rather than the page, so it stays attached while the bar
+     shrinks. */
   .nav--open {
     display: flex;
     position: absolute;
-    top: var(--header-h);
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: var(--bg-solid);
-    border-bottom: 1px solid var(--border);
     flex-direction: column;
-    padding: 12px;
-    gap: 4px;
-    box-shadow: var(--shadow-lg);
+    align-items: stretch;
+    padding: 8px;
+    gap: 2px;
+    background: var(--hd-solid);
+    border: 1px solid var(--hd-border);
+    border-radius: var(--header-radius);
+    box-shadow: var(--hd-shadow-compact);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .nav--open {
-      background: var(--glass-strong);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-      backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+      background: var(--hd-glass-strong);
+      -webkit-backdrop-filter: blur(20px) saturate(140%);
+      backdrop-filter: blur(20px) saturate(140%);
     }
+  }
+  /* Menu rows stay at a comfortable tap size even when the bar is compact; the
+     two-class selector out-specifies the compact `padding` rule above. */
+  .site-header .nav--open a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 11px 12px;
   }
   .nav__toggle {
     display: inline-flex;
@@ -1237,10 +1396,6 @@ p.state {
 }
 
 @media (max-width: 560px) {
-  /* Keep the session block from crowding the header on a phone. */
-  .session__user {
-    display: none;
-  }
   .section-h {
     flex-direction: column;
     align-items: flex-start;
@@ -1604,22 +1759,36 @@ p.state {
   }
 }
 
-/* ── session / identity (header) ────────────────────────────────────────── */
+/* ── session / identity (header) ──────────────────────────────────────────
+   Sits on the dark glass, so the labels use the fixed header palette rather
+   than the page tokens. The role chip is the one opaque element — it carries
+   the role name, which must never be lost in the blur. */
 .session {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: auto;
+  /* Shrinkable, so a narrow bar compresses the identity text instead of
+     overflowing. The bar is a flex row with no wrap; every child that can
+     yield space must be allowed to. */
+  min-width: 0;
+  flex-shrink: 1;
 }
 .session__user {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.88rem;
+  min-width: 0;
+  overflow: hidden;
+}
+/* Sign-out stays whole — it is the one control that must never be clipped. */
+.session .btn {
+  flex-shrink: 0;
 }
 .session__name {
   font-weight: 600;
-  color: var(--text);
+  color: var(--hd-text);
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1632,20 +1801,31 @@ p.state {
   letter-spacing: 0.05em;
   padding: 3px 8px;
   border-radius: 999px;
-  background: var(--bg-subtle);
-  color: var(--text-muted);
-  border: 1px solid var(--border-strong);
+  background: var(--hd-surface);
+  color: var(--hd-text-muted);
+  border: 1px solid var(--hd-border-strong);
+  white-space: nowrap;
 }
 .session__role--admin {
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: var(--hd-primary-soft);
+  color: var(--hd-primary-ink);
   border-color: transparent;
 }
-/* --accent-ink, not --accent, so the petrol label stays readable. */
 .session__role--examiner {
-  background: var(--accent-soft);
-  color: var(--accent-ink);
+  background: var(--hd-accent-soft);
+  color: var(--hd-accent-ink);
   border-color: transparent;
+}
+/* The header's buttons sit on dark glass, so they need the dark-glass control
+   treatment instead of the page's light surface. */
+.site-header .btn--ghost {
+  color: var(--hd-text-muted);
+  border-color: var(--hd-border-strong);
+}
+.site-header .btn--ghost:hover {
+  background: var(--hd-surface-hover);
+  border-color: var(--hd-accent);
+  color: var(--hd-text);
 }
 .badge-soft {
   margin-left: 8px;
