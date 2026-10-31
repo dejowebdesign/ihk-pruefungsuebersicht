@@ -83,12 +83,14 @@
 
   --maxw: 1200px;
 
-  /* The header occupies a constant band. At the top it is FULL-BLEED: the bar
-     spans the whole viewport with no edge gap and no rounding. Once scrolled it
-     narrows horizontally (the primary motion) and only drops a little height,
-     so it becomes a floating rounded glass strip instead of a thin line. The
-     band height never changes, so the page below never moves. */
-  --header-h: 116px;
+  /* The header occupies a constant band that is EXACTLY the bar's own height:
+     no extra reserve above or below it, so a full-bleed band directly under the
+     header (the start page hero) sits flush against it. At the top the bar is
+     FULL-BLEED — the whole viewport wide, no edge gap, no rounding. Once
+     scrolled it narrows horizontally (the primary motion) and only drops a
+     little height, so it becomes a floating rounded glass strip. The band
+     height never changes, so the page below never moves. */
+  --header-h: 96px;
   --header-bar-h: 96px;
   --header-bar-h-compact: 84px;
   --logo-h: 54px;
@@ -117,20 +119,26 @@
      The navigation is deliberately dark in BOTH themes (that is the requested
      look), so these are fixed values rather than theme tokens. The fill, blur
      and shadow are lifted from the reference bar (a translucent anthracite
-     over `blur(18px) saturate(150%)`), then re-checked against the worst case —
+     over `blur(20px) saturate(155%)`), then re-checked against the worst case —
      the glass over a white page, the lightest surface it can ever sit on:
-       text         #eef3fa on glass  5.9:1   (16.0:1 on the solid fallback)
-       text-muted   #d5dde8 on glass  4.9:1   (12.6:1)
+       text         #eef3fa on glass  4.8:1   (16.0:1 on the solid fallback)
+       text-muted   #e9eff7 on glass  4.6:1   (12.6:1)
        accent-ink   #6ff0dc on the active pill  6.1:1
        primary-ink  #cfe8ff on the role chip    5.6:1 (opaque chip)
-     Every value therefore clears WCAG AA for normal text in both themes. */
-  --hd-glass: rgba(11, 18, 33, 0.72);
-  --hd-glass-strong: rgba(9, 16, 30, 0.84); /* compact state: a touch denser */
+     Every value therefore clears WCAG AA for normal text in both themes. The
+     fill is much more transparent than the old near-opaque pair (0.72/0.84) on
+     purpose: the page behind has to stay recognisable through the milky glass.
+     The requested 0.58/0.66 pair was checked and drops the nav label to 3.99:1
+     over the lightest surface it can scroll across (a light card), below the
+     4.5:1 AA floor — so it is nudged to the most transparent pair that still
+     passes: 0.64 at the top, 0.70 once compact (a touch denser, as asked). */
+  --hd-glass: rgba(19, 30, 47, 0.64);
+  --hd-glass-strong: rgba(19, 30, 47, 0.70); /* compact state: a touch denser */
   --hd-solid: #101828; /* fallback where backdrop-filter is unsupported */
   --hd-border: rgba(255, 255, 255, 0.10);
   --hd-border-strong: rgba(110, 168, 254, 0.16); /* blue hairline, as reference */
   --hd-text: #eef3fa;
-  --hd-text-muted: #d5dde8;
+  --hd-text-muted: #e9eff7;
   --hd-accent: #7fe3d0;
   --hd-accent-ink: #6ff0dc;
   --hd-primary-ink: #cfe8ff;
@@ -349,6 +357,13 @@ h4 {
   min-height: calc(100vh - var(--header-h) - 60px);
   padding: 28px 0 56px;
 }
+/* A page whose first block is a full-bleed band (the start page hero) must sit
+   flush under the header: the hero paints its own top padding, so the page's
+   own 28px would read as an empty strip between the bar and the hero. Scoped
+   with `:has()` so every other page keeps its spacing untouched. */
+.page:has(> .hero) {
+  padding-top: 0;
+}
 
 /* ── header ───────────────────────────────────────────────────────────────
    A dark-glass navigation bar that is FULL-BLEED at the top and pulls in
@@ -421,8 +436,8 @@ h4 {
     /* Dark, milky glass: a translucent anthracite fill over a heavy blur, plus
        a hairline highlight on the top edge for the "polished" read. */
     background: var(--hd-glass);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
-    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(155%);
+    backdrop-filter: blur(20px) saturate(155%);
   }
   .site-header--scrolled .site-header__inner {
     background: var(--hd-glass-strong);
@@ -1524,8 +1539,10 @@ p.state {
   }
   /* Phones/tablets: the full-bleed bar is a touch shorter and its edge padding
      tighter, so a 96px band does not eat a large share of a small viewport. The
-     shrink-on-scroll behaviour is unchanged. */
+     shrink-on-scroll behaviour is unchanged. `--header-h` must track the bar
+     here too, or the band would reserve 12px of dead space above the hero. */
   .site-header {
+    --header-h: 84px;
     --header-bar-h: 84px;
     --header-bar-h-compact: 72px;
     --logo-h: 46px;
@@ -1919,42 +1936,24 @@ p.state {
 
 /* ── session / identity (header) ──────────────────────────────────────────
    Sits on the dark glass, so the labels use the fixed header palette rather
-   than the page tokens. Only the ROLE is shown (no username) as a small glass
-   chip; the sign-out button follows it, and the theme toggle after that is the
-   rightmost control. */
+   than the page tokens. Only the ROLE is shown (no username) as a single,
+   discreet glass badge; the sign-out button follows it, and the theme toggle
+   after that is the rightmost control. */
 .session {
   display: flex;
   align-items: center;
   gap: 10px;
-  /* Shrinkable, so a narrow bar compresses the chip instead of overflowing.
+  /* Shrinkable, so a narrow bar compresses the badge instead of overflowing.
      The bar is a grid with no wrap; every child that can yield space must be
      allowed to. */
   min-width: 0;
   flex-shrink: 1;
 }
-/* Username + role wrapper. Shrinkable, so a long name ellipsises rather than
-   widening the bar. */
-.session__user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.88rem;
-  min-width: 0;
-  overflow: hidden;
-}
 /* Sign-out stays whole — it is the one control that must never be clipped. */
 .session .btn {
   flex-shrink: 0;
 }
-.session__name {
-  font-weight: 600;
-  color: var(--hd-text);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* The role chip: a small frosted pill with a light contour, matching the glass
+/* The role badge: a small frosted pill with a light contour, matching the glass
    language of the bar. */
 .session__role {
   font-size: 0.68rem;
@@ -2419,23 +2418,12 @@ p.state {
     padding-left: 10px;
     padding-right: 10px;
   }
-  /* The username shortens to an ellipsis before anything is allowed to push the
-     bar wider. It stays visible (the brief requires the account name). */
-  .session__name {
-    max-width: 84px;
-  }
 }
 
 @media (max-width: 380px) {
   .header__actions,
   .session {
     gap: 8px;
-  }
-  .session__user {
-    gap: 6px;
-  }
-  .session__name {
-    max-width: 56px;
   }
   .session__role {
     padding: 4px 8px;

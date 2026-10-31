@@ -575,9 +575,12 @@ width, shadow `0 6px 16px -8px / 0 2px 6px`, nav pills 40px tall / 10px radius /
   yield instead of overflowing. Below 1049px the nav is hidden and the centre
   track collapses to **0** (not `display:none`, which would hide the mobile
   dropdown that is its child).
-- Identity block keeps **both the username and the role chip** (the brief
-  requires "Benutzername" and "Rollenkennzeichnung"). The name ellipsises
-  (160px → 84px ≤560px → 56px ≤380px) rather than widening the bar.
+- Identity block shows **only the role badge** (no username, no tooltip). An
+  earlier revision also printed `user.username`; the customer explicitly removed
+  that ("admin ADMINISTRATOR" was a duplicate display). `roleLabel()` maps
+  admin → "Administrator", examiner → "Prüfer". Do **not** re-add the name: it
+  is `session__role` only, and `.session__user` / `.session__name` no longer
+  exist.
 
 ### Other glass + control
 - Footer, cards, panels and dialogs gained the same `@supports` glass upgrade.
@@ -598,3 +601,25 @@ width, shadow `0 6px 16px -8px / 0 2px 6px`, nav pills 40px tall / 10px radius /
 - `@supports` cannot be toggled from JS, so prove the blur by screenshotting
   with and without `backdrop-filter:none` and comparing edge energy (see memory).
 - Empty DB ⇒ `GET /api/ihk*` returns **503**; that is "no data yet", not a bug.
+
+### Header band, hero flush and glass transparency (correction pass)
+- **`--header-h` MUST equal `--header-bar-h`** — and both must be re-declared in
+  the `≤768px` block. The band originally reserved 116px for a 96px bar (20px of
+  dead space) and the phone block lowered the bar to 84px without lowering the
+  band (12px gap on mobile). Either slip leaves a visible empty strip between the
+  bar and a full-bleed block. The `<main class="page">` starts flush at
+  `--header-h`, so any surplus is visible immediately.
+- The start-page hero is flush because of **`.page:has(> .hero) { padding-top: 0 }`**
+  — `:has()` scopes the removal to pages whose *first* child is a full-bleed
+  band. Other pages keep `padding: 28px 0 56px` (verified: `/fragen` and
+  `/muendliche-pruefung` still 28px). `:has()` is supported by every browser
+  that also supports `backdrop-filter`, so no fallback is needed.
+- Glass fill is `rgba(19,30,47,.64)` top / `.70` compact over
+  `blur(20px) saturate(155%)`. The customer asked for `.58`/`.66`, but `.58`
+  measures **3.99:1** for the nav label over the lightest surface the sticky bar
+  can scroll across (a light card), below the 4.5:1 AA floor — so `.64`/`.70` is
+  the most transparent pair that still passes (4.8:1 / 5.8:1). Do not lower it
+  further without re-checking contrast. Proof of the increase in transparency:
+  A/B render of the fill over a white|black split — background bleed Δ71 (old
+  `.72` fill) → Δ92 (new `.64`), and the bar is ~25 units brighter over white.
+- Backend untouched by this pass; frontend 219 tests, backend 374, build ✓.

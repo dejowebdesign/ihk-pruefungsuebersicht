@@ -219,7 +219,7 @@ describe("Header session area", () => {
     await waitFor(() => expect(screen.getByRole("link", { name: "Anmelden" })).toBeInTheDocument());
   });
 
-  it("shows the examiner's name, role and a sign-out button", async () => {
+  it("shows the examiner's role and a sign-out button", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       status: 200,
@@ -231,10 +231,9 @@ describe("Header session area", () => {
 
     const { Header } = await import("@/components/Header");
     render(<Header />);
-    // The header shows BOTH the account name and the role label, as the brief
-    // requires ("Benutzername", "Rollenkennzeichnung").
+    // The header shows the role badge only — the account name is not displayed.
     await waitFor(() => expect(screen.getByText("Prüfer")).toBeInTheDocument());
-    expect(screen.getByText("anna")).toBeInTheDocument();
+    expect(screen.queryByText("anna")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Abmelden" })).toBeInTheDocument();
   });
 

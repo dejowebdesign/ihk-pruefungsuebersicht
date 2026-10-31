@@ -99,15 +99,13 @@ export function Header({ logoSrc = null }: { logoSrc?: string | null }) {
             <div className="session">
               {user ? (
                 <>
-                  {/* Username + role, both required by the brief: the account,
-                      the username and the role label ("Administrator" /
-                      "Prüfer") must stay visible. The wrapper is shrinkable so
-                      a long name ellipsises instead of widening the bar. */}
-                  <span className="session__user" title={`${user.username} — ${roleLabel(user.role)}`}>
-                    <span className="session__name">{user.username}</span>
-                    <span className={`session__role session__role--${user.role}`}>
-                      {roleLabel(user.role)}
-                    </span>
+                  {/* Role badge ONLY — the account name is deliberately not
+                      shown, neither as text nor in a tooltip, so there is no
+                      duplicate identity line. `roleLabel()` maps the role to
+                      its display name (admin → "Administrator",
+                      examiner → "Prüfer"). */}
+                  <span className={`session__role session__role--${user.role}`}>
+                    {roleLabel(user.role)}
                   </span>
                   {/* Sign-out. The label is a span so the very narrow layout can
                       drop the text and keep the icon (still named for screen
