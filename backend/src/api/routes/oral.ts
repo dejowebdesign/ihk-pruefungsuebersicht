@@ -25,8 +25,8 @@ import {
   EXAM_STATUSES,
   type ExamStatus,
 } from "../../oral/service";
-import { isRating, type Rating } from "../../oral/scoring";
-import { ORAL_QUESTIONS_PER_EXAM } from "../../oral/themes";
+import { isRating, scoreExam, type Rating } from "../../oral/scoring";
+import { ORAL_QUESTIONS_PER_EXAM, normalizeThemeName } from "../../oral/themes";
 import { seedOralPool } from "../../oral/seed";
 import { loadExamReport, buildExamReportPdf, reportFileName } from "../../oral/pdf";
 
@@ -84,7 +84,23 @@ oral.get("/exams/:id", async (c) => {
     },
   });
   if (!exam) return apiError(c, 404, "exam not found");
-  return c.json(exam);
+
+  // The per-theme weighted breakdown is derived here, from the STORED ratings,
+  // so every client (web UI, PDF, future consumers) shows identical numbers.
+  // Legacy exams (scoringVersion 1) are points-based; they expose their stored
+  // percent only and carry no percentage breakdown.
+  const breakdown =
+    exam.scoringVersion === 2
+      ? scoreExam(
+          exam.items.map((i) => ({
+            themeName: normalizeThemeName(i.themeName),
+            weight: i.weight,
+            rating: (i.rating as Rating | null) ?? null,
+          })),
+        ).themes
+      : undefined;
+
+  return c.json({ ...exam, breakdown });
 });
 
 // ---- read: score (read-only — never recomputes/writes) ----
@@ -95,11 +111,10 @@ oral.get("/exams/:id/score", async (c) => {
     where: { id },
     select: {
       id: true,
-      maxPoints: true,
-      totalPoints: true,
       percent: true,
       result: true,
       status: true,
+      scoringVersion: true,
     },
   });
   if (!exam) return apiError(c, 404, "exam not found");

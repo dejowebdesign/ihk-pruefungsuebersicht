@@ -1,227 +1,279 @@
-// Excel-parity tests for the oral exam scoring logic.
+// Phase 11 — weighted PERCENTAGE scoring.
 //
-// These tests verify the Web app reproduces the EXACT results of the Excel
-// matrix `Pruefungsmatrix_muendliche_Pruefung_34a_vereinfacht_mit_Antworten.xlsx`
-// for concrete evaluation combinations. They are the single source of truth
-// for "Bewertungslogik 1:1".
-//
-// Reference (Pruefung sheet + W1 decision):
-//   theme weights = 8,12,12,12,8,16,8,16,8  (sum 100)
-//   G = richtig→B, teilweise richtig→B/2, falsch→0
-//   G18 = SUM(G8:G15), G19 = G18/100, G20 = G18>=50 ? "Bestanden" : "Nicht bestanden"
+// Every expected value below is derived from the spec's own examples
+// (18/18/18/10/9/9/9/9 = 100 %, pass at 50 %), not from the implementation.
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  questionPoints,
-  totalPoints,
-  percentValue,
-  passResult,
   scoreExam,
-  ORAL_MAX_POINTS,
-  ORAL_PASS_THRESHOLD,
-  RATINGS,
+  questionFactor,
+  passResult,
+  ORAL_PASS_PERCENT,
+  scoreExamLegacy,
+  type Rating,
 } from "../src/oral/scoring";
-import { ORAL_THEMES } from "../src/oral/themes";
+import { ORAL_THEMES, ORAL_TOTAL_WEIGHT } from "../src/oral/themes";
 
-const WEIGHTS = ORAL_THEMES.map((t) => t.weight); // [8,12,12,12,8,16,8,16,8]
+const BGB = "Buergerliches Gesetzbuch / Jedermannsrechte";
+const STGB = "Straf- und Verfahrensrecht";
+const UMM = "Umgang mit Menschen / Deeskalation";
+const RD = "Recht der oeffentlichen Sicherheit und Ordnung einschliesslich Gewerberecht";
+const DS = "Datenschutzrecht";
+const UVV = "Unfallverhuetungsvorschriften";
+const WAF = "Umgang mit Waffen";
+const SST = "Grundlagen der Sicherheitstechnik";
 
-describe("oral scoring — Excel parity", () => {
-  describe("Bewertungsstufen 1:1", () => {
-    it("exposes exactly the 3 Excel rating levels with exact labels", () => {
-      expect(RATINGS).toEqual(["richtig", "teilweise richtig", "falsch"]);
-    });
+const W: Record<string, number> = {
+  [BGB]: 18,
+  [STGB]: 18,
+  [UMM]: 18,
+  [RD]: 10,
+  [DS]: 9,
+  [UVV]: 9,
+  [WAF]: 9,
+  [SST]: 9,
+};
 
-    it("richtig → full weight (Excel: B)", () => {
-      for (const w of WEIGHTS) {
-        expect(questionPoints(w, "richtig")).toBe(w);
-      }
-    });
+/** One exam: 2 questions from each main theme, 1 from each other theme. */
+function items(ratingOf: (theme: string, index: number) => Rating | null) {
+  const out: Array<{ themeName: string; weight: number; rating: Rating | null }> = [];
+  for (const t of ORAL_THEMES) {
+    const count = t.questionsPerExam;
+    for (let i = 0; i < count; i++) {
+      out.push({ themeName: t.name, weight: W[t.name], rating: ratingOf(t.name, i) });
+    }
+  }
+  return out;
+}
 
-    it("teilweise richtig → half weight (Excel: B/2), exact integer because all weights even", () => {
-      const expected = [4, 6, 6, 6, 4, 8, 4, 8, 4];
-      WEIGHTS.forEach((w, i) => {
-        expect(questionPoints(w, "teilweise richtig")).toBe(w / 2);
-        expect(questionPoints(w, "teilweise richtig")).toBe(expected[i]);
-        // no fractional remainder — Excel format '0.0' shows clean .0
-        expect(Number.isInteger(questionPoints(w, "teilweise richtig"))).toBe(true);
-      });
-    });
+const all = (r: Rating | null) => () => r;
+/** Only `theme` correct, everything else wrong. */
+const only = (theme: string) => (t: string) => (t === theme ? "richtig" : "falsch");
 
-    it("falsch → 0 (Excel third branch)", () => {
-      for (const w of WEIGHTS) {
-        expect(questionPoints(w, "falsch")).toBe(0);
-      }
-    });
-
-    it("unrated (null) → 0, matching Excel's empty/'' branch", () => {
-      for (const w of WEIGHTS) {
-        expect(questionPoints(w, null)).toBe(0);
-        expect(questionPoints(w, undefined)).toBe(0);
-      }
-    });
+describe("weight configuration", () => {
+  it("has exactly 8 themes", () => {
+    expect(ORAL_THEMES).toHaveLength(8);
   });
 
-  describe("Punkteberechnung 1:1 (G18 = SUM)", () => {
-    it("all richtig → 100 points (sum of all weights)", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "richtig" as const }));
-      expect(totalPoints(items)).toBe(100);
-    });
-
-    it("all falsch → 0 points", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "falsch" as const }));
-      expect(totalPoints(items)).toBe(0);
-    });
-
-    it("all teilweise richtig → 50 (sum of weight/2)", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "teilweise richtig" as const }));
-      expect(totalPoints(items)).toBe(50);
-    });
-
-    it("mixed concrete example A: richtig on 1,3,6; teilweise on 2,4; falsch on rest", () => {
-      // richtig: 8+12+16 = 36 ; teilweise: 6+6 = 12 ; falsch: 0  → 48
-      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
-      const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(totalPoints(items)).toBe(48);
-    });
-
-    it("mixed concrete example B: richtig on 6 only, rest falsch → 16", () => {
-      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
-      const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(totalPoints(items)).toBe(16);
-    });
+  it("sums to exactly 100 %", () => {
+    expect(ORAL_TOTAL_WEIGHT).toBe(100);
   });
 
-  describe("Prozentberechnung 1:1 (G19 = G18/G17)", () => {
-    it("max percent = 100 when all richtig", () => {
-      expect(percentValue(100)).toBe(100);
-    });
-
-    it("0 percent when all falsch", () => {
-      expect(percentValue(0)).toBe(0);
-    });
-
-    it("55 points → 55 percent (exact, no rounding)", () => {
-      expect(percentValue(55)).toBe(55);
-    });
-
-    it("18 points → 18 percent", () => {
-      expect(percentValue(18)).toBe(18);
-    });
-
-    it("50 points → 50 percent (boundary)", () => {
-      expect(percentValue(50)).toBe(50);
-    });
+  it("uses the required weights per theme", () => {
+    expect(Object.fromEntries(ORAL_THEMES.map((t) => [t.name, t.weight]))).toEqual(W);
   });
 
-  describe("Rundungslogik 1:1", () => {
-    it("never produces a fractional total — all weights even ⇒ integer sum", () => {
-      // Exhaustive-ish: for every combination of the 3 ratings across 9 themes,
-      // the total is an integer. We sample randomly to keep it cheap.
-      for (let i = 0; i < 1000; i++) {
-        const items = WEIGHTS.map((w) => ({
-          weight: w,
-          rating: RATINGS[Math.floor(Math.random() * 3)],
-        }));
-        const t = totalPoints(items);
-        expect(Number.isInteger(t)).toBe(true);
-      }
-    });
-
-    it("percent is always an exact integer (total integer, max 100)", () => {
-      for (let i = 0; i < 1000; i++) {
-        const items = WEIGHTS.map((w) => ({
-          weight: w,
-          rating: RATINGS[Math.floor(Math.random() * 3)],
-        }));
-        expect(Number.isInteger(percentValue(totalPoints(items)))).toBe(true);
-      }
-    });
+  it("has no duplicate theme name or orderKey", () => {
+    expect(new Set(ORAL_THEMES.map((t) => t.name)).size).toBe(8);
+    expect(new Set(ORAL_THEMES.map((t) => t.orderKey)).size).toBe(8);
   });
 
-  describe("Bestehenslogik 1:1 (G20 = G18>=50)", () => {
-    it("exactly 50 → Bestanden (boundary inclusive, matches 'Ab 50 Punkten')", () => {
-      expect(passResult(50)).toBe("Bestanden");
-    });
+  it("draws exactly 2 questions from each main theme and 1 from each other", () => {
+    expect(ORAL_THEMES.filter((t) => t.questionsPerExam === 2).map((t) => t.name)).toEqual([
+      BGB,
+      STGB,
+      UMM,
+      RD,
+    ]);
+    expect(ORAL_THEMES.filter((t) => t.questionsPerExam === 1).map((t) => t.name)).toEqual([
+      DS,
+      UVV,
+      WAF,
+      SST,
+    ]);
+  });
+});
 
-    it("49 → Nicht bestanden", () => {
-      expect(passResult(49)).toBe("Nicht bestanden");
-    });
-
-    it("100 → Bestanden", () => {
-      expect(passResult(100)).toBe("Bestanden");
-    });
-
-    it("0 → Nicht bestanden", () => {
-      expect(passResult(0)).toBe("Nicht bestanden");
-    });
+describe("rating factors (B1: 100 / 50 / 0 %)", () => {
+  it("maps the three levels to 1 / 0.5 / 0", () => {
+    expect(questionFactor("richtig")).toBe(1);
+    expect(questionFactor("teilweise richtig")).toBe(0.5);
+    expect(questionFactor("falsch")).toBe(0);
   });
 
-  describe("scoreExam — full Excel G18/G19/G20 snapshot", () => {
-    it("example A (48 pts) → 48 %, Nicht bestanden", () => {
-      const ratings = ["richtig", "teilweise richtig", "richtig", "teilweise richtig", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
-      const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(scoreExam(items)).toEqual({
-        maxPoints: 100,
-        totalPoints: 48,
-        percent: 48,
-        result: "Nicht bestanden",
-      });
-    });
+  it("treats an unanswered question as wrong", () => {
+    expect(questionFactor(null)).toBe(0);
+    expect(questionFactor(undefined)).toBe(0);
+  });
+});
 
-    it("all richtig → 100 %, Bestanden", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "richtig" as const }));
-      expect(scoreExam(items)).toEqual({
-        maxPoints: 100,
-        totalPoints: 100,
-        percent: 100,
-        result: "Bestanden",
-      });
-    });
+describe("all questions correct", () => {
+  it("is exactly 100 %", () => {
+    expect(scoreExam(items(all("richtig"))).percent).toBe(100);
+  });
+  it("passes", () => {
+    expect(scoreExam(items(all("richtig"))).result).toBe("Bestanden");
+  });
+});
 
-    it("all teilweise richtig → 50 %, Bestanden (boundary)", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "teilweise richtig" as const }));
-      expect(scoreExam(items)).toEqual({
-        maxPoints: 100,
-        totalPoints: 50,
-        percent: 50,
-        result: "Bestanden",
-      });
-    });
+describe("only one theme fully correct (spec 10.2)", () => {
+  it.each([
+    [BGB, 18],
+    [STGB, 18],
+    [UMM, 18],
+    [RD, 10],
+    [DS, 9],
+    [UVV, 9],
+    [WAF, 9],
+    [SST, 9],
+  ])("only %s correct = %i %%", (theme, expected) => {
+    expect(scoreExam(items(only(theme))).percent).toBe(expected);
+  });
+});
 
-    it("all falsch → 0 %, Nicht bestanden", () => {
-      const items = WEIGHTS.map((w) => ({ weight: w, rating: "falsch" as const }));
-      expect(scoreExam(items)).toEqual({
-        maxPoints: 100,
-        totalPoints: 0,
-        percent: 0,
-        result: "Nicht bestanden",
-      });
-    });
-
-    it("example B (16 pts) → 16 %, Nicht bestanden", () => {
-      const ratings = ["falsch", "falsch", "falsch", "falsch", "falsch", "richtig", "falsch", "falsch", "falsch"] as const;
-      const items = WEIGHTS.map((w, i) => ({ weight: w, rating: ratings[i] }));
-      expect(scoreExam(items)).toEqual({
-        maxPoints: 100,
-        totalPoints: 16,
-        percent: 16,
-        result: "Nicht bestanden",
-      });
-    });
+describe("partial results in the main themes (2 questions each)", () => {
+  it.each([
+    [BGB, 18],
+    [STGB, 18],
+    [UMM, 18],
+    [RD, 10],
+  ])("1 of 2 correct in %s = half the weight (%i %%)", (theme, weight) => {
+    const s = scoreExam(items((t, i) => (t === theme ? (i === 0 ? "richtig" : "falsch") : "falsch")));
+    expect(s.percent).toBe(weight / 2);
   });
 
-  describe("constants", () => {
-    it("ORAL_MAX_POINTS = 100 (Excel G17)", () => {
-      expect(ORAL_MAX_POINTS).toBe(100);
-    });
-    it("ORAL_PASS_THRESHOLD = 50 (Excel G20)", () => {
-      expect(ORAL_PASS_THRESHOLD).toBe(50);
-    });
-    it("weights sum to 100", () => {
-      expect(WEIGHTS.reduce((a, b) => a + b, 0)).toBe(100);
-    });
-    it("all weights are divisible by 4 (guarantees weight/2 and weight/4 integers)", () => {
-      for (const w of WEIGHTS) expect(w % 4).toBe(0);
-    });
+  it("1 correct + 1 teilweise richtig in BGB = 13.5 %", () => {
+    const s = scoreExam(
+      items((t, i) => (t === BGB ? (i === 0 ? "richtig" : "teilweise richtig") : "falsch")),
+    );
+    expect(s.percent).toBe(13.5);
+  });
+
+  it("both teilweise richtig in BGB = 9 %", () => {
+    const s = scoreExam(items((t) => (t === BGB ? "teilweise richtig" : "falsch")));
+    expect(s.percent).toBe(9);
+  });
+});
+
+describe("a theme asked twice keeps the same weight as when asked once", () => {
+  it("Datenschutz with 2 questions, both correct = 9 % (not 18 %)", () => {
+    const base = items(all("falsch"));
+    base.push({ themeName: DS, weight: W[DS], rating: "richtig" });
+    const s = scoreExam(base.map((b) => (b.themeName === DS ? { ...b, rating: "richtig" } : b)));
+    expect(s.percent).toBe(9);
+  });
+
+  it("Datenschutz with 2 questions, 1 of 2 correct = 4.5 %", () => {
+    const base = items(all("falsch"));
+    base.push({ themeName: DS, weight: W[DS], rating: "richtig" });
+    let first = true;
+    const s = scoreExam(
+      base.map((b) => {
+        if (b.themeName !== DS) return b;
+        if (first) {
+          first = false;
+          return { ...b, rating: "richtig" };
+        }
+        return { ...b, rating: "falsch" };
+      }),
+    );
+    expect(s.percent).toBe(4.5);
+  });
+
+  it.each([[UVV], [WAF], [SST]])("%s with 2 questions, 1 of 2 correct = 4.5 %%", (theme) => {
+    const base = items(all("falsch"));
+    base.push({ themeName: theme as string, weight: 9, rating: "falsch" });
+    let first = true;
+    const s = scoreExam(
+      base.map((b) => {
+        if (b.themeName !== theme) return b;
+        if (first) {
+          first = false;
+          return { ...b, rating: "richtig" };
+        }
+        return { ...b, rating: "falsch" };
+      }),
+    );
+    expect(s.percent).toBe(4.5);
+  });
+});
+
+describe("breakdown", () => {
+  it("reports one entry per asked theme with percent and contribution", () => {
+    const s = scoreExam(items(all("richtig")));
+    expect(s.themes).toHaveLength(8);
+    for (const t of s.themes) {
+      expect(t.percent).toBe(100);
+      expect(t.contribution).toBe(t.weight);
+    }
+  });
+
+  it("contributions sum exactly to the overall result", () => {
+    const s = scoreExam(items((t, i) => (i === 0 ? "richtig" : "teilweise richtig")));
+    const sum = s.themes.reduce((a, b) => a + b.contribution, 0);
+    expect(sum).toBe(s.percent);
+  });
+
+  it("records how many questions were asked per theme", () => {
+    const s = scoreExam(items(all("richtig")));
+    const byName = Object.fromEntries(s.themes.map((t) => [t.themeName, t.asked]));
+    expect(byName[BGB]).toBe(2);
+    expect(byName[DS]).toBe(1);
+  });
+});
+
+describe("pass mark (50 % transferred 1:1 from 50 of 100 points)", () => {
+  it("is 50", () => {
+    expect(ORAL_PASS_PERCENT).toBe(50);
+  });
+  it.each([
+    [49.99, "Nicht bestanden"],
+    [50, "Bestanden"],
+    [50.01, "Bestanden"],
+    [0, "Nicht bestanden"],
+    [100, "Bestanden"],
+  ])("%s %% -> %s", (pct, expected) => {
+    expect(passResult(pct)).toBe(expected);
+  });
+});
+
+describe("no premature rounding", () => {
+  it("keeps 4.5 and 13.5 exact", () => {
+    const base = items(all("falsch"));
+    base.push({ themeName: DS, weight: 9, rating: "richtig" });
+    let first = true;
+    const s = scoreExam(
+      base.map((b) => {
+        if (b.themeName !== DS) return b;
+        if (first) {
+          first = false;
+          return { ...b, rating: "richtig" };
+        }
+        return { ...b, rating: "falsch" };
+      }),
+    );
+    expect(s.percent).toBe(4.5);
+    expect(Number.isInteger(s.percent * 2)).toBe(true);
+  });
+
+  it("a realistic mixed exam is exact", () => {
+    // BGB 2/2, StGB 1/2, UmM 1/2 + 1 teilweise, RdO 2/2, DS 1/1,
+    // UVV 0/1, Waffen 1/1, SST 1/1
+    const ratings: Record<string, Array<Rating | null>> = {
+      [BGB]: ["richtig", "richtig"],
+      [STGB]: ["richtig", "falsch"],
+      [UMM]: ["richtig", "teilweise richtig"],
+      [RD]: ["richtig", "richtig"],
+      [DS]: ["richtig"],
+      [UVV]: ["falsch"],
+      [WAF]: ["richtig"],
+      [SST]: ["richtig"],
+    };
+    const s = scoreExam(items((t, i) => ratings[t][i]));
+    // 18 + 9 + (1.5/2)*18=13.5 + 10 + 9 + 0 + 9 + 9 = 77.5
+    expect(s.percent).toBe(77.5);
+    expect(s.result).toBe("Bestanden");
+  });
+});
+
+describe("legacy points scorer is retained for historical exams", () => {
+  it("still computes the old points/percent", () => {
+    const s = scoreExamLegacy([
+      { weight: 8, rating: "richtig" },
+      { weight: 8, rating: "teilweise richtig" },
+      { weight: 8, rating: "falsch" },
+    ]);
+    expect(s.totalPoints).toBe(12);
+    expect(s.percent).toBe(12);
   });
 });

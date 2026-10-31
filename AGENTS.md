@@ -366,8 +366,10 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
   All imported **verbatim** from the task text; no existing record changed, none
   deleted, no duplicates found. Append-only diff in
   `backend/prisma/seed/oral-questions.json`.
-- **Pool per theme (now):** StGB 66, UmW 58, Sicherheitstechnik 53, UmM 50,
-  BGB 44, Datenschutz 42, RdOesO 33, Gewerberecht 20, UVV 11.
+- **Pool per theme (after Phase 10):** StGB 66, UmW 58, Sicherheitstechnik 53,
+  UmM 50, BGB 44, Datenschutz 42, RdOesO 33, Gewerberecht 20, UVV 11.
+  (Phase 11 merged RdOesO+Gewerberecht and added 54 more — see the Phase 11
+  section for the current figures.)
 - **Text was generated from the source, never retyped.** A parser
   (`/tmp/q35/parse_original.py` at the time; the authoritative copy now lives in
   `tests/oral-import-2026.test.ts` as `EXPECTED`) produced the records, which
@@ -396,6 +398,114 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
   rendered in the take-screen with intact umlauts.
 - **Sections 2–4 of that task (auth, user management, PDF export, exam delete)
   were already on `main`** (PRs #3/#4/#5) — verified, not rebuilt.
+## Phase 11 — 8 themes + weighted percentage scoring (DONE)
+
+Replaces the Phase 8–10 model. The customer confirmed two decisions:
+**A1** merge Gewerberecht into RdOesO; **B1** keep the three-stage rating.
+
+### Themes (8) and weights (sum = 100)
+| # | Themenbereich | weight | questions/exam |
+|---|---|---:|---:|
+| 1 | Buergerliches Gesetzbuch / Jedermannsrechte | 18 | 2 |
+| 2 | Straf- und Verfahrensrecht | 18 | 2 |
+| 3 | Umgang mit Menschen / Deeskalation | 18 | 2 |
+| 4 | Recht der oeffentlichen Sicherheit und Ordnung einschliesslich Gewerberecht | 10 | 2 |
+| 5 | Datenschutzrecht | 9 | 1 |
+| 6 | Unfallverhuetungsvorschriften | 9 | 1 |
+| 7 | Umgang mit Waffen | 9 | 1 |
+| 8 | Grundlagen der Sicherheitstechnik | 9 | 1 |
+
+The former `Gewerberecht / Bewachungsverordnung` and `Recht der oeffentlichen
+Sicherheit und Ordnung` are ONE theme now (label keeps the transliterated
+spelling so it stays byte-comparable with the seed data). All 20 Gewerberecht
+questions were kept; both prefixes (`Gewerberecht-*`, `RdOesO-*`) share the one
+pool. `ORAL_LEGACY_THEME_ALIASES` + `normalizeThemeName()` map the old names onto
+the merged one so **historical exams stay scoreable**.
+
+### Exam composition (exactly 13)
+4 main themes × 2 = 8, 4 other themes × 1 = 4, plus **1 rotating** question from
+one of the 4 other themes. Max 2 per theme, no duplicate question. `drawExam()`
+self-checks the shape and **throws** if the pool cannot satisfy it — it never
+emits a wrongly-shaped exam.
+
+### Rotation (persisted, concurrency-safe)
+`OralRotationState` (single row, id `oral-rotation`) holds a counter advanced with
+an atomic `increment` **inside the exam-creation transaction**, so (a) it survives
+restarts and never resets to Datenschutz, (b) parallel starts get distinct slots,
+and (c) a failed creation rolls the counter back instead of burning a slot.
+
+### Scoring (percentages, 3 stages)
+```
+theme result   = sum(rating factors) / questions asked of that theme   # 0..1
+contribution   = theme result * theme weight                          # pp
+total          = sum of the 8 contributions                          # 0..100
+```
+Rating factors: `richtig` 1.0, `teilweise richtig` 0.5, `falsch`/unanswered 0.
+**The weight never depends on how many questions were asked**, so a theme asked
+twice is still scored over the same weight (Datenschutz 2/2 correct = 9 %, not
+18 %). No premature rounding: every value is a multiple of 0.25 and exact in
+IEEE-754 (13.5, 4.5, 6.75). Pass mark = **50 %** (the old 50-of-100 points rule
+transferred 1:1).
+
+### The points system is gone from the UI and the PDF
+No `Punkte`, no point bars, no max-points anywhere a user can see.
+`maxPoints`/`totalPoints`/`OralExamQuestion.points` still EXIST as columns — they
+are the legacy model's storage — but are never displayed and stay 0 for percent
+exams. `scoringVersion` selects the scorer: **2** = percent (new exams),
+**1** = legacy points (every pre-migration exam). `recomputeScoreTx` picks the
+scorer from `scoringVersion`, so a historical exam is never reinterpreted.
+Do not "clean up" the legacy scorer or columns without checking those tests.
+
+### Migration `20261101000000_percent_scoring_8_themes`
+Non-destructive. **`orderKey` is UNIQUE**, so the migration parks ALL theme rows
+at 90–98 *before* assigning the final keys 1–8 — assigning orderKey 4 first
+collides with Straf- und Verfahrensrecht. The Gewerberecht row is parked
+permanently at orderKey 90 (kept, never active) so its questions could be
+re-pointed with zero orphan risk. Verified by applying it to a copy of the real
+`dev.db` (9 themes/377 questions/106 exams): result = 8 themes summing to 100,
+merged theme 53 questions, 0 orphans, all questions/exams/items/users intact.
+A seeder run then takes it to 431 questions.
+
+### Data
+- **+54 questions** (55 provided − 1 exact duplicate of `UmM-23`): StGB +38,
+  merged theme +8 (6 new GewO/BewachV + 2 general), Datenschutz +3, UmW +2,
+  UmM +2, Sicherheitstechnik +1. Pool 377 → **431**.
+- Pool per theme now: StGB 104, merged RdOesO 61 (35 RdOesO + 26 Gewerberecht),
+  UmW 60, Sicherheitstechnik 54, UmM 52, Datenschutz 45, BGB 44, UVV 11.
+- **11 "similar but not identical" questions were imported as separate records**
+  and documented in `docs/oral-import-phase11-review.md` (rule 2.1: never
+  auto-delete or auto-replace a near-duplicate).
+- `nr` was **renumbered within the merged theme** (1..61) because both source
+  themes numbered from 1 — `nr` is technical metadata; question text and
+  `excelId` are untouched. `excelId` values never change (historical exams and
+  `OralQuestion.id` stability depend on it).
+- Two source hyphen artifacts (`Tatbestandsmerk-male:`, `Tat-bestandsmerkmale:`)
+  are preserved verbatim and flagged in the review doc.
+
+### Two real bugs found while doing this
+1. **`poolMatchesSeed` ignored the theme**, so a pure re-categorisation (the
+   merge) never reached an already-populated DB. It now compares `theme.name` and
+   also fails when a stale theme row lingers. Covered by the merged-theme test.
+2. **The first migration draft assigned orderKey 4 before renumbering**, which
+   violates the UNIQUE constraint on any DB where orderKey 4 is taken. Caught
+   only by applying the migration to a real database copy — a syntax check or
+   `db push` would not have caught it. **Always test a migration against a copy
+   of real data, not just `db push`.**
+
+### Concurrency note (SQLite)
+Prisma's default interactive-transaction budget (2 s wait / 5 s runtime) is too
+tight for queued writers: parallel exam starts surfaced as a spurious
+"Operations timed out". `createExam` now passes `{ maxWait: 30_000, timeout:
+30_000 }`, and the test DB uses `?connection_limit=1` so writers serialise
+instead of colliding on SQLite's single write lock.
+
+### Tests
+`oral-scoring` 40, `oral-randomize` 16, `oral-service` 41 (incl. rotation
+persistence, no-burnt-slot, 8-way parallel starts, legacy-exam immutability),
+`oral-pdf-delete` 41, `oral-question-quality` 33, `oral-import-2026` 13,
+`frontend/tests/oral-percent-ui.test.tsx` 6 (renders the REAL page and asserts
+no `Punkte`/`Pkt.` and an exact `13,5`). Backend 354 / frontend 158, build ✓.
+
 ## PDF layout pitfalls (`backend/src/oral/pdf.ts`)
 
 - **A PDF baseline is the text's BOTTOM edge, not the top.** `text(value, x, size)`
@@ -403,11 +513,17 @@ Per the "no silent correction" rule, these were imported unchanged and flagged:
   (~0.72 × size ascent). Two calls without an intervening `gap()` share one
   baseline and overprint; a call at a box's top edge draws outside the box.
   This caused the result-box overlap fixed in PR #8.
-- **The result box now uses fixed offsets from an explicit `boxTop`**, with each
+- **The result box uses fixed offsets from an explicit `boxTop`**, with each
   text pushed as its own op rather than via the shared `y` cursor:
-  label `boxTop-15`, points `boxTop-31`, percent `boxTop-34`, status `boxTop-52`
-  (box interior is `[boxTop-64, boxTop]`). Keep those offsets inside
-  `-0.72*size … -(64 - 0.24*size)`.
+  label `boxTop-15`, threshold line `boxTop-31`, percent `boxTop-34`, status
+  `boxTop-52` (box interior is `[boxTop-64, boxTop]`). Keep those offsets inside
+  `-0.72*size … -(64 - 0.24*size)`. Phase 11 replaced the old "n von m Punkten"
+  line with the static "Bestehensgrenze 50 %" text.
+- **`extractPositionedText` sees the WHOLE page, not just the result box.** After
+  Phase 11 added a per-theme breakdown table, "Gesamtergebnis" appears three
+  times and a naive `expect(hits).toHaveLength(1)` fails. The helper in
+  `tests/oral-pdf-delete.test.ts` therefore filters ops to the vertical band of
+  the result box rect before matching.
 - **Presence-only assertions cannot catch layout bugs.** `extractPdfText()` in
   `tests/oral-pdf-delete.test.ts` only proves a string exists. For geometry use
   `extractPositionedText()` / `extractFilledRects()`, which parse the real

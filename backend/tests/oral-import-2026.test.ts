@@ -277,8 +277,9 @@ describe("2026 import — the 35 new questions", () => {
     // and the theme totals grew by exactly the imported amounts
     const umw = rows.filter((r) => r.thema === UMW);
     const stgb = rows.filter((r) => r.thema === STGB);
-    expect(umw).toHaveLength(58); // 31 before + 27
-    expect(stgb).toHaveLength(66); // 58 before + 8
+    // Phase 10 added 27 UmW / 8 StGB; Phase 11 added 2 UmW / 38 StGB more.
+    expect(umw).toHaveLength(60); // 31 + 27 + 2
+    expect(stgb).toHaveLength(104); // 58 + 8 + 38
   });
 
   it("stores every question and answer verbatim (character for character)", () => {
@@ -370,8 +371,8 @@ describe("2026 import — the 35 new questions", () => {
 
   it("uses the theme's existing source string, so no new source appears", () => {
     const sources = new Set(rows.map((r) => r.quelle));
-    // Exactly the 9 pre-existing source values — the import introduced none.
-    expect(sources.size).toBe(9);
+    // The 9 pre-existing source values plus the Phase 11 task text.
+    expect(sources.size).toBe(10);
     for (const id of IMPORTED) {
       expect(sources.has(byId.get(id)!.quelle), id).toBe(true);
     }
@@ -393,9 +394,51 @@ describe("2026 import — the 35 new questions", () => {
     }
   });
 
-  it("does not touch the exam structure (13 questions, 9 themes, 100 points)", () => {
+  it("keeps both records of every flagged same-topic overlap", () => {
+    // Phase 11 imported 54 questions verbatim. Some restate an older question
+    // about the same legal institute. Per the "no silent correction" rule the
+    // OLD record must not be deleted or reworded to make room for the new one,
+    // and the NEW record must not be dropped as a duplicate. Both stay, and a
+    // human decides — see docs/oral-import-phase11-review.md.
+    const overlaps: Array<[string, string]> = [
+      ["StGB-76", "StGB-45"],
+      ["StGB-77", "StGB-46"],
+      ["StGB-78", "StGB-47"],
+      ["StGB-77", "StGB-24"],
+      ["StGB-78", "StGB-25"],
+      ["StGB-83", "StGB-42"],
+      ["StGB-89", "StGB-44"],
+      ["StGB-85", "StGB-23"],
+      ["StGB-67", "StGB-17"],
+      ["StGB-68", "StGB-41"],
+      ["Gewerberecht-21", "Gewerberecht-08"],
+      ["Gewerberecht-22", "Gewerberecht-03"],
+      ["RdOesO-35", "RdOesO-14"],
+    ];
+    for (const [newId, oldId] of overlaps) {
+      const a = byId.get(newId);
+      const b = byId.get(oldId);
+      expect(a, newId).toBeTruthy();
+      expect(b, oldId).toBeTruthy();
+      // Neither was emptied, and the two remain textually distinct records.
+      expect(a!.frage.length).toBeGreaterThan(0);
+      expect(b!.frage.length).toBeGreaterThan(0);
+      expect(a!.frage).not.toBe(b!.frage);
+      expect(a!.excelId).not.toBe(b!.excelId);
+    }
+  });
+
+  it("keeps the two verbatim hyphen artefacts from the source text", () => {
+    // The source line-wraps left these; they are stored unchanged so the text
+    // stays traceable to its origin. Do NOT "fix" them without a decision.
+    const joined = rows.map((r) => `${r.frage}\n${r.erw ?? ""}`).join("\n");
+    expect(joined).toContain("Tatbestandsmerk-male");
+    expect(joined).toContain("Tat-bestandsmerkmale");
+  });
+
+  it("does not touch the exam structure (8 themes, weights summing to 100 %)", () => {
     // Guard against the import leaking into the exam logic.
-    expect(ORAL_THEMES).toHaveLength(9);
+    expect(ORAL_THEMES).toHaveLength(8);
     expect(ORAL_THEMES.reduce((s, t) => s + t.weight, 0)).toBe(100);
     expect(ORAL_THEMES.filter((t) => t.name === "Unfallverhuetungsvorschriften")).toHaveLength(1);
   });

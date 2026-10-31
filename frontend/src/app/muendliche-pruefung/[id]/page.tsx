@@ -1,7 +1,14 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { api, ApiClientError, type OralExam, type OralExamQuestion, type OralRating } from "@/lib/api";
+import {
+  api,
+  ApiClientError,
+  type OralExam,
+  type OralExamQuestion,
+  type OralRating,
+  type OralThemeBreakdown,
+} from "@/lib/api";
 import { ErrorState } from "@/components/States";
 import { useIdentity } from "@/lib/use-identity";
 import { canManageExams } from "@/lib/auth";
@@ -12,11 +19,17 @@ const RATING_LABEL: Record<OralRating, string> = {
   "teilweise richtig": "Teilweise richtig",
   falsch: "Falsch",
 };
+// Share of a question's value each rating yields (B1: 100 / 50 / 0 %).
+const RATING_SHARE: Record<OralRating, string> = {
+  richtig: "100 %",
+  "teilweise richtig": "50 %",
+  falsch: "0 %",
+};
 
-function pointsFor(weight: number, rating: OralRating | null): number {
-  if (rating === "richtig") return weight;
-  if (rating === "teilweise richtig") return weight / 2;
-  return 0;
+/** Format a percentage without trailing noise: 13.5 → "13,5", 76 → "76". */
+function fmtPercent(v: number): string {
+  const rounded = Math.round(v * 100) / 100;
+  return rounded.toLocaleString("de-DE", { maximumFractionDigits: 2 });
 }
 
 export default function OralExamPage({ params }: { params: { id: string } }) {
@@ -29,7 +42,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   const [exam, setExam] = useState<OralExam | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [current, setCurrent] = useState(0); // index into items (0..7)
+  const [current, setCurrent] = useState(0);
   const [noteDraft, setNoteDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -55,7 +68,6 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
     load();
   }, [load]);
 
-  // when navigating to another question, sync the note draft
   useEffect(() => {
     const item = exam?.items?.[current];
     if (item) setNoteDraft(item.note ?? "");
@@ -107,13 +119,13 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
 
   async function copyOverall() {
     if (!exam) return;
+    // Luna transfer: only the single overall percent, nothing else.
     const text = `${Math.round(exam.percent)} %`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
       const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
@@ -140,9 +152,6 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
   const items = (exam.items ?? []).slice().sort((a, b) => a.orderKey - b.orderKey);
   const isCompleted = exam.status === "completed";
   const item = items[current];
-
-  // live total (from cached values on items)
-  const liveTotal = items.reduce((s, it) => s + pointsFor(it.weight, it.rating), 0);
   const livePercent = Math.round(exam.percent);
 
   return (
@@ -168,9 +177,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
       {isCompleted ? (
         <ResultView exam={exam} onCopy={copyOverall} copied={copied} items={items} />
       ) : !canManage ? (
-        <div className="oral-card">
-          Diese Prüfung ist noch nicht abgeschlossen.
-        </div>
+        <div className="oral-card">Diese Prüfung ist noch nicht abgeschlossen.</div>
       ) : item ? (
         <ExamTaker
           item={item}
@@ -185,8 +192,7 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
           onNext={() => setCurrent((c) => Math.min(items.length - 1, c + 1))}
           onComplete={completeExam}
           completing={completing}
-          liveTotal={liveTotal}
-          maxPoints={exam.maxPoints}
+          livePercent={livePercent}
         />
       ) : (
         <div className="oral-card">Diese Prüfung hat keine Fragen.</div>
@@ -203,7 +209,6 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
                   <th>Themenbereich</th>
                   <th>Frage-ID</th>
                   <th>Bewertung</th>
-                  <th>Punkte</th>
                 </tr>
               </thead>
               <tbody>
@@ -213,7 +218,6 @@ export default function OralExamPage({ params }: { params: { id: string } }) {
                     <td>{it.themeName}</td>
                     <td>{it.question.excelId}</td>
                     <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
-                    <td>{pointsFor(it.weight, it.rating)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -238,23 +242,22 @@ function ExamTaker(props: {
   onNext: () => void;
   onComplete: () => void;
   completing: boolean;
-  liveTotal: number;
-  maxPoints: number;
+  livePercent: number;
 }) {
-  const { item, index, total, onPrev, onNext, onComplete, completing, liveTotal, maxPoints } = props;
+  const { item, index, total, onPrev, onNext, onComplete, completing, livePercent } = props;
   const progress = Math.round(((index + 1) / total) * 100);
   return (
     <div className="oral-take">
       <div className="oral-progress">
         <span>Frage {index + 1} von {total}</span>
         <div className="oral-progress__bar"><div className="oral-progress__fill" style={{ width: `${progress}%` }} /></div>
-        <span>{Math.round((liveTotal / maxPoints) * 100)} %</span>
+        <span>{livePercent} %</span>
       </div>
 
       <div className="oral-card oral-take__card">
         <div>
           <span className="oral-take__theme">{item.themeName}</span>
-          <span className="oral-take__weight">Gewichtung: {item.weight} Pkt.</span>
+          <span className="oral-take__weight">Gewichtung: {item.weight} %</span>
         </div>
         <div className="oral-take__question">{item.question.question}</div>
 
@@ -277,7 +280,7 @@ function ExamTaker(props: {
             >
               {RATING_LABEL[r]}
               <br />
-              <small>{r === "richtig" ? item.weight : r === "teilweise richtig" ? item.weight / 2 : 0} Pkt.</small>
+              <small>{RATING_SHARE[r]}</small>
             </button>
           ))}
         </div>
@@ -293,7 +296,7 @@ function ExamTaker(props: {
         />
 
         <div className="oral-take__score">
-          Aktuell: <strong>{liveTotal}</strong> / {maxPoints} Punkte
+          Aktuell: <strong>{livePercent} %</strong>
         </div>
 
         <div className="oral-take__nav">
@@ -318,13 +321,16 @@ function ResultView(props: {
   items: OralExamQuestion[];
 }) {
   const { exam, onCopy, copied, items } = props;
+  // Per-theme breakdown is computed and served by the backend from the stored
+  // ratings; the UI only formats it.
+  const breakdown: OralThemeBreakdown[] = exam.breakdown ?? [];
   return (
     <div className="oral-card oral-result">
       <h2>Gesamtergebnis</h2>
       <div className="oral-result__big">{Math.round(exam.percent)} %</div>
       <p>
-        {exam.totalPoints} / {exam.maxPoints} Punkte —{" "}
         <span className={`oral-status oral-status--${exam.result === "Bestanden" ? "pass" : "fail"}`}>{exam.result}</span>
+        {" "}· Bestehensgrenze 50 %
       </p>
       <div className="oral-result__actions">
         <button className="btn btn--primary oral-result__copy" onClick={onCopy}>
@@ -343,6 +349,38 @@ function ResultView(props: {
         </a>
       </div>
 
+      <details open style={{ marginTop: 24, textAlign: "left" }}>
+        <summary style={{ cursor: "pointer", fontWeight: 600 }}>Auswertung nach Themengebiet</summary>
+        <div className="table-scroll" style={{ marginTop: 12 }}>
+          <table className="oral-table">
+            <thead>
+              <tr>
+                <th>Themengebiet</th>
+                <th>Ergebnis</th>
+                <th>Gewichtung</th>
+                <th>Beitrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {breakdown.map((b) => (
+                <tr key={b.themeName}>
+                  <td>{b.themeName}</td>
+                  <td>{fmtPercent(b.percent)} %</td>
+                  <td>{fmtPercent(b.weight)} %</td>
+                  <td>{fmtPercent(b.contribution)} %</td>
+                </tr>
+              ))}
+              <tr style={{ fontWeight: 700 }}>
+                <td>Gesamtergebnis</td>
+                <td>{Math.round(exam.percent)} %</td>
+                <td>{fmtPercent(breakdown.reduce((s, b) => s + b.weight, 0))} %</td>
+                <td>{fmtPercent(exam.percent)} %</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
       <details style={{ marginTop: 24, textAlign: "left" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Detaillierte Auswertung</summary>
         <div className="table-scroll" style={{ marginTop: 12 }}>
@@ -353,7 +391,6 @@ function ResultView(props: {
                 <th>Themenbereich</th>
                 <th>Frage-ID</th>
                 <th>Bewertung</th>
-                <th>Punkte</th>
                 <th>Notiz</th>
               </tr>
             </thead>
@@ -364,7 +401,6 @@ function ResultView(props: {
                   <td>{it.themeName}</td>
                   <td>{it.question.excelId}</td>
                   <td>{it.rating ? RATING_LABEL[it.rating] : "—"}</td>
-                  <td>{it.points}</td>
                   <td>{it.note ?? ""}</td>
                 </tr>
               ))}

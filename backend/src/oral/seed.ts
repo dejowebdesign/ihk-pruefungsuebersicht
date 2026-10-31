@@ -38,7 +38,14 @@ export function seedFingerprint(rows: SeedRow[] = seedRows): string {
  */
 async function poolMatchesSeed(db: PrismaClient): Promise<boolean> {
   const stored = await db.oralQuestion.findMany({
-    select: { excelId: true, question: true, answer: true, nr: true, source: true },
+    select: {
+      excelId: true,
+      question: true,
+      answer: true,
+      nr: true,
+      source: true,
+      theme: { select: { name: true } },
+    },
   });
   if (stored.length !== seedRows.length) return false;
   const byId = new Map(stored.map((r) => [r.excelId, r]));
@@ -47,7 +54,17 @@ async function poolMatchesSeed(db: PrismaClient): Promise<boolean> {
     if (!r) return false;
     if (r.question !== s.frage) return false;
     if ((r.answer ?? null) !== (s.erw ?? null)) return false;
+    // The theme must match too: a pure re-categorisation (e.g. the Phase 11
+    // Gewerberecht merge) changes no question text, so comparing only the text
+    // would leave an already-populated database on the old categorisation.
+    if (r.theme.name !== s.thema) return false;
   }
+  // Any legacy theme row left over from an earlier model must not linger, or
+  // /themes would advertise a 9th theme. (Removed by seedOralPool.)
+  const legacy = await db.oralTheme.count({
+    where: { name: { notIn: ORAL_THEMES.map((t) => t.name) } },
+  });
+  if (legacy > 0) return false;
   return true;
 }
 
@@ -60,9 +77,29 @@ export async function seedOralPool(
   for (const t of ORAL_THEMES) {
     await db.oralTheme.upsert({
       where: { name: t.name },
-      create: { orderKey: t.orderKey, name: t.name, weight: t.weight },
-      update: { orderKey: t.orderKey, weight: t.weight },
+      create: {
+        orderKey: t.orderKey,
+        name: t.name,
+        weight: t.weight,
+        questionsPerExam: t.questionsPerExam,
+      },
+      update: { orderKey: t.orderKey, weight: t.weight, questionsPerExam: t.questionsPerExam },
     });
+  }
+
+  // 1b) Remove theme rows that are no longer part of the model (e.g. the
+  // pre-Phase-11 "Gewerberecht / Bewachungsverordnung" after its questions were
+  // merged into the RdOesO theme). Only EMPTY rows are deleted — a theme that
+  // still holds questions is left alone so no question can ever be orphaned.
+  const currentNames = ORAL_THEMES.map((t) => t.name);
+  const stale = await db.oralTheme.findMany({
+    where: { name: { notIn: currentNames } },
+    select: { id: true, _count: { select: { questions: true } } },
+  });
+  for (const st of stale) {
+    if (st._count.questions === 0) {
+      await db.oralTheme.delete({ where: { id: st.id } });
+    }
   }
 
   // 2) Questions, keyed by excelId.
