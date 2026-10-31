@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "@/styles/globals.css";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Header logoSrc={findLogo()} />
         <main className="page">{children}</main>
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );

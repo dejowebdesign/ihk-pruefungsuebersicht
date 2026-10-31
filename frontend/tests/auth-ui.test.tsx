@@ -231,8 +231,10 @@ describe("Header session area", () => {
 
     const { Header } = await import("@/components/Header");
     render(<Header />);
-    await waitFor(() => expect(screen.getByText("anna")).toBeInTheDocument());
-    expect(screen.getByText("Prüfer")).toBeInTheDocument();
+    // The header shows BOTH the account name and the role label, as the brief
+    // requires ("Benutzername", "Rollenkennzeichnung").
+    await waitFor(() => expect(screen.getByText("Prüfer")).toBeInTheDocument());
+    expect(screen.getByText("anna")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Abmelden" })).toBeInTheDocument();
   });
 
@@ -248,7 +250,7 @@ describe("Header session area", () => {
 
     const { Header } = await import("@/components/Header");
     render(<Header />);
-    await waitFor(() => expect(screen.getByText("anna")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Prüfer")).toBeInTheDocument());
 
     // The areas examiners may not use are not offered at all.
     expect(screen.queryByRole("link", { name: "Verwaltung" })).not.toBeInTheDocument();

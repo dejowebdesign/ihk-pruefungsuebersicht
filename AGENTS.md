@@ -542,3 +542,59 @@ no `Punkte`/`Pkt.` and an exact `13,5`). Backend 354 / frontend 158, build ✓.
 - **Pushing:** if `git push` hangs on a password prompt the cached token has
   expired — re-run `git remote set-url origin "https://${GITHUB_TOKEN}@github.com/…"`
   and push with `GIT_TERMINAL_PROMPT=0` so it fails fast instead of hanging.
+
+## Phase 12 — Dark-glass navigation header (DONE)
+
+The navigation bar is a **floating dark-glass surface in both themes** (fixed
+`--hd-*` palette, deliberately not theme tokens). Design reference:
+`sachkunde.duckdns.org` (Angular, `mat-toolbar`). Measured from the reference:
+fill `rgba(9,16,30,.76)`, `blur(18px) saturate(150%)`, radius 22px, a
+blue-tinted hairline `rgba(110,168,254,.14)`, `min(1140px, 100% - 28px)` max
+width, shadow `0 6px 16px -8px / 0 2px 6px`, nav pills 40px tall / 10px radius /
+14px text. Our values mirror these (tokens in `globals.css` under
+"dark-glass header palette").
+
+### Shrink-on-scroll
+- `useScrolled()` (`frontend/src/lib/use-scrolled.ts`) — passive listener, one
+  `requestAnimationFrame` per burst, **asymmetric thresholds** (on > 24px, off
+  < 16px) so resting on the boundary cannot flicker. The header adds
+  `.site-header--scrolled`.
+- The motion is **width-first**: `--header-width` 100% → 90% (`--header-maxw`
+  caps at 1440px), radius 0 → 22px, height 96 → 84px, logo 54 → 46px, all on one
+  240ms `cubic-bezier(0.22,0.61,0.36,1)` (`--header-motion`).
+- **The band height is constant in both states** (`--header-h`), and the bar
+  compacts *inside* it, so the page below never reflows. Verified: `main.top`
+  identical at scrollY 0 / 600 / 0.
+- The floating gap is real **padding on the sticky `.site-header`**, never a
+  child margin (a sticky element's child margin collapses through the frame and
+  the gap disappears once pinned).
+
+### Layout
+- `.site-header__inner` is a grid: `minmax(0,1fr) auto minmax(0,1fr)` — equal
+  outer tracks centre the nav; the `minmax(0,…)` floor lets the identity block
+  yield instead of overflowing. Below 1049px the nav is hidden and the centre
+  track collapses to **0** (not `display:none`, which would hide the mobile
+  dropdown that is its child).
+- Identity block keeps **both the username and the role chip** (the brief
+  requires "Benutzername" and "Rollenkennzeichnung"). The name ellipsises
+  (160px → 84px ≤560px → 56px ≤380px) rather than widening the bar.
+
+### Other glass + control
+- Footer, cards, panels and dialogs gained the same `@supports` glass upgrade.
+- `BackToTop` (`frontend/src/components/BackToTop.tsx`) — round 44px floating
+  glass button, appears past 420px, smooth scroll (instant under
+  `prefers-reduced-motion`).
+
+### Logo
+- `frontend/public/ihk-logo.png` is embedded **verbatim** (sha256
+  `ebe0d4e8…`, 1672×941 RGBA, 16:9). `layout.tsx` `findLogo()` probes
+  `ihk-logo.png` / `logo.png` / `logo.svg` server-side and passes the path to
+  `Header`, which renders `<img class="brand__logo">` with `object-fit: contain`
+  and no filter. Falls back to an `IHK` mark only when no file exists.
+
+### Gotchas
+- The reference shrinks via **max-width transition**, not transform — copy that,
+  not a `scale()`, or the text blurs.
+- `@supports` cannot be toggled from JS, so prove the blur by screenshotting
+  with and without `backdrop-filter:none` and comparing edge energy (see memory).
+- Empty DB ⇒ `GET /api/ihk*` returns **503**; that is "no data yet", not a bug.
